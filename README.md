@@ -1,104 +1,117 @@
 
-# Módulo de Integração SEI x e-Ouv
+# Módulo de Integração SEI & FalaBR (e-Ouv e e-Sic)
 
-## Requisitos:
-- SEI 3.0.0 instalado/atualizado ou versão superior (verificar valor da constante de versão do SEI no arquivo /sei/web/SEI.php).
+## Requisitos
 
-- Utilizar o Sistema de Ouvidorias do Governo Federal e-Ouv(sistema.ouvidorias.gov.br). Caso ainda não tenha aderido ao e-Ouv e queira saber mais informações acesse www.ouvidorias.gov.br.
+- SEI versão 3.0.0 ou superior (verificar versão do SEI no arquivo /sei/web/SEI.php).
 
-- Antes de executar os scripts de instalação/atualização (itens 4 e 5 abaixo), o usuário de acesso aos bancos de dados do SEI e do SIP, constante nos arquivos ConfiguracaoSEI.php e ConfiguracaoSip.php, deverá ter permissão de acesso total ao banco de dados, permitindo, por exemplo, criação e exclusão de tabelas.
+- Utilizar o Sistema FalaBR do Governo Federal (e-Ouv e e-Sic). Caso ainda não tenha aderido ao FalaBR e queira saber mais informações acesse https://falabr.cgu.gov.br/.
 
-	O item abaixo não é mais necessário a partir da versão 3.0.0.
+- [IMPORTANTE] Para executar os scripts de instalação/atualização (itens XX e XX abaixo), o usuário configurado nos arquivos **ConfiguracaoSEI.php** e **ConfiguracaoSip.php**, deverá ter permissão de acesso total ao banco de dados do SEI e do SIP, permitindo criação e exclusão de tabelas.
 
-- Instalar na pasta infra/infra_php a biblioteca nusoap. Como o sistema e-Ouv utiliza versionamento de WebServices a biblioteca padrão do SEI para consumir webservices não consegue resolver essa questão. A mesma pode ser baixada em: https://sourceforge.net/projects/nusoap/files/?source=navbar
-	- Após a instalação é necessário fazer uma correção na biblioteca conforme abaixo:
+## Instalação/atualização e configuração
 
+### Procedimentos antes da instalação
 
->
-	alterar o arquivo nusoap.php na linha 4694
-		de:$this->schemas[$ns]->imports[$ns2][$ii]['loaded'] = true;
-		para:$this->schemas[$ns][$ns2]->imports[$ns2][$ii]['loaded'] = true;
+1. Fazer backup completo dos bancos de dados do SEI e do SIP.
 
+2. Inserir os Tipos de Procedimento para cada tipo de Manifestação no SEI **[IMPORTANTE]**
 
-## Procedimentos para Instalação:
+Acesse no SEI o menu *Administração > Tipos de Processos > Listar* para verificar os tipos já existentes. Você poderá criar um novo tipo de documento para cada tipo de manifestação do FalaBR se for o caso.
 
-1. Antes, fazer backup dos bancos de dados do SEI e do SIP.
+Anote os IDs de cada *Tipo de Processo* que será vinculado os processos importados do FalaBR. Estes código deverão ser atualizados no arquivo `./sei/web/modulos/cgu/mod-se-eouv/rn/MdCguEouvAtualizadorBDRN.php` conforme descrito no item XX 
 
-2. Carregar no servidor os arquivos do módulo localizados na pasta "/sei/web/modulos/cgu/mod-sei-eouv" e os scripts de instalação/atualização "/sei/scripts/md_cgu_eouv_atualizar_modulo.php" e "/sip/scripts/md_cgu_eouv_atualizar_modulo.php".
+> Este ítem é pré-requisito para a execução do script no item XX
 
-3. Editar o arquivo "/sei/config/ConfiguracaoSEI.php", tomando o cuidado de usar editor que não altere o charset do arquivo, para adicionar a referência à classe de integração do módulo e seu caminho relativo dentro da pasta "/sei/web/modulos" na array 'Modulos' da chave 'SEI':
+Abaixo os tipos de manifestação do FalaBR que poderão ser importadas para o SEI:
 
-		'SEI' => array(
-			'URL' => 'http://[Servidor_PHP]/sei',
-			'Producao' => false,
-			'RepositorioArquivos' => '/var/sei/arquivos',
-			'Modulos' => array('MdCguEouvIntegracao' => 'cgu/mod-sei-eouv',)
-			),
-
-
-4. Rodar o script de banco "/sip/scripts/md_cgu_eouv_atualizar_modulo.php" em linha de comando no servidor do SIP, verificando se não houve erro em sua execução, em que ao final do log deverá ser informado "FIM". Exemplo de comando de execução:
-
-		/usr/bin/php -c /etc/php.ini /opt/sip/scripts/md_cgu_eouv_atualizar_modulo.php > md_cgu_eouv_atualizar_modulo-1.log
-
-5. Rodar o script de banco "/sei/scripts/md_cgu_eouv_atualizar_modulo.php" em linha de comando no servidor do SEI, verificando se não houve erro em sua execução, em que ao final do log deverá ser informado "FIM". Exemplo de comando de execução:
-
-		/usr/bin/php -c /etc/php.ini /opt/sei/scripts/md_cgu_eouv_atualizar_modulo.php > md_cgu_eouv_atualizar_modulo_1.log
+|id_tipo_manifestacao_eouv |id_tipo_procecimento    |de_tipo_manifestacao_eouv |
+| :-: 			   | :-: 		    | :-- 		       |
+|1                         |`xxx`                   |Denúncia                  |
+|2                         |`xxx`                   |Reclamação                |
+|3                         |`xxx`                   |Elogio                    |
+|4                         |`xxx`                   |Sugestão                  |
+|5                         |`xxx`                   |Solicitação               |
+|6                         |`xxx`                   |Simplifique               |
+|7                         |`xxx`                   |Comunicado                |
+|8 			   |`xxx`		    |Acesso à Informação       |
 
 
-6. Após a execução com sucesso, com um usuário com permissão de Administrador no SEI, seguir os passos dispostos no tópico Orientações Negociais, abaixo.
+### Instalação/atualização
 
-7. **IMPORTANTE**: Na execução dos dois scripts acima, ao final deve constar o termo "FIM" e informação de que a instalação ocorreu com sucesso (SEM ERROS). Do contrário, o script não foi executado até o final e algum dado não foi inserido/atualizado no banco de dados correspondente, devendo recuperar o backup do banco pertinente e repetir o procedimento.
-		- Constando o termo "FIM" e informação de que a instalação ocorreu com sucesso, pode logar no SEI e SIP e verificar no menu Infra > Módulos se consta o módulo "Módulo de Integração entre o sistema SEI e o E-ouv(Sistema de Ouvidorias)" com o valor da última versão do módulo.
+3. Baixar os arquivos deste repositório e colocar na pasta */sei/web/modulos/cgu/mod-sei-eouv*
 
-8. Em caso de erro durante a execução do script verificar (lendo as mensagens de erro e no menu Infra > Log do SEI e do SIP) se a causa é algum problema na infra-estrutura local. Neste caso, após a correção, deve recuperar o backup do banco pertinente e repetir o procedimento, especialmente a execução dos scripts indicados nos itens 4 e 5 acima.
-	- Caso não seja possível identificar a causa, entrar em contato com: Rafael Leandro - rafael.ferreira@cgu.gov.br
+Poderá baixar usando *git* (verificar o caminho onde o SEI está instalado, no exemplo abaixo segue o padrão '/opt'):
 
-## Orientações Negociais:
+```bash
+$ cd /opt/sei/web/modulos
+$ mkdir -p cgu
+$ git clone git@github.com:cgugovbr/mod-sei-eouv.git
+```
 
-Criamos um vídeo com a demonstração do funcionamento do módulo focado na parte negocial, caso queira entender um pouco mais sobre o módulo acesse:
+Ou baixar a versão desejada usando o link:
 
-https://www.youtube.com/watch?v=geUCx7H79Gw
+https://github.com/cgugovbr/mod-sei-eouv/archive/4.0.0.zip
 
-1. Imediatamente após a instalação com sucesso, com usuário com permissão de "Administrador" do SEI, é necessário realizar as parametrizações do módulo. Siga abaixo o roteiro de acordo com a versão desejada:
+3. Caso esteja instalando pela primeira vez o módulo adicionar o móduloo **'MdCguEouvIntegracao' => 'cgu/mod-sei-eouv'** no *array* 'Modulos' no arquivo */sei/config/ConfiguracaoSEI.php* conforme abaixo:
 
-**Versão 2.0.5 ou anterior:**
+```text
+'SEI' => array(
+	'URL' => 'http://[Servidor_PHP]/sei',
+	'Producao' => false,
+	'RepositorioArquivos' => '/var/sei/arquivos',
+	'Modulos' => array(
+		[...],
+		'MdCguEouvIntegracao' => 'cgu/mod-sei-eouv',
+	)
+),
 
-No menu Infra > Parâmetros alterando os seguintes Parâmetros:
+```
 
-- EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES: Colocar a Data Inicial no formato (DD/MM/AAAA) para carregar as manifestações do e-Ouv. Sugerimos que seja colocada a data atual para que apenas as novas manifestações sejam importadas para o SEI.
+> Utilize sempre editores de texto que não altere o *charset* do arquivo
 
-- EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO: Quando a rotina for executada ela criará um documento PDF com os dados da Manifestação do EOUV que será anexada ao processo. Esse parâmetro será usado para dizer qual o Tipo de Documento será usado para criar esse documento. Lembrando que deve ser do Grupo de Documentos Externos. Para verificar os tipos existentes acesse Administração > Tipos de Documento > Listar.
 
-- ID_SERIE_EXTERNO_OUVIDORIA: Quando a rotina importar um documento da Manifestação no Eouv usará esse código para inserir no campo Tipo Docuemnto. Para verificar os tipos existentes acesse Administração > Tipos de Documento > Listar.
+4. Execute o *script* '*/sei/web/modulos/cgu/mod-sei-eouv/scripts/md_cgu_eouv_atualizar_modulo_sip.php*' em linha de comando no servidor SIP, verificando se não houve erro durante a execução. Ao final deve aparecer a mensagem "FIM".
 
-- EOUV_USUARIO_ACESSO_WEBSERVICE: Nome de usuário para acesso aos WebServices do e-Ouv.
-Este nome de usuário é gerado para cada órgão especificamente para consumir os Webservices do e-Ouv.
-Caso ainda não possua esse usuário e a senha abaixo entrar em contato através do e-mail abaixo solicitando o mesmo: marcos.silva@cgu.gov.br
+Para executar o *script* execute o seguinte comando:
 
-- EOUV_SENHA_ACESSO_WEBSERVICE: Senha do usuário para acesso aos WebServices do e-Ouv.
+```bash
+$ /usr/bin/php -c /etc/php.ini /sei/web/modulos/cgu/mod-sei-eouv/scripts/md_cgu_eouv_atualizar_modulo_sip.php > md_cgu_eouv_atualizar_modulo_sip_400.log
+```
 
-- EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO: Já vem configurado para o ambiente de produção do e-Ouv com https://sistema.ouvidorias.gov.br/Servicos/ServicoConsultaManifestacao.svc
-Obs: Para efeitos de testes e homologação utilizar o ambiente de treinamento: http://treinamentoouvidorias.cgu.gov.br
+5. Execute o *script* '*/sei/web/modulos/cgu/mod-sei-eouv/scripts/md_cgu_eouv_atualizar_modulo_sei.php*' em linha de comando no servidor SEI, verificando se não houve erro durante a execução. Ao final deve aparecer a mensagem "FIM".
 
-- EOUV_URL_WEBSERVICE_IMPORTACAO_ANEXO_MANIFESTACAO: Já vem configurado para o ambiente de produção do e-Ouv com https://sistema.ouvidorias.gov.br/Servicos/ServicoAnexosManifestacao.svc
-Obs: Para efeitos de testes e homologação utilizar o ambiente de treinamento: http://treinamentoouvidorias.cgu.gov.br
+Para executar o *script* execute o seguinte comando:
 
-- ID_UNIDADE_OUVIDORIA: Código da Unidade que deverá registrar os novos processos. Ao importar os processos do e-Ouv para o SEI essa será a unidade que receberá os Processos no SEI.
+```bash
+$ /usr/bin/php -c /etc/php.ini /sei/web/modulos/cgu/mod-sei-eouv/scripts/md_cgu_eouv_atualizar_modulo_sei.php > md_cgu_eouv_atualizar_modulo_sei_400.log
+```
 
-**A partir da versão 3.0.0:**
+> **[IMPORTANTE]** Ao final da execução dos dois *scripts* acima deve constar o termo "FIM" e informação de que a instalação ocorreu com sucesso (SEM ERROS). Do contrário, o script não foi executado até o final e algum dado não foi inserido/atualizado nos bancos de dados correspondentes. Neste caso, deve-se restaurar o backup do banco pertinente e repetir o procedimento.
 
-No menu *E-Ouv > Parâmetros do Módulo E-ouv* alterando os seguintes Parâmetros:
+> Constando o termo "FIM" e informação de que a instalação ocorreu com sucesso, pode logar no SEI e SIP e verificar no menu *Infra > Módulos* se consta o módulo "Módulo de Integração entre o sistema SEI e o E-ouv(Sistema de Ouvidorias)" com o valor da última versão do módulo.
 
-- EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES: Colocar a Data Inicial no formato (DD/MM/AAAA) para carregar as manifestações do e-Ouv. Sugerimos que seja colocada a data atual para que apenas as novas manifestações sejam importadas para o SEI.
+**@todo - verificar nome do módulo**
 
-- EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO: Quando a rotina for executada ela criará um documento PDF com os dados da Manifestação do EOUV que será anexada ao processo. Esse parâmetro será usado para dizer qual o Tipo de Documento será usado para criar esse documento. Lembrando que deve ser do Grupo de Documentos Externos. Para verificar os tipos existentes acesse Administração > Tipos de Documento > Listar.
+### Configurações
 
-- ID_SERIE_EXTERNO_OUVIDORIA: Quando a rotina importar um documento da Manifestação no Eouv usará esse código para inserir no campo Tipo Docuemnto. Para verificar os tipos existentes acesse Administração > Tipos de Documento > Listar.
+6. Após do módulo o usuário com "Administrador" do SEI deverá parametrizar o módulo, conforme descrito abaixo:
+
+
+6.1 Acessar o menu *E-Ouv > Parâmetros do Módulo E-ouv* ajustando os seguintes parãmetros:
+
+- **EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES** - Colocar a Data Inicial no formato (DD/MM/AAAA) para carregar as manifestações do FalaBR (antigo e-Ouv) dos tipos 1 à 7, conforme *Tabela 1 - Tipo de Manifestação*. Sugerimos que seja colocada a data atual para que apenas as novas manifestações sejam importadas para o SEI.
+
+- **EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO** - Quando a rotina de importação for executada será gerado documento PDF com os dados da Manifestação do FalaBR que será anexado ao processo com o mesmo número de identificação do FalaBR. Este parâmetro será usado para indicar qual o Tipo de Documento no SEI será utilizado para este PDF. Lembrando que deve ser do Grupo de **Documentos Externos**. Para verificar os tipos existentes acesse *Administração > Tipos de Documento > Listar*.
+
+- **ID_SERIE_EXTERNO_OUVIDORIA** - Quando a rotina de importação for executada o documento da Manifestação no FalaBR usará esse código para inserir no campo Tipo Docuemnto. Para verificar os tipos existentes acesse *Administração > Tipos de Documento > Listar*.
+
+**@todo - verificar os dois campos acima no código** 
 
 O conjunto de informações em destaque abaixo será fornecido pela CGU:
 
-> - EOUV_USUARIO_ACESSO_WEBSERVICE: Nome de usuário para acesso aos WebServices do e-Ouv. Este nome de usuário é gerado para cada órgão
-> especificamente para consumir os Webservices do e-Ouv. Caso ainda não
+- EOUV_USUARIO_ACESSO_WEBSERVICE: Nome de usuário para acesso aos WebServices do e-Ouv. Este nome de usuário é gerado para cada órgão
+ especificamente para consumir os Webservices do e-Ouv. Caso ainda não
 > possua esse usuário e a senha abaixo entrar em contato através do
 > e-mail abaixo solicitando o mesmo: marcos.silva@cgu.gov.br
 >
@@ -130,3 +143,14 @@ Obs: Para efeitos de testes e homologação utilizar o ambiente de treinamento: 
 |5                         |`xxx`                   |Solicitação               |
 |6                         |`xxx`                   |Simplifique               |
 |7                         |`xxx`                   |Comunicado                |
+
+
+
+- Caso não seja possível identificar a causa, entrar em contato com: Rafael Leandro - rafael.ferreira@cgu.gov.br
+
+## Orientações Negociais:
+
+Criamos um vídeo com a demonstração do funcionamento do módulo focado na parte negocial, caso queira entender um pouco mais sobre o módulo acesse:
+
+https://www.youtube.com/watch?v=geUCx7H79Gw
+
