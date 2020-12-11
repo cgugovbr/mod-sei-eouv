@@ -183,9 +183,13 @@ $ /usr/bin/php -c /etc/php.ini /sei/scripts/md_cgu_eouv_atualizar_modulo_sei.php
 
 	Este móduo possui duas funções para importação das manifestações 'e-Ouv' (tipo 1 a 7) e 'e-Sic' (tipo 8). Segue abaixo as respectivas funções para agendamento:
 
-	10.1 Para importar do FalaBR as manifestações 'e-Ouv' faça o agendamento da função **"MdCguEouvAgendamentoRN::executarImportacaoManifestacaoEOuv"**
+	10.1 Para importar do FalaBR as manifestações 'e-Ouv' faça o agendamento da função:
+	
+	- **MdCguEouvAgendamentoRN::executarImportacaoManifestacaoEOuv**
 
-	10.2 Para importar do FalaBR as manifestações 'e-Sic' faça o agendamento da função **"MdCguEouvAgendamentoRN::executarImportacaoManifestacaoESic"**
+	10.2 Para importar do FalaBR as manifestações 'e-Sic' faça o agendamento da função 
+	
+	- **MdCguEouvAgendamentoRN::executarImportacaoManifestacaoESic**
 
 	> Sugerimos fazer o agendamento para ser executado uma vez por dia
 
