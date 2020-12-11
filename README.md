@@ -195,9 +195,10 @@ Este móduo possui duas funções para importação das manifestações 'e-Ouv' 
 
 ## Orientações Gerais
 
-Criamos um vídeo com a demonstração do funcionamento do módulo focado na parte negocial, caso queira entender um pouco mais sobre o módulo acesse:
+### Tutorial 
 
-https://www.youtube.com/watch?v=geUCx7H79Gw
+Criamos um vídeo com a demonstração do funcionamento do módulo focado na parte negocial:
 
-> Em caso de erro pedimos entrar em contato por meio do email Caso não seja possível identificar a causa, entrar em contato com: Rafael Leandro - rafael.ferreira@cgu.gov.br
+[![Tutorial módulo integração SEI & FalaBR](https://img.youtube.com/vi/geUCx7H79Gw/0.jpg)](https://www.youtube.com/watch?v=geUCx7H79Gw)
 
+> Em caso dúvidas favor enviar um email para [SESOL - CGU](mailto: sesol@cgu.gov.br?subject=[DUVIDA]%20SEI%20-%20módulo%20FalaBR)
