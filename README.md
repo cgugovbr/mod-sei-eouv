@@ -139,7 +139,7 @@ $ /usr/bin/php -c /etc/php.ini /sei/scripts/md_cgu_eouv_atualizar_modulo_sei.php
 
 9. Parametrizar o módulo, usando o usuário com perfil "Administrador" do SEI, conforme descrito abaixo:
 
-9.1 Acessar o menu *E-Ouv > Parâmetros do Módulo E-ouv* ajustando os seguintes parâmetros:
+9.1. Acessar o menu *E-Ouv > Parâmetros do Módulo E-ouv* ajustando os seguintes parâmetros:
 
 i. **EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES** - Inserir neste campo a Data Inicial, no formato (DD/MM/AAAA), para carregar as manifestações do FalaBR (e-Ouv) dos tipos 1 à 7, conforme *Tabela 1 - Tipo de Manifestação*. Sugerimos que seja colocada a **data atual** para que apenas as novas manifestações sejam importadas para o SEI.
 
@@ -149,7 +149,7 @@ iii. **ID_SERIE_EXTERNO_OUVIDORIA** - Este parâmetro não está sendo utilizado
 
 **@todo - verificar os dois campos acima no código** 
 
-iv. **EOUV_USUARIO_ACESSO_WEBSERVICE** - Nome de usuário para acesso aos WebServices do FalaBR, gerado especificamente para cada órgão. Caso ainda não possua este usuário e a senha abaixo, solicitar via e-mail para [Marcos Silva](mailto:marcos.silva@cgu.gov.br?subject=[SOLICITAÇÃO]%20Usuário%20e%20Senha%20API%20FalaBR)
+iv. **EOUV_USUARIO_ACESSO_WEBSERVICE** - Nome de usuário para acesso aos WebServices do FalaBR, gerado especificamente para cada órgão. Caso ainda não possua este usuário e a senha abaixo, solicitar via e-mail para [Marcos Silva - marcos.silva@cgu.gov.br](mailto:marcos.silva@cgu.gov.br?subject=[SOLICITAÇÃO]%20Usuário%20e%20Senha%20API%20FalaBR)
 
 v. **EOUV_SENHA_ACESSO_WEBSERVICE** - Senha do usuário para acesso aos WebServices do FalaBR
 
@@ -167,7 +167,7 @@ x. **ID_UNIDADE_OUVIDORIA** - Código da Unidade no SEI que deverá registrar os
 
 > Caso esteja atualizando a versão, o item 6.1 já deverá constar os *ids* corretos, portanto siga para o item 9.2
 
-9.2 Acessar o menu *E-Ouv > Parâmetros do Módulo e-Sic* ajustando os seguintes parâmetros:
+9.2. Acessar o menu *E-Ouv > Parâmetros do Módulo e-Sic* ajustando os seguintes parâmetros:
 
 i. **ESIC_DATA_INICIAL_IMPORTACAO_MANIFESTACOES** - Inserir neste campo a Data Inicial, no formato (DD/MM/AAAA), para carregar as manifestações do FalaBR (e-Sic) dos tipos 8, conforme *Tabela 1 - Tipo de Manifestação*. Sugerimos que seja colocada a **data atual** para que apenas as novas manifestações sejam importadas para o SEI.
 
@@ -201,4 +201,4 @@ Criamos um vídeo com a demonstração do funcionamento do módulo focado na par
 
 [![Tutorial módulo integração SEI & FalaBR](https://img.youtube.com/vi/geUCx7H79Gw/0.jpg)](https://www.youtube.com/watch?v=geUCx7H79Gw)
 
-> Em caso dúvidas favor enviar um email para [SESOL - CGU](mailto: sesol@cgu.gov.br?subject=[DUVIDA]%20SEI%20-%20módulo%20FalaBR)
+> Em caso dúvidas favor enviar um email para [SESOL - sesol@cgu.gov.br](mailto:sesol@cgu.gov.br?subject=[DUVIDA]%20SEI%20-%20módulo%20FalaBR)
