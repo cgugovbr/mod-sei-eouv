@@ -90,30 +90,30 @@ $ cp /sei/web/modulos/cgu/mod-sei-eouv/scripts/sip/md_cgu_eouv_atualizar_modulo_
 
 6. **[IMPORTANTE]** Atualizar as informações do tipo de procedimento, inseridas no SEI conforme item 2, no arquivo `./sei/web/modulos/cgu/mod-se-eouv/rn/MdCguEouvAtualizadorBDRN.php`, conforme segue:
 
-6.1 Dentro do método **instalarv205** atualizar onde está 'XXXXXXXX' com o *ID* correspondente para o 'tipo de procedimento' referente aos tipos de 1 à 7, conforme *ID* abaixo:
+	6.1 Dentro do método **instalarv205** atualizar onde está 'XXXXXXXX' com o *ID* correspondente para o 'tipo de procedimento' referente aos tipos de 1 à 7, conforme *ID* abaixo:
 
-```bash
-$this->logar('CRIANDO REGISTROS PARA A TABELA md_eouv_depara_importacao');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'1\', \'Denúncia\', \'XXXXXXXX\');');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'2\', \'Reclamação\', \'XXXXXXXX\');');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'3\', \'Elogio\', \'XXXXXXXX\');');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'4\', \'Sugestão\', \'XXXXXXXX\');');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'5\', \'Solicitação\', \'XXXXXXXX\');');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'6\', \'Simplifique\', \'XXXXXXXX\');');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'7\', \'Comunicado\', \'XXXXXXXX\');');
-```
+	```bash
+	$this->logar('CRIANDO REGISTROS PARA A TABELA md_eouv_depara_importacao');
+		BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'1\', \'Denúncia\', \'XXXXXXXX\');');
+		BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'2\', \'Reclamação\', \'XXXXXXXX\');');
+		BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'3\', \'Elogio\', \'XXXXXXXX\');');
+		BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'4\', \'Sugestão\', \'XXXXXXXX\');');
+		BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'5\', \'Solicitação\', \'XXXXXXXX\');');
+		BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'6\', \'Simplifique\', \'XXXXXXXX\');');
+		BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'7\', \'Comunicado\', \'XXXXXXXX\');');
+	```
 
-> Caso esteja atualizando a versão, o item 6.1 já deverá constar os *ids* corretos, portanto siga para o item 6.2
+	> Caso esteja atualizando a versão, o item 6.1 já deverá constar os *ids* corretos, portanto siga para o item 6.2
 
-6.2 Dentro do método **instalarv400** atualizar onde está 'XXXXXXXX' com o *ID* correspondente para o 'tipo de procedimento' referente ao tipo 8, acesso à informação, conforme abaixo:
+	6.2 Dentro do método **instalarv400** atualizar onde está 'XXXXXXXX' com o *ID* correspondente para o 'tipo de procedimento' referente ao tipo 8, acesso à informação, conforme abaixo:
 
-```bash
-/**
- * Criar um "depara_importação" para a Manifestação e-Sic
- */
-$this->logar('CRIANDO REGISTROS PARA A TABELA md_eouv_depara_importacao');
-BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, id_tipo_procedimento, de_tipo_manifestacao_eouv) VALUES (8, XXXXXXXX, \'Acesso à Informação\');');
-```
+	```bash
+	/**
+	 * Criar um "depara_importação" para a Manifestação e-Sic
+	 */
+	$this->logar('CRIANDO REGISTROS PARA A TABELA md_eouv_depara_importacao');
+	BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, id_tipo_procedimento, de_tipo_manifestacao_eouv) VALUES (8, XXXXXXXX, \'Acesso à Informação\');');
+	```
 
 7. Execute o *script* '*/sip/scripts/md_cgu_eouv_atualizar_modulo_sip.php*' em linha de comando no servidor SIP, verificando se não houve erro durante a execução. Ao final deve aparecer a mensagem "FIM".
 
@@ -139,47 +139,45 @@ $ /usr/bin/php -c /etc/php.ini /sei/scripts/md_cgu_eouv_atualizar_modulo_sei.php
 
 9. Parametrizar o módulo, usando o usuário com perfil "Administrador" do SEI, conforme descrito abaixo:
 
-9.1. Acessar o menu *E-Ouv > Parâmetros do Módulo E-ouv* ajustando os seguintes parâmetros:
+	9.1 Acessar o menu *E-Ouv > Parâmetros do Módulo E-ouv* ajustando os seguintes parâmetros:
 
-i. **EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES** - Inserir neste campo a Data Inicial, no formato (DD/MM/AAAA), para carregar as manifestações do FalaBR (e-Ouv) dos tipos 1 à 7, conforme *Tabela 1 - Tipo de Manifestação*. Sugerimos que seja colocada a **data atual** para que apenas as novas manifestações sejam importadas para o SEI.
+	- **EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES** - Inserir neste campo a Data Inicial, no formato (DD/MM/AAAA), para carregar as manifestações do FalaBR (e-Ouv) dos tipos 1 à 7, conforme *Tabela 1 - Tipo de Manifestação*. Sugerimos que seja colocada a **data atual** para que apenas as novas manifestações sejam importadas para o SEI.
 
-ii. **EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO** - Quando a rotina de importação for executada será gerado um documento PDF com os dados da manifestação que será anexado ao processo com o mesmo número de identificação do FalaBR. Este parâmetro será usado para indicar qual o Tipo de Documento no SEI será utilizado para este PDF. Lembrando que deve ser do Grupo de **Documentos Externos**. Para verificar os tipos existentes acesse *Administração > Tipos de Documento > Listar*.
+	- **EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO** - Quando a rotina de importação for executada será gerado um documento PDF com os dados da manifestação que será anexado ao processo com o mesmo número de identificação do FalaBR. Este parâmetro será usado para indicar qual o Tipo de Documento no SEI será utilizado para este PDF. Lembrando que deve ser do Grupo de **Documentos Externos**. Para verificar os tipos existentes acesse *Administração > Tipos de Documento > Listar*.
 
-iii. **ID_SERIE_EXTERNO_OUVIDORIA** - Este parâmetro não está sendo utilizado, poderá ser ignorado.
+	- **ID_SERIE_EXTERNO_OUVIDORIA** - Este parâmetro não está sendo utilizado, poderá ser ignorado.
 
-**@todo - verificar os dois campos acima no código** 
+	- **EOUV_USUARIO_ACESSO_WEBSERVICE** - Nome de usuário para acesso aos WebServices do FalaBR, gerado especificamente para cada órgão. Caso ainda não possua este usuário e a senha abaixo, solicitar via e-mail para [Marcos Silva - marcos.silva@cgu.gov.br](mailto:marcos.silva@cgu.gov.br?subject=[SOLICITAÇÃO]%20Usuário%20e%20Senha%20API%20FalaBR)
 
-iv. **EOUV_USUARIO_ACESSO_WEBSERVICE** - Nome de usuário para acesso aos WebServices do FalaBR, gerado especificamente para cada órgão. Caso ainda não possua este usuário e a senha abaixo, solicitar via e-mail para [Marcos Silva - marcos.silva@cgu.gov.br](mailto:marcos.silva@cgu.gov.br?subject=[SOLICITAÇÃO]%20Usuário%20e%20Senha%20API%20FalaBR)
+	- **EOUV_SENHA_ACESSO_WEBSERVICE** - Senha do usuário para acesso aos WebServices do FalaBR
 
-v. **EOUV_SENHA_ACESSO_WEBSERVICE** - Senha do usuário para acesso aos WebServices do FalaBR
+	- **CLIENT_ID** - Id gerado para acesso aos WebServices.
 
-vi. **CLIENT_ID** - Id gerado para acesso aos WebServices.
+	- **CLIENT_SECRET** - Senha gerada para acesso aos WebServices.
 
-vii. **CLIENT_SECRET** - Senha gerada para acesso aos WebServices.
+	- **TOKEN** - Token gerado para acesso aos WebServices.
 
-viii. **TOKEN** - Token gerado para acesso aos WebServices.
+	- **EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO** - Já vem configurado para o ambiente de produção do FalaBR com https://sistema.ouvidorias.gov.br/api/manifestacoes
 
-ix. **EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO** - Já vem configurado para o ambiente de produção do FalaBR com https://sistema.ouvidorias.gov.br/api/manifestacoes
+	> Para efeitos de testes e homologação utilizar o ambiente de treinamento: https://treinamentoouvidorias.cgu.gov.br/api/manifestacoes
 
-Obs: Para efeitos de testes e homologação utilizar o ambiente de treinamento: https://treinamentoouvidorias.cgu.gov.br/api/manifestacoes
+	- **ID_UNIDADE_OUVIDORIA** - Código da Unidade no SEI que deverá registrar os novos processos 'e-Ouv' importados do FalaBR
 
-x. **ID_UNIDADE_OUVIDORIA** - Código da Unidade no SEI que deverá registrar os novos processos 'e-Ouv' importados do FalaBR
+	> Caso esteja atualizando a versão, o item 6.1 já deverá constar os *ids* corretos, portanto siga para o item 9.2
 
-> Caso esteja atualizando a versão, o item 6.1 já deverá constar os *ids* corretos, portanto siga para o item 9.2
+	9.2 Acessar o menu *E-Ouv > Parâmetros do Módulo e-Sic* ajustando os seguintes parâmetros:
 
-9.2. Acessar o menu *E-Ouv > Parâmetros do Módulo e-Sic* ajustando os seguintes parâmetros:
+	- **ESIC_DATA_INICIAL_IMPORTACAO_MANIFESTACOES** - Inserir neste campo a Data Inicial, no formato (DD/MM/AAAA), para carregar as manifestações do FalaBR (e-Sic) dos tipos 8, conforme *Tabela 1 - Tipo de Manifestação*. Sugerimos que seja colocada a **data atual** para que apenas as novas manifestações sejam importadas para o SEI.
 
-i. **ESIC_DATA_INICIAL_IMPORTACAO_MANIFESTACOES** - Inserir neste campo a Data Inicial, no formato (DD/MM/AAAA), para carregar as manifestações do FalaBR (e-Sic) dos tipos 8, conforme *Tabela 1 - Tipo de Manifestação*. Sugerimos que seja colocada a **data atual** para que apenas as novas manifestações sejam importadas para o SEI.
+	- **ESIC_URL_WEBSERVICE_IMPORTACAO_RECURSOS** - Já vem configurado para o ambiente de produção do FalaBR com 'https://sistema.ouvidorias.gov.br/api/recursos?NumProtocolo='
 
-ii. **ESIC_URL_WEBSERVICE_IMPORTACAO_RECURSOS** - Já vem configurado para o ambiente de produção do FalaBR com 'https://sistema.ouvidorias.gov.br/api/recursos?NumProtocolo='
+	> Para efeitos de testes e homologação utilizar o ambiente de treinamento: https://treinamentoouvidorias.cgu.gov.br/api/recursos?NumProtocolo=
 
-Obs: Para efeitos de testes e homologação utilizar o ambiente de treinamento: https://treinamentoouvidorias.cgu.gov.br/api/recursos?NumProtocolo=
+	- **ESIC_ID_UNIDADE_PRINCIPAL** - Código da Unidade no SEI que deverá registrar os novos processos 'e-Sic' importados do FalaBR
 
-iii. **ESIC_ID_UNIDADE_PRINCIPAL** - Código da Unidade no SEI que deverá registrar os novos processos 'e-Sic' importados do FalaBR
+	- **ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA** - Código da Unidade no SEI que deverá registrar os recursos de **primeira** instância
 
-iv. **ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA** - Código da Unidade no SEI que deverá registrar os recursos de **primeira** instância
-
-v. **ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA** - Código da Unidade no SEI que deverá registrar os recursos de **segunda** instância
+	- **ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA** - Código da Unidade no SEI que deverá registrar os recursos de **segunda** instância
 
 10. Criar agendamento para as funções desejadas
 
