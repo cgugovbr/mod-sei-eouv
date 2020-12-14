@@ -371,15 +371,6 @@ class MdCguEouvAtualizadorBDRN extends InfraRN
         $this->logar('EXECUTANDO A INSTALACAO DA VERSAO 4.0.0 DO MODULO ' . $this->nomeDesteModulo . ' NA BASE DO SEI');
 
         /**
-         * @todo - Evert - Inserir no manual para criar o tipo_procedimento via sei e inserir aqui antes de rodar o script
-         */
-        /**
-         * Criar um "tipo_procedimento" para a Manifestação e-Sic
-         */
-        $this->logar('CRIANDO REGISTROS PARA A TABELA tipo_procedimento');
-        BancoSEI::getInstance()->executarSql('INSERT INTO tipo_procedimento (id_tipo_procedimento, nome, descricao, sin_ativo, sta_nivel_acesso_sugestao, sin_interno, sin_ouvidoria, sin_individual, id_hipotese_legal_sugestao, sta_grau_sigilo_sugestao) VALUES (100001514, \'e-Sic Ouvidoria: Acesso à Informação\', \'Ouvidoria: Manifestação Tipo 8\', \'S\', \'0\', \'N\', \'N\', \'N\', NULL, NULL);');
-
-        /**
          * Criar um "depara_importação" para a Manifestação e-Sic
          */
         $this->logar('CRIANDO REGISTROS PARA A TABELA md_eouv_depara_importacao');
