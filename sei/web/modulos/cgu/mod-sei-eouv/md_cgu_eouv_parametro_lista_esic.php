@@ -26,7 +26,7 @@ try {
 
   SessaoSEI::getInstance()->validarPermissao($_GET['acao']);
 
-  switch($_GET['acao']){
+    switch($_GET['acao']){
     case 'md_cgu_eouv_parametro_excluir':
       try{
         $arrStrIds = PaginaSEI::getInstance()->getArrStrItensSelecionados();
@@ -56,8 +56,8 @@ try {
       }
       break;
 
-    case 'md_cgu_eouv_parametro_listar':
-      $strTitulo = 'Paramêtros do Módulo de Integração SEI x FalaBR (e-Ouv)';
+    case 'md_cgu_eouv_parametro_listar_esic':
+      $strTitulo = 'Paramêtros do Módulo de Integração SEI x FalaBR (e-Sic)';
       break;
 
     default:
@@ -77,7 +77,7 @@ try {
   }
    
   $objMdCguEouvParametroDTO = new MdCguEouvParametroDTO();
-  $objMdCguEouvParametroDTO->setStrDeTipo('eouv');
+  $objMdCguEouvParametroDTO->setStrDeTipo('esic');
   $objMdCguEouvParametroDTO->retNumIdParametro();
   $objMdCguEouvParametroDTO->retStrNoParametro();
   $objMdCguEouvParametroDTO->retStrDeValorParametro();
@@ -86,7 +86,7 @@ try {
   //PaginaSEI::getInstance()->prepararPaginacao($objMdCguEouvParametroDTO);
 
   $objMdCguEouvParametroRN = new MdCguEouvParametroRN();
-  $arrObjMdCguEouvParametroDTO = $objMdCguEouvParametroRN->listarParametro($objMdCguEouvParametroDTO);
+  $arrObjMdCguEouvParametroDTO = $objMdCguEouvParametroRN->listarParametroESic($objMdCguEouvParametroDTO);
 
   //PaginaSEI::getInstance()->processarPaginacao($objMdCguEouvParametroDTO);
   $numRegistros = count($arrObjMdCguEouvParametroDTO);

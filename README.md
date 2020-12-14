@@ -40,22 +40,46 @@ Abaixo os tipos de manifestações do FalaBR que serão importadas para o SEI:
 |7                         |`xxx`                   |Comunicado                |
 |8 			   |`xxx`		    |Acesso à Informação       |
 
+### Download do módulo
 
-### Instalação/atualização
-
-3. Baixar os arquivos deste repositório e colocar na pasta */sei/web/modulos/cgu/mod-sei-eouv*
-
-Poderá baixar usando *git* (verificar o caminho onde o SEI está instalado, no exemplo abaixo segue o padrão '/opt'):
+3. Baixar os arquivos deste repositório
+ 
+   Poderá baixar usando *git*, para isso recomendamos usar uma pasta temporária:
+   
+   ```bash
+   $ cd /temp
+   $ git clone git@github.com:cgugovbr/mod-sei-eouv.git
+   ```
+   
+   Ou baixar a versão desejada usando o link:
+   
+   https://github.com/cgugovbr/mod-sei-eouv/archive/4.0.0.zip
+ 
+A estrutura de pastas deste módulo é a seguinte:
 
 ```bash
-$ cd /opt/sei/web/modulos
-$ mkdir -p cgu
-$ git clone git@github.com:cgugovbr/mod-sei-eouv.git
+./mod-sei-eouv
+ --/sei
+ --/sip
+ --/README.md
+```
+  
+  > Os arquivos contidos dentro dos diretórios sei e sip não substituem nenhum código-fonte original do sistema. Eles apenas posicionam os arquivos do módulo nas pastas corretas de *scripts*, configurações e pasta de módulos, todos posicionados dentro de um diretório específico denominado '*cgu/mod-sei-eouv*' para deixar claro quais scripts fazem parte do módulo.
+  
+4. Copiar os arquivos do módulo para a pasta de destino
+  
+    - Caso estiver usando o arquivo 'zip', os arquivos do módulo poderá ser descompactados e mesclados no diretório raiz de instalação do SEI. Lembrando de substituir o termo **'VERSAO'** no nome do arquivo 'zip' com a versão que está sendo instalada.
+  
+```bash
+$ cd <DIRETORIDIO_RAZ_DE_INSTALAÇÃO_DO_SEI>
+$ unzip mod-sei-eouv-VERSAO.zip
 ```
 
-Ou baixar a versão desejada usando o link:
-
-https://github.com/cgugovbr/mod-sei-eouv/archive/4.0.0.zip
+    - Caso esteja utilizando 'git' os diretórios do módulo devem ser mesclados usando cópia simples, para as repectivas pastas '/sei' e '/sip' de sua instalação.
+    
+    > A pasta final do módulo será *'./sei/web/modulos/cgu/mod-sei-eouv'*    
+ 
+### Instalação/atualização
 
 4. Copiar os scripts de instalação para as pastas do *sip* e do *sei*, conforme segue:
 

@@ -75,6 +75,7 @@
   $objEouvRelatorioImportacaoDetalheDTO->retNumIdRelatorioImportacao();
   $objEouvRelatorioImportacaoDetalheDTO->retStrProtocoloFormatado();
   $objEouvRelatorioImportacaoDetalheDTO->retStrSinSucesso();
+  $objEouvRelatorioImportacaoDetalheDTO->retStrTipManifestacao();
   $objEouvRelatorioImportacaoDetalheDTO->retDthDthImportacao();
   $objEouvRelatorioImportacaoDetalheDTO->retStrDescricaoLog();
 
@@ -122,7 +123,8 @@
     }
 
     $strResultado .= '<th class="infraTh" width="15%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDetalheDTO,'Protocolo Formatado','ProtocoloFormatado',$arrObjEouvRelatorioImportacaoDetalheDTO).'</th>'."\n";
-    $strResultado .= '<th class="infraTh" width="10%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDetalheDTO,'Sucesso','SinSucesso',$arrObjEouvRelatorioImportacaoDetalheDTO).'</th>'."\n";
+    $strResultado .= '<th class="infraTh" width="7%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDetalheDTO,'Tipo','TipManifestacao',$arrObjEouvRelatorioImportacaoDetalheDTO).'</th>'."\n";
+    $strResultado .= '<th class="infraTh" width="7%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDetalheDTO,'Sucesso','SinSucesso',$arrObjEouvRelatorioImportacaoDetalheDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh" width="10%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDetalheDTO,'Data Importacao','DthImportacao',$arrObjEouvRelatorioImportacaoDetalheDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDetalheDTO,'Detalhe','DescricaoLog',$arrObjEouvRelatorioImportacaoDetalheDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh" width="25%">Ações</th>'."\n";
@@ -138,7 +140,8 @@
         $strResultado .= '<td>'.PaginaSEI::getInstance()->getTrCheck($i,trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado()),trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado())).'</td>';
       }
 
-      $strResultado .= '<td>'.trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado()).'</td>';
+      $strResultado .= '<td align="center">'.trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado()).'</td>';
+      $strResultado .= '<td align="center">'.(trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrTipManifestacao()) =='R' ? 'e-Sic' : 'e-Ouv').'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrSinSucesso().'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getDthDthImportacao().'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrDescricaoLog().'</td>';
