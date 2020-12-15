@@ -213,8 +213,8 @@ class MdCguEouvAtualizadorBDRN extends InfraRN
 
         $this->logar('CRIANDO Parâmetros do Sei');
         $objInfraParametro = new InfraParametro(BancoSEI::getInstance());
-        $objInfraParametro->setValor('EOUV_URL_WEBSERVICE_IMPORTACAO_ANEXO_MANIFESTACAO', 'https://sistema.ouvidorias.gov.br/Servicos/ServicoAnexosManifestacao.svc');
-        $objInfraParametro->setValor('EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO', 'https://sistema.ouvidorias.gov.br/Servicos/ServicoConsultaManifestacao.svc');
+        $objInfraParametro->setValor('EOUV_URL_WEBSERVICE_IMPORTACAO_ANEXO_MANIFESTACAO', 'https://treinafalabr.cgu.gov.br/Servicos/ServicoAnexosManifestacao.svc');
+        $objInfraParametro->setValor('EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO', 'https://treinafalabr.cgu.gov.br/Servicos/ServicoConsultaManifestacao.svc');
         $objInfraParametro->setValor('ID_UNIDADE_OUVIDORIA', '110000001');
         $objInfraParametro->setValor('ID_SERIE_EXTERNO_OUVIDORIA', '92');
         $objInfraParametro->setValor('EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO', '63');
@@ -371,6 +371,15 @@ class MdCguEouvAtualizadorBDRN extends InfraRN
         $this->logar('EXECUTANDO A INSTALACAO DA VERSAO 4.0.0 DO MODULO ' . $this->nomeDesteModulo . ' NA BASE DO SEI');
 
         /**
+         * @todo - Evert - Inserir no manual para criar o tipo_procedimento via sei e inserir aqui antes de rodar o script
+         */
+        /**
+         * Criar um "tipo_procedimento" para a Manifestação e-Sic
+         */
+        $this->logar('CRIANDO REGISTROS PARA A TABELA tipo_procedimento');
+        BancoSEI::getInstance()->executarSql('INSERT INTO tipo_procedimento (id_tipo_procedimento, nome, descricao, sin_ativo, sta_nivel_acesso_sugestao, sin_interno, sin_ouvidoria, sin_individual, id_hipotese_legal_sugestao, sta_grau_sigilo_sugestao) VALUES (100001514, \'e-Sic Ouvidoria: Acesso à Informação\', \'Ouvidoria: Manifestação Tipo 8\', \'S\', \'0\', \'N\', \'N\', \'N\', NULL, NULL);');
+
+        /**
          * Criar um "depara_importação" para a Manifestação e-Sic
          */
         $this->logar('CRIANDO REGISTROS PARA A TABELA md_eouv_depara_importacao');
@@ -383,7 +392,7 @@ class MdCguEouvAtualizadorBDRN extends InfraRN
          * - 'R' (e-Sic) - manifestações e-sic com 'R'ecursos - tipo 8
          */
         $this->logar('CRIANDO COLUNA PARA TIPO DE MANIFESTAÇÃO PARA A TABELA md_eouv_rel_import');
-        BancoSEI::getInstance()->executarSql('ALTER TABLE md_eouv_rel_import ADD tip_manifestacao ' . $objInfraMetaBD->tipoTextoFixo(2) . ' NOT NULL DEFAULT (\'P\');');
+        BancoSEI::getInstance()->executarSql('ALTER TABLE md_eouv_rel_import ADD tipo_manifestacao ' . $objInfraMetaBD->tipoTextoFixo(2) . ' NOT NULL DEFAULT (\'P\');');
 
         /**
          * Criar coluna na tabela md_eouv_rel_import_det para identificar qual o tipo de manifestação
@@ -392,24 +401,20 @@ class MdCguEouvAtualizadorBDRN extends InfraRN
          * - 'R' (e-Sic) - manifestações e-sic com 'R'ecursos - tipo 8
          */
         $this->logar('CRIANDO COLUNA PARA TIPO DE MANIFESTAÇÃO PARA A TABELA md_eouv_rel_import_det');
-        BancoSEI::getInstance()->executarSql('ALTER TABLE md_eouv_rel_import_det ADD tipo_manifestacao ' . $objInfraMetaBD->tipoTextoFixo(2) . ' NOT NULL DEFAULT (\'P\');');
+        BancoSEI::getInstance()->executarSql('ALTER TABLE md_eouv_rel_import_det ADD tip_manifestacao ' . $objInfraMetaBD->tipoTextoFixo(2) . ' NOT NULL DEFAULT (\'P\');');
         BancoSEI::getInstance()->executarSql('ALTER TABLE md_eouv_rel_import_det ADD dth_prazo_atendimento ' . $objInfraMetaBD->tipoDataHora() . ' NULL;');
-
-        /**
-         * Criar coluna na tabela md_eouv_parametros para identificar especificar o tipo de parâmetro
-         */
-        $this->logar('CRIANDO COLUNA PARA TIPO DE MANIFESTAÇÃO PARA A TABELA md_eouv_rel_import');
-        BancoSEI::getInstance()->executarSql('ALTER TABLE md_eouv_parametros ADD de_tipo ' . $objInfraMetaBD->tipoTextoFixo(4) . ' NOT NULL DEFAULT (\'eouv\');');
 
         /**
          * Cria parâmetros na tabela md_eouv_parametros para manifestações do e-Sic (tipo 8)
          */
         $this->logar('CRIA REGISTROS NA TABELA md_eouv_parametros PARA MANIFESTAÇÕES DO E-SIC (TIPO 8)');
         BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (12, \'ESIC_DATA_INICIAL_IMPORTACAO_MANIFESTACOES\', \'01/01/1900\', \'esic\');');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (13, \'ESIC_URL_WEBSERVICE_IMPORTACAO_RECURSOS\', \'https://sistema.ouvidorias.gov.br/api/recursos?NumProtocolo=\', \'esic\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (13, \'ESIC_URL_WEBSERVICE_IMPORTACAO_RECURSOS\', \'https://treinafalabr.cgu.gov.br/api/recursos?NumProtocolo=\', \'esic\');');
         BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (14, \'ESIC_ID_UNIDADE_PRINCIPAL\', \'110000001\', \'esic\');');
         BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (15, \'ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA\', \'110000001\', \'esic\');');
         BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (16, \'ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA\', \'110000001\', \'esic\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (17, \'ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA\', \'110000001\', \'esic\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (18, \'ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO\', \'110000001\', \'esic\');');
 
         /**
          * Atualizar versão do módulo na tabela infra-parametro do SEI

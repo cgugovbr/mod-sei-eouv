@@ -183,7 +183,7 @@ $ /usr/bin/php -c /etc/php.ini /sei/scripts/md_cgu_eouv_atualizar_modulo_sei.php
 
 	- **EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO** - Já vem configurado para o ambiente de produção do FalaBR com https://sistema.ouvidorias.gov.br/api/manifestacoes
 
-	> Para efeitos de testes e homologação utilizar o ambiente de treinamento: https://treinamentoouvidorias.cgu.gov.br/api/manifestacoes
+	> Para efeitos de testes e homologação utilizar o ambiente de treinamento: https://treinafalabr.cgu.gov.br/api/manifestacoes
 
 	- **ID_UNIDADE_OUVIDORIA** - Código da Unidade no SEI que deverá registrar os novos processos 'e-Ouv' importados do FalaBR
 
@@ -195,7 +195,7 @@ $ /usr/bin/php -c /etc/php.ini /sei/scripts/md_cgu_eouv_atualizar_modulo_sei.php
 
 	- **ESIC_URL_WEBSERVICE_IMPORTACAO_RECURSOS** - Já vem configurado para o ambiente de produção do FalaBR com 'https://sistema.ouvidorias.gov.br/api/recursos?NumProtocolo='
 
-	> Para efeitos de testes e homologação utilizar o ambiente de treinamento: https://treinamentoouvidorias.cgu.gov.br/api/recursos?NumProtocolo=
+	> Para efeitos de testes e homologação utilizar o ambiente de treinamento: https://treinafalabr.cgu.gov.br/api/recursos?NumProtocolo=
 
 	- **ESIC_ID_UNIDADE_PRINCIPAL** - Código da Unidade no SEI que deverá registrar os novos processos 'e-Sic' importados do FalaBR
 
