@@ -664,6 +664,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                $idTipoDocumentoAnexoPadrao,
                $idTipoDocumentoAnexoDadosManifestacao,
                $idUnidadeOuvidoria,
+               $idUnidadeEsicPrincipal,
                $idUnidadeRecursoPrimeiraInstancia,
                $idUnidadeRecursoSegundaInstancia,
                $idUsuarioSei,
@@ -736,7 +737,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                         break;
 
                     case "ESIC_ID_UNIDADE_PRINCIPAL":
-                        $idUnidadeOuvidoria = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
+                        $idUnidadeEsicPrincipal = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
                         break;
 
                     case "ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA":
@@ -774,7 +775,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $IdentificacaoServico = 'CadastrarManifestacao';
 
         // Simula login inicial
-        $this->simulaLogin($SiglaSistema, $IdentificacaoServico, $idUnidadeOuvidoria);
+        $this->simulaLogin($SiglaSistema, $IdentificacaoServico, $idUnidadeEsicPrincipal);
 
         // Executa a importação dos dados
         try {
@@ -907,6 +908,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                $arrObjParticipantesDTO,
                $idTipoDocumentoAnexoDadosManifestacao,
                $idUnidadeOuvidoria,
+               $idUnidadeEsicPrincipal,
                $idUnidadeRecursoPrimeiraInstancia,
                $idUnidadeRecursoSegundaInstancia,
                $idUnidadeRecursoTerceiraInstancia,
@@ -950,8 +952,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
          */
         if ($tipoManifestacao == 'P' && $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'] <> 8) {
             $manifestacaoESic = false;
+            $idUnidadeDestino = $idUnidadeOuvidoria;
         } elseif ($tipoManifestacao == 'R' && $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'] == 8) {
             $manifestacaoESic = true;
+            $idUnidadeDestino = $idUnidadeEsicPrincipal;
 
             /**
              * Importar Recursos caso seja manifestação e-Sic (Tipo 8)
@@ -979,6 +983,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         $dataRegistro = $arrDetalheManifestacao['DataCadastro'];
         $numProtocoloFormatado =  $this->formatarProcesso($arrDetalheManifestacao['NumerosProtocolo'][0]);
+
+        var_dump('ok');
+        die();
 
         /**
          * Esta data é gravada na tabela de log detalhada
@@ -1147,7 +1154,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 }
 
                 $objProcedimentoAPI->setEspecificacao($varEspecificacaoAssunto);
-                $objProcedimentoAPI->setIdUnidadeGeradora($idUnidadeOuvidoria);
+                $objProcedimentoAPI->setIdUnidadeGeradora($idUnidadeDestino);
                 $objProcedimentoAPI->setNumeroProtocolo($numProtocoloFormatado);
                 $objProcedimentoAPI->setDataAutuacao($arrDetalheManifestacao['DataCadastro']);
                 $objProcedimentoAPI->setNivelAcesso($objTipoProcedimentoDTO->getStrStaNivelAcessoSugestao());
@@ -1555,7 +1562,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
          * *********************************************************************************************/
 
         $pdf = new InfraPDF("P", "pt", "A4");
-//        $pdf = new MdCguEouvInfraPDF("P", "pt", "A4");
 
         $pdf->AddPage();
 
@@ -1600,7 +1606,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $pdf->SetFont('arial', 'B', 12);
         $pdf->Cell(180, 20, "Órgão Destinatário:", 0, 0, 'R');
         $pdf->setFont('arial', '', 12);
-        $pdf->Cell(0, 20, $retornoWsLinha['OuvidoriaDestino']['NomeOuvidoria'], 0, 1, 'L');
+        $pdf->Cell(0, 20, $retornoWsLinha['OuvidoriaDestino']['NomOuvidoria'], 0, 1, 'L');
 
         // Órgão de Interesse
         if ($retornoWsLinha['OrgaoInteresse'] && $retornoWsLinha['OrgaoInteresse']['NomeOrgao']) {
@@ -1655,10 +1661,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $pdf->Cell(70, 20, $retornoWsLinha['ModoResposta']['DescModoResposta'], 0, 1, 'L');
 
         // Registrado Por
-        $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(180, 20, "Registrado Por:", 0, 0, 'R');
-        $pdf->setFont('arial', '', 12);
-        $pdf->Cell(70, 20, $retornoWsLinha['RegistradoPor'], 0, 1, 'L');
+//        $pdf->SetFont('arial', 'B', 12);
+//        $pdf->Cell(180, 20, "Registrado Por:", 0, 0, 'R');
+//        $pdf->setFont('arial', '', 12);
+//        $pdf->Cell(70, 20, $retornoWsLinha['RegistradoPor'], 0, 1, 'L');
 
         // Serviço
         $pdf->SetFont('arial', 'B', 12);
@@ -1794,43 +1800,43 @@ class MdCguEouvAgendamentoRN extends InfraRN
         /**
          * Envolvidos
          */
-        $menu_count++;
-        $pdf->Ln(30);
-        $pdf->SetFont('arial', 'B', 14);
-        $pdf->Cell(0, 20, $menu_count . ". Envolvido(s)", true, 0, 'L');
-        $pdf->Ln(30);
-
-        $envolvidos = $retornoWsLinha['Teor']['EnvolvidosManifestacao'];
-        if (count($envolvidos) > 0) {
-
-            foreach ($envolvidos as $envolvido) {
-
-                // Nome do Arquivo
-                $pdf->SetFont('arial', 'B', 12);
-                $pdf->Cell(180, 20, "Nome:", 0, 0, 'R');
-                $pdf->setFont('arial', '', 12);
-                $pdf->Cell(70, 20, $envolvido['Nome'], 0, 1, 'L');
-
-                // Tipo de Anexo
-                $pdf->SetFont('arial', 'B', 12);
-                $pdf->Cell(180, 20, "Função:", 0, 0, 'R');
-                $pdf->setFont('arial', '', 12);
-                $pdf->Cell(70, 20, $envolvido['Funcao'], 0, 1, 'L');
-
-                // Anexo Complementar
-                $pdf->SetFont('arial', 'B', 12);
-                $pdf->Cell(180, 20, "Orgão:", 0, 0, 'R');
-                $pdf->setFont('arial', '', 12);
-                $pdf->Cell(70, 20, $envolvido['Orgao'], 0, 1, 'L');
-
-                $pdf->Ln(20);
-            }
-        } else {
-            // Sem envolvidos
-            $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(180, 20, "Não há envolvidos na manifestação.", 0, 0, 'L');
-            $pdf->Ln(20);
-        }
+//        $menu_count++;
+//        $pdf->Ln(30);
+//        $pdf->SetFont('arial', 'B', 14);
+//        $pdf->Cell(0, 20, $menu_count . ". Envolvido(s)", true, 0, 'L');
+//        $pdf->Ln(30);
+//
+//        $envolvidos = $retornoWsLinha['Teor']['EnvolvidosManifestacao'];
+//        if (count($envolvidos) > 0) {
+//
+//            foreach ($envolvidos as $envolvido) {
+//
+//                // Nome do Arquivo
+//                $pdf->SetFont('arial', 'B', 12);
+//                $pdf->Cell(180, 20, "Nome:", 0, 0, 'R');
+//                $pdf->setFont('arial', '', 12);
+//                $pdf->Cell(70, 20, $envolvido['Nome'], 0, 1, 'L');
+//
+//                // Tipo de Anexo
+//                $pdf->SetFont('arial', 'B', 12);
+//                $pdf->Cell(180, 20, "Função:", 0, 0, 'R');
+//                $pdf->setFont('arial', '', 12);
+//                $pdf->Cell(70, 20, $envolvido['Funcao'], 0, 1, 'L');
+//
+//                // Anexo Complementar
+//                $pdf->SetFont('arial', 'B', 12);
+//                $pdf->Cell(180, 20, "Orgão:", 0, 0, 'R');
+//                $pdf->setFont('arial', '', 12);
+//                $pdf->Cell(70, 20, $envolvido['Orgao'], 0, 1, 'L');
+//
+//                $pdf->Ln(20);
+//            }
+//        } else {
+//            // Sem envolvidos
+//            $pdf->SetFont('arial', 'B', 12);
+//            $pdf->Cell(180, 20, "Não há envolvidos na manifestação.", 0, 0, 'L');
+//            $pdf->Ln(20);
+//        }
 
         /**
          * Campos Adicionais
@@ -1863,39 +1869,39 @@ class MdCguEouvAgendamentoRN extends InfraRN
         /**
          * Dados das Respostas
          */
-        $menu_count++;
-        $pdf->Ln(30);
-        $pdf->SetFont('arial', 'B', 14);
-        $pdf->Cell(0, 20, $menu_count . ". Dados das Respostas", true, 0, 'L');
-        $pdf->Ln(30);
+//        $menu_count++;
+//        $pdf->Ln(30);
+//        $pdf->SetFont('arial', 'B', 14);
+//        $pdf->Cell(0, 20, $menu_count . ". Dados das Respostas", true, 0, 'L');
+//        $pdf->Ln(30);
 
         // Envolve DAS4 ou superior
-        $pdf->SetFont('arial', 'B', 12);
-        $pdf->MultiCell(180, 20, "Envolve ocupante de cargo comissionado DAS a partir do nível 4 ou equivalente?", 0, 'R');
-        $pdf->setFont('arial', '', 12);
-        $pdf->MultiCell(380, 20,$retornoWsLinha['InformacoesAdicionais']['EnvolveCargoComissionadoDAS4OuSuperior'], 0, 'C');
-        $pdf->Ln(20);
+//        $pdf->SetFont('arial', 'B', 12);
+//        $pdf->MultiCell(180, 20, "Envolve ocupante de cargo comissionado DAS a partir do nível 4 ou equivalente?", 0, 'R');
+//        $pdf->setFont('arial', '', 12);
+//        $pdf->MultiCell(380, 20,$retornoWsLinha['InformacoesAdicionais']['EnvolveCargoComissionadoDAS4OuSuperior'], 0, 'C');
+//        $pdf->Ln(20);
 
         // Manifestação Apta?
-        $pdf->SetFont('arial', 'B', 12);
-        $pdf->MultiCell(180, 20, "Manifestação Apta?", 0, 'R');
-        $pdf->setFont('arial', '', 12);
-        $pdf->MultiCell(380, 20, $retornoWsLinha['InformacoesAdicionais']['Apta'], 0, 'C');
-        $pdf->Ln(20);
+//        $pdf->SetFont('arial', 'B', 12);
+//        $pdf->MultiCell(180, 20, "Manifestação Apta?", 0, 'R');
+//        $pdf->setFont('arial', '', 12);
+//        $pdf->MultiCell(380, 20, $retornoWsLinha['InformacoesAdicionais']['Apta'], 0, 'C');
+//        $pdf->Ln(20);
 
         // Há envolvimento de Empresa?
-        $pdf->SetFont('arial', 'B', 12);
-        $pdf->MultiCell(180, 20, "Há envolvimento de Empresa?", 0, 'R');
-        $pdf->setFont('arial', '', 12);
-        $pdf->MultiCell(380, 20, $retornoWsLinha['InformacoesAdicionais']['EnvolveEmpresa'], 0, 'C');
-        $pdf->Ln(20);
+//        $pdf->SetFont('arial', 'B', 12);
+//        $pdf->MultiCell(180, 20, "Há envolvimento de Empresa?", 0, 'R');
+//        $pdf->setFont('arial', '', 12);
+//        $pdf->MultiCell(380, 20, $retornoWsLinha['InformacoesAdicionais']['EnvolveEmpresa'], 0, 'C');
+//        $pdf->Ln(20);
 
         // Há envolvimento de Servidor Público?
-        $pdf->SetFont('arial', 'B', 12);
-        $pdf->MultiCell(180, 20, "Há envolvimento de Servidor Público?", 0, 'R');
-        $pdf->setFont('arial', '', 12);
-        $pdf->MultiCell(380, 20, $retornoWsLinha['InformacoesAdicionais']['EnvolveServidorPublico'], 0, 'J');
-        $pdf->Ln(20);
+//        $pdf->SetFont('arial', 'B', 12);
+//        $pdf->MultiCell(180, 20, "Há envolvimento de Servidor Público?", 0, 'R');
+//        $pdf->setFont('arial', '', 12);
+//        $pdf->MultiCell(380, 20, $retornoWsLinha['InformacoesAdicionais']['EnvolveServidorPublico'], 0, 'J');
+//        $pdf->Ln(20);
 
         /**
          * Respostas
@@ -2039,7 +2045,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                         $pdf->SetFont('arial', 'B', 12);
                         $pdf->Cell(180, 20, "Destinatário:", 0, 0, 'R');
                         $pdf->setFont('arial', '', 12);
-                        $pdf->Cell(70, 20, $retornoWsLinha['OuvidoriaDestino']['NomeOuvidoria'], 0, 1, 'L');
+                        $pdf->Cell(70, 20, $retornoWsLinha['OuvidoriaDestino']['NomOuvidoria'], 0, 1, 'L');
 
                         // Data de Abertura
                         $pdf->SetFont('arial', 'B', 12);
@@ -2258,7 +2264,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         } elseif ($tipo_recurso == 'PR') {
             $nomeDocumentoArvore = 'Pedido Revisão';
         } else {
-            $nomeDocumentoArvore = 'Inicial e-Sic';
+            $nomeDocumentoArvore = 'Pedido Inicial';
         }
 
         $objDocumentoManifestacao->setNumero($nomeDocumentoArvore);
@@ -2464,6 +2470,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
      */
     public function hashDuplicado($strArquivo)
     {
+        /**
+         * @todo - verificar o hash e um arquivo no mesmo protocolo (é possível?)
+         */
+
         // Verifica hash do arquivo
         $hash = md5_file($strArquivo);
 
