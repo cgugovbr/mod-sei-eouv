@@ -897,7 +897,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
         }
     }
 
-    public function executarImportacaoLinha($retornoWsLinha, $tipoManifestacao = 'P'){
+    public function executarImportacaoLinha($retornoWsLinha, $tipoManifestacao = 'P')
+    {
 
         global $objEouvRelatorioImportacaoDTO,
                $idTipoDocumentoAnexoPadrao,
@@ -984,8 +985,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $dataRegistro = $arrDetalheManifestacao['DataCadastro'];
         $numProtocoloFormatado =  $this->formatarProcesso($arrDetalheManifestacao['NumerosProtocolo'][0]);
 
-        var_dump('ok');
-        die();
 
         /**
          * Esta data é gravada na tabela de log detalhada
@@ -1169,7 +1168,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                 $objSeiRN = new SeiRN();
 
-                $arrDocumentos = $this->gerarAnexosProtocolo($arrDetalheManifestacao['Teor']['Anexos'], $numProtocoloFormatado, $tipoManifestacao );
+                $arrDocumentos = $this->gerarAnexosProtocolo($arrDetalheManifestacao['Teor']['Anexos'], $numProtocoloFormatado, $tipoManifestacao);
 
                 /**
                  * Verificar o tipo de documento a ser importado para gerar o PDF conforme tipo de documento
@@ -2340,9 +2339,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
             foreach ($this->verificaRetornoWS($retornoWsAnexoLista) as $retornoWsAnexoLinha) {
                 try {
 
-                    if ($tipoManifestacao == 'R') {
-                        $strNomeArquivoOriginal = $retornoWsAnexoLinha['nomeArquivo'];
-                    } else {
+                    $strNomeArquivoOriginal = $retornoWsAnexoLinha['nomeArquivo'];
+                    if ($strNomeArquivoOriginal == null) {
                         $strNomeArquivoOriginal = $retornoWsAnexoLinha['NomeArquivo'];
                     }
                     $ext = strtoupper(pathinfo($strNomeArquivoOriginal, PATHINFO_EXTENSION));
