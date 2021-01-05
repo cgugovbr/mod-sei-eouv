@@ -791,8 +791,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $ultimaDataExecucao = $dataInicialImportacaoManifestacoes;
             }
 
-//            $ultimaDataExecucao = '10/11/2020 01:00:00';
-//            $dataAtual = '10/11/2020 23:59:00';
+//            $ultimaDataExecucao = '23/12/2020 01:00:00';
+//            $dataAtual = '23/12/2020 23:59:00';
             $semManifestacoesEncontradas = true;
             $qtdManifestacoesNovas = 0;
             $qtdManifestacoesAntigas = 0;
@@ -2378,7 +2378,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                         $objAnexoManifestacao->setNomeArquivo($strNomeArquivoOriginal);
                         $objAnexoManifestacao->setConteudo(base64_encode(file_get_contents(DIR_SEI_TEMP . '/' . $strNomeArquivoUpload)));
 
-                        if ($this->hashDuplicado(DIR_SEI_TEMP . '/' . $strNomeArquivoUpload)) {
+                        if ($this->hashDuplicado(DIR_SEI_TEMP . '/' . $strNomeArquivoUpload, $numProtocoloFormatado)) {
                             $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Arquivo já anexado ao processo: ' . $strNomeArquivoOriginal, 'S', $tipoManifestacao);
                         } else {
                             if ($IdProtocolo && $IdProtocolo <> '') {
@@ -2466,18 +2466,14 @@ class MdCguEouvAgendamentoRN extends InfraRN
      * @return bool
      * @throws InfraException
      */
-    public function hashDuplicado($strArquivo)
+    public function hashDuplicado($strArquivo, $numProtocoloFormatado)
     {
-        /**
-         * @todo - verificar o hash e um arquivo no mesmo protocolo (é possível?)
-         */
-
         // Verifica hash do arquivo
         $hash = md5_file($strArquivo);
 
         // Select na tabela Anexe com o hash Criado
         $consulta = new MdCguEouvConsultarHashBD($this->getObjInfraIBanco());
-        $res = $consulta->consultarHash($hash);
+        $res = $consulta->consultarHash($hash, $numProtocoloFormatado);
 
         return count($res) > 0;
     }

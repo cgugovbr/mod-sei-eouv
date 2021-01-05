@@ -14,9 +14,18 @@ class MdCguEouvConsultarHashBD extends InfraBD {
         parent::__construct($objInfraIBanco);
     }
 
-    public function consultarHash($hash) {
+    public function consultarHash($hash, $numProtocoloFormatado) {
         try {
-            $sql = "SELECT hash FROM anexo WHERE hash = '" . $hash . "';";
+            $sql_protocolo = "SELECT id_protocolo FROM protocolo WHERE protocolo_formatado = '" . $numProtocoloFormatado . "';";
+            $protocolo = $this->getObjInfraIBanco()->consultarSql($sql_protocolo);
+
+            if (count($protocolo) > 0) {
+                $id_protocolo = $protocolo[0]['id_protocolo'];
+            } else {
+                $id_protocolo = 0;
+            }
+
+            $sql = "SELECT hash FROM anexo WHERE hash = '" . $hash . "' AND id_protocolo = " . $id_protocolo . ";";
 
             return $this->getObjInfraIBanco()->consultarSql($sql);
         }catch(Exception $e){
