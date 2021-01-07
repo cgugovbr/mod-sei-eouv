@@ -192,6 +192,54 @@ class MdCguEouvAgendamentoRN extends InfraRN
         return $retornoWs;
     }
 
+    public function executarServicoConsultaRecursos($urlConsultaRecurso, $token, $ultimaDataExecucao = null, $dataAtual = null, $numprotocolo = null, $numIdRelatorio = null)
+    {
+
+        $arrParametrosUrl = array(
+            'dataAberturaInicio' => $ultimaDataExecucao,
+            'dataAberturaFim' => $dataAtual,
+            'NumProtocolo' => $numprotocolo
+        );
+
+        $arrParametrosUrl = http_build_query($arrParametrosUrl);
+
+        $urlConsultaManifestacao = $urlConsultaRecurso . "?" . $arrParametrosUrl;
+
+        $retornoWs = $this->apiRestRequest($urlConsultaRecurso, $token, 1);
+
+        if (is_null($numprotocolo)) {
+            //Verifica se retornou Token Invalido
+            if (is_string($retornoWs)) {
+                if (strpos($retornoWs, 'Invalidado') !== false) {
+                    //Token expirado, necessÃ¡rio gerar novo Token
+                    return "Token Invalidado";
+                }
+
+                //Outro erro
+                if (strpos($retornoWs, 'Erro') !== false) {
+                    //Token expirado, necessÃ¡rio gerar novo Token
+                    return "Erro:" . $retornoWs;
+                }
+
+            }
+        } else {
+            //Faz tratamento diferenciado para consulta por Protocolo específico
+            if(is_string($retornoWs)) {
+                if (strpos($retornoWs, 'Erro') !== false) {
+                    if (strpos($retornoWs, '404') !== false) {
+                        $this->gravarLogLinha($this->formatarProcesso($numprotocolo), $numIdRelatorio, "Usuário não possui permissão de acesso neste protocolo.", 'N');
+                        $retornoWs = null;
+                    } else {
+                        $this->gravarLogLinha($this->formatarProcesso($numprotocolo), $numIdRelatorio, "Erro desconhecido" . $retornoWs, 'N');
+                        throw new Exception($retornoWs);
+                    }
+                }
+            }
+        }
+
+        return $retornoWs;
+    }
+
     protected function inicializarObjInfraIBanco()
     {
         return BancoSEI::getInstance();
@@ -516,7 +564,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     $objUnidadeDTO = null;
                 }
 
-               // $this->validarAcessoAutorizado(explode(',',str_replace(' ','',$objServicoDTO->getStrServidor())));
+                // $this->validarAcessoAutorizado(explode(',',str_replace(' ','',$objServicoDTO->getStrServidor())));
 
                 SessaoSEI::getInstance()->simularLogin(null, null, $objServicoDTO->getNumIdUsuario(), $objUnidadeDTO->getNumIdUnidade());
 
@@ -793,9 +841,14 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
 //            $ultimaDataExecucao = '23/12/2020 01:00:00';
 //            $dataAtual = '23/12/2020 23:59:00';
+            $ultimaDataExecucao = '06/01/2021 00:10:00';
+            $dataAtual = '06/01/2021 11:00:00';
             $semManifestacoesEncontradas = true;
             $qtdManifestacoesNovas = 0;
             $qtdManifestacoesAntigas = 0;
+            $semRecursosEncontrados = true;
+            $qtdRecursosNovos = 0;
+            $qtdRecursosAntigos = 0;
 
             /**
              * A função abaixo gravarLogImportacao recebe o tipo de manifestação 'R' (Recursos) para as manifestações do e-Sic
@@ -807,14 +860,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $textoMensagemErroToken = '';
 
             $retornoWs = $this->executarServicoConsultaManifestacoes($urlWebServiceEOuv, $token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
+//            $retornoWs = [];
+            $retornoWsRecursos = $this->executarServicoConsultaRecursos($urlWebServiceESicRecursos, $token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
+//            $retornoWsRecursos = [];
 
-            /**
-             * Exemplos de Manifestações
-             */
-            // $retornoWs = [["Links"=> [["rel"=>"self","href"=>"https://sistema.ouvidorias.gov.br/api/manifestacoes/2477063"]],"InudPossuiIdentidadePreservada"=>false,"IdManifestacao"=>2477063,"NumerosProtocolo"=>["23546048338202032"],"OuvidoriaDestino"=> ["IdOuvidoria"=>65,"IdOrgaoSiorg"=>100911,"NomeOuvidoria"=>"IFCE – Instituto Federal de Educação, Ciência e Tecnologia do Ceará"],"Assunto"=>["IdAssunto"=>731,"DescAssunto"=>"Acesso à informação"],"Servico"=>null,"TipoFormulario"=> ["IdTipoFormulario"=>3,"DescTipoFormulario"=>"Acesso à Informação"],"TipoManifestacao"=> ["IdTipoManifestacao"=>8,"DescTipoManifestacao"=>"Acesso à Informação"],"EmailManifestante"=>"higomeneses@hotmail.com","DataCadastro"=>"02/10/2020","PrazoAtendimento"=>"05/11/2020","Situacao"=>["IdSituacaoManifestacao"=>6,"DescSituacaoManifestacao"=>"Concluída"],"ResponsavelAnalise"=>"Antônio José Pessoa de Alencar; Tércio Victor de Oliveira Leal"]];
-            // $retornoWs = [["Links"=>[["rel"=>"self","href"=>"https://sistema.ouvidorias.gov.br/api/manifestacoes/2702136"]],"IndPossuiIdentidadePreservada"=>true,"IdManifestacao"=>2702136,"NumerosProtocolo"=>["23546061303202099"],"OuvidoriaDestino"=>["IdOuvidoria"=>65,"IdOrgaoSiorg"=>100911,"NomeOuvidoria"=>"IFCE – Instituto Federal de Educação, Ciência e Tecnologia do Ceará"],"Assunto"=>null,"Servico"=>null,"TipoFormulario"=>["IdTipoFormulario"=>3,"DescTipoFormulario"=>"Acesso à Informação"],"TipoManifestacao"=>["IdTipoManifestacao"=>8,"DescTipoManifestacao"=>"Acesso à Informação"],"EmailManifestante"=>null,"DataCadastro"=>"01/12/2020","PrazoAtendimento"=>"21/12/2020","Situacao"=>["IdSituacaoManifestacao"=>1,"DescSituacaoManifestacao"=>"Cadastrada"],"ResponsavelAnalise"=>""]];
-
-            //Caso retornado algum erro
+            //Caso retornado algum erro - Manifestações e-Sic
             if (is_string($retornoWs)) {
 
                 if (strpos($retornoWs, 'Invalidado') !== false) {
@@ -834,6 +884,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 }
             }
 
+            /**
+             * @todo - criar rotina para buscar recursos das manifestções com erro caso exista alguma na tabela de log
+             */
+
             if ($textoMensagemErroToken == '') {
                 $arrComErro = $this->obterManifestacoesComErro($urlWebServiceEOuv, $token, $ultimaDataExecucao, $dataAtual, $idRelatorioImportacao, 'R');
 
@@ -844,17 +898,31 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     $arrManifestacoes = $retornoWs;
                 }
 
+                if (isset($retornoWsRecursos) && is_array($retornoWsRecursos)) {
+                    $arrRecursos = $retornoWsRecursos['Recursos'];
+                    $qtdRecursosNovos = count($arrRecursos);
+                }
+
                 if (is_array($arrComErro)) {
                     $qtdManifestacoesAntigas = count($arrComErro);
                     $arrManifestacoes = array_merge($arrManifestacoes, $arrComErro);
                 }
 
+                // Importa manifestações e-Sic
                 if (count($arrManifestacoes) > 0) {
                     $semManifestacoesEncontradas = false;
                     foreach ($arrManifestacoes as $retornoWsLinha) {
                         if ($retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'] == 8) {
                             $this->executarImportacaoLinha($retornoWsLinha, 'R');
                         }
+                    }
+                }
+
+                // Importa recursos e-Sic
+                if (count($arrRecursos) > 0) {
+                    $semRecursosEncontrados = false;
+                    foreach ($arrRecursos as $retornoWsLinha) {
+                        $this->executarImportacaoLinhaRecursos($retornoWsLinha);
                     }
                 }
 
@@ -865,6 +933,13 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     $textoMensagemFinal = $textoMensagemFinal . ' Não foram encontradas manifestações para o período.';
                 } else {
                     $textoMensagemFinal = $textoMensagemFinal . '<br>Quantidade de Manifestações novas encontradas (e-Ouv|e-Sic): ' . $qtdManifestacoesNovas . '<br>Quantidade de Manifestações encontadas que ocorreram erro em outras importações: ' . $qtdManifestacoesAntigas;
+                }
+
+                if ($semRecursosEncontrados) {
+                    $textoMensagemFinal = $textoMensagemFinal . ' Não foram encontrados recursos para o período.';
+                } else {
+//                    $textoMensagemFinal = $textoMensagemFinal . '<br>Quantidade de Recursos novos encontrados (e-Sic): ' . $qtdRecursosNovos . '<br>Quantidade de Recursos encontados que ocorreram erro em outras importações: ' . $qtdRecursosAntigos;
+                    $textoMensagemFinal = $textoMensagemFinal . '<br>Quantidade de Recursos novos encontrados (e-Sic): ' . $qtdRecursosNovos;
                 }
 
                 if ($ocorreuErroEmProtocolo) {
@@ -946,7 +1021,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         //$arrDetalheManifestacao = ["IndRestricaoConteudo"=>true,"ResumoSolicitacao"=>"","Links"=>[["rel"=>"eouv","href"=>"https=>//sistema.ouvidorias.gov.br/publico/Manifestacao/ServicoDetalharManifestacao?id=0IRE2Ogle74=&idsol=+AOAFbvA0/Gyd/H8cmotUB+g9L7hrlDu"]],"IndPossuiIdentidadePreservada"=>false,"IdManifestacao"=>2647079,"NumerosProtocolo"=>["23546058301202012"],"OuvidoriaDestino"=>["IdOuvidoria"=>65,"IdOrgaoSiorg"=>100911,"NomeOuvidoria"=>"IFCE – Instituto Federal de Educação, Ciência e Tecnologia do Ceará"],"Assunto"=>["IdAssunto"=>22,"DescAssunto"=>"Auxílio"],"Servico"=>null,"TipoFormulario"=>["IdTipoFormulario"=>1,"DescTipoFormulario"=>"Padrão"],"TipoManifestacao"=>["IdTipoManifestacao"=>2,"DescTipoManifestacao"=>"Reclamação"],"EmailManifestante"=>"anasuelyccavalcante@hotmail.com","DataCadastro"=>"17/11/2020","PrazoAtendimento"=>"18/12/2020","Situacao"=>["IdSituacaoManifestacao"=>1,"DescSituacaoManifestacao"=>"Cadastrada"],"ResponsavelAnalise"=>"","OrgaoInteresse"=>null,"SubAssunto"=>null,"Tag"=>null,"RegistradoPor"=>"ANA SUELY COELHO CAVALCANTE","CanalEntrada"=>["IdCanalEntrada"=>13,"DescCanalEntrada"=>"Internet"],"ModoResposta"=>["IdModoResposta"=>1,"DescModoResposta"=>"Pelo sistema (com avisos por email)","IndModoRespostaAtivo"=>"S"],"InformacoesAdicionais"=>["Apta"=>"","EnvolveEmpresa"=>"","EnvolveServidorPublico"=>"","EnvolveCargoComissionadoDAS4OuSuperior"=>""],"dadosExtraJson"=>[],"ObservacoesOuvidoria"=>null,"Teor"=>["DescricaoAtosOuFatos"=>"Devido as informações (admissão/demissão) desatualizadas no INSS, a DATAPREV juntamente com a CEF cancelaram o meu AUXÍLIO EMERGENCIAL. Estou DESEMPREGADA desde julho/2019 e NÃO POSSUO NENHUMA RENDA. Meu Cadastro Único está atualizado. PELO AMOR DE DEUS, RESOLVAM ISSO, sim? NÃO POSSUO VÍNCULO EMPREGATÍCIO ALGUM, NÃO SOU FUNCIONÁRIA PÚBLICA. Aguardo solução através desde canal, pois no site da DATAPREV não estão me permitindo sequer contestar!","PropostaMelhoria"=>null,"Anexos"=>[["IdAnexoManifestacao"=>1705768,"NomeArquivo"=>"Screenshot_20201108-005032.png","IdObjeto"=>null,"IndComplementar"=>false,"TipoAnexoManifestacao"=>["IdTipoAnexoManifestacao"=>1,"DescTipoAnexoManifestacao"=>"Anexo Manifestação"],"Links"=>[["rel"=>"self","href"=>"https=>//sistema.ouvidorias.gov.br/api/manifestacoes/2647079/anexos/1705768"]]],["IdAnexoManifestacao"=>1705769,"NomeArquivo"=>"Screenshot_20201106-201011.png","IdObjeto"=>null,"IndComplementar"=>false,"TipoAnexoManifestacao"=>["IdTipoAnexoManifestacao"=>1,"DescTipoAnexoManifestacao"=>"Anexo Manifestação"],"Links"=>[["rel"=>"self","href"=>"https=>//sistema.ouvidorias.gov.br/api/manifestacoes/2647079/anexos/1705769"]]],["IdAnexoManifestacao"=>1705770,"NomeArquivo"=>"Screenshot_20201108-005027.png","IdObjeto"=>null,"IndComplementar"=>false,"TipoAnexoManifestacao"=>["IdTipoAnexoManifestacao"=>1,"DescTipoAnexoManifestacao"=>"Anexo Manifestação"],"Links"=>[["rel"=>"self","href"=>"https=>//sistema.ouvidorias.gov.br/api/manifestacoes/2647079/anexos/1705770"]]],["IdAnexoManifestacao"=>1705771,"NomeArquivo"=>"Screenshot_20201108-005021.png","IdObjeto"=>null,"IndComplementar"=>false,"TipoAnexoManifestacao"=>["IdTipoAnexoManifestacao"=>1,"DescTipoAnexoManifestacao"=>"Anexo Manifestação"],"Links"=>[["rel"=>"self","href"=>"https=>//sistema.ouvidorias.gov.br/api/manifestacoes/2647079/anexos/1705771"]]]],"LocalFato"=>["Municipio"=>["IdMunicipio"=>530010,"DescMunicipio"=>"Brasília","Uf"=>["SigUf"=>"DF","DescUf"=>"DISTRITO FEDERAL"]],"DescricaoLocalFato"=>"DATAPREV","GeoReferencia"=>null],"EnvolvidosManifestacao"=>[["IdEnvolvidoManifestacao"=>419152,"Nome"=>"DATAPREV","Orgao"=>"CAIXA ECONÔMICA FEDERAL E INSS","Funcao"=>"Ministro(a)","IdFuncaoEnvolvidoManifestacao"=>13]],"CamposAdicionaisManifestacao"=>[]],"Historico"=>[["HistoricoAcao"=>["DescTipoAcaoManifestacao"=>"Cadastro","DataHoraAcao"=>"17/11/2020 22=>53","Responsavel"=>"ANA SUELY COELHO CAVALCANTE","InformacoesAdicionais"=>"Registro dos dados da manifestação"]],["HistoricoAcao"=>["DescTipoAcaoManifestacao"=>"Visualização","DataHoraAcao"=>"18/11/2020 11=>46","Responsavel"=>"Tércio Victor de Oliveira Leal","InformacoesAdicionais"=>"Detalhamento no Fala.BR pelo usuário logado"]]],"TipoIdentificacaoManifestante"=>["IdTTipoIdentificacaoManifestanteDTO"=>4,"DescTipoIdentificacaoManifestanteDTO"=>"Identificadas sem Restrição"],"Manifestante"=>["TipoPessoa"=>["IdTipoPessoa"=>1,"DescTipoPessoa"=>"Pessoa Física"],"Pais"=>null,"TipoDocumentoIdentificacao"=>["IdTipoDocumentoIdentificacao"=>1,"DescTipoDocumentoIdentificacao"=>"CPF","IndAtivo"=>true],"NumeroDocumentoIdentificacao"=>"04158985870","Nome"=>"ANA SUELY COELHO CAVALCANTE","Email"=>"anasuelyccavalcante@hotmail.com","DataNascimento"=>null,"Telefone"=>["Numero"=>"989596984","ddd"=>"85"],"Endereco"=>["CEP"=>null,"Municipio"=>null,"Logradouro"=>null,"Numero"=>null,"Complemento"=>null,"Bairro"=>null],"genero"=>null,"FaixaEtaria"=>null,"corRaça"=>null,"Profissao"=>null,"Escolaridade"=>null,"RazaoSocial"=>null,"TipoInstituicao"=>null,"AreaAtuacao"=>null,"NomeRepresentante"=>null,"CargoRepresentante"=>null,"EmailRepresentante"=>null],"IndAcessoRestrito"=>false];
         // Com resposta
-       //$arrDetalheManifestacao = ["IndRestricaoConteudo"=>true,"ResumoSolicitacao"=>"","Links"=>[["rel"=>"eouv","href"=>"https://sistema.ouvidorias.gov.br/publico/Manifestacao/ServicoDetalharManifestacao?id=pB2mXMQNO4o=&idsol=+AOAFbvA0/Gyd/H8cmotUB+g9L7hrlDu"]],"IndPossuiIdentidadePreservada"=>false,"IdManifestacao"=>2670732,"NumerosProtocolo"=>["23546059531202007"],"OuvidoriaDestino"=>["IdOuvidoria"=>65,"IdOrgaoSiorg"=>100911,"NomeOuvidoria"=>"IFCE – Instituto Federal de Educação, Ciência e Tecnologia do Ceará"],"Assunto"=>["IdAssunto"=>57,"DescAssunto"=>"Defesa do Consumidor"],"Servico"=>null,"TipoFormulario"=>["IdTipoFormulario"=>1,"DescTipoFormulario"=>"Padrão"],"TipoManifestacao"=>["IdTipoManifestacao"=>2,"DescTipoManifestacao"=>"Reclamação"],"EmailManifestante"=>"luanaalbuquerquev@gmail.com","DataCadastro"=>"24/11/2020","PrazoAtendimento"=>null,"Situacao"=>["IdSituacaoManifestacao"=>5,"DescSituacaoManifestacao"=>"Complementação Solicitada"],"ResponsavelAnalise"=>"Tércio Victor de Oliveira Leal","OrgaoInteresse"=>null,"SubAssunto"=>null,"Tag"=>null,"RegistradoPor"=>"Luana Albuquerque","CanalEntrada"=>["IdCanalEntrada"=>13,"DescCanalEntrada"=>"Internet"],"ModoResposta"=>["IdModoResposta"=>1,"DescModoResposta"=>"Pelo sistema (com avisos por email)","IndModoRespostaAtivo"=>"S"],"InformacoesAdicionais"=>["Apta"=>"","EnvolveEmpresa"=>"","EnvolveServidorPublico"=>"","EnvolveCargoComissionadoDAS4OuSuperior"=>""],"dadosExtraJson"=>[],"ObservacoesOuvidoria"=>null,"Teor"=>["DescricaoAtosOuFatos"=>"Bom dia!\r\nFico muitíssimo chateada todas as vezes que preciso resolver algo no SETOR DE ESTÁGIOS do IFCE, sempre me tratam com descaso e eu demoro MESES para conseguir assinaturas que deveriam levar minutos. Os e-mails demoram muito a serem respondidos, preciso entrar em contato com o coordenador do curso para tentar agilizar o processo.\r\nUltimamente eu tive que entregar os relatórios de estágio obrigatório, peguei o modelo no SITE OFICIAL do IFCE e ele ficou minimamente diferente do original pois editei no .pages e não no .word, eu passei meses escrevendo esses relatórios e agora preciso refazer em um computador com windows. A instituição que precisa me dar um documento oficial em .pages, ou aceitar o que eu consegui editar (O MELHOR POSSÍVEL E A MUITO CUSTO), eu solicitei este documento e não existe. E mais, o recebimento destes relatórios está diretamente ligado a continuidade do meu estágio em 2021, preciso da assinatura do termo aditivo que ainda não me foi concedida.\r\nMais um adendo, no semestre passado o coordenador de estágios fez com que eu retirasse duas cadeiras porque as aulas voltariam em março e eu não poderia conciliar o estágio com o trabalho, não voltamos, COMO PREVISTO. Eu perdi duas cadeiras que já tinha feito provas presencialmente, sem motivo algum. É isto, espero ter sido clara. Obrigada!","PropostaMelhoria"=>null,"Anexos"=>[],"LocalFato"=>["Municipio"=>["IdMunicipio"=>230440,"DescMunicipio"=>"Fortaleza","Uf"=>["SigUf"=>"CE","DescUf"=>"CEARÁ"]],"DescricaoLocalFato"=>"IFCE","GeoReferencia"=>null],"EnvolvidosManifestacao"=>[],"CamposAdicionaisManifestacao"=>[]],"Historico"=>[["HistoricoAcao"=>["DescTipoAcaoManifestacao"=>"Cadastro","DataHoraAcao"=>"24/11/2020 09=>14","Responsavel"=>"Luana Albuquerque","InformacoesAdicionais"=>"Registro dos dados da manifestação"]],["HistoricoAcao"=>["DescTipoAcaoManifestacao"=>"Visualização","DataHoraAcao"=>"24/11/2020 09=>15","Responsavel"=>"Tércio Victor de Oliveira Leal","InformacoesAdicionais"=>"Detalhamento no Fala.BR pelo usuário logado"]],["HistoricoAcao"=>["DescTipoAcaoManifestacao"=>"Visualização","DataHoraAcao"=>"24/11/2020 09=>16","Responsavel"=>"Tércio Victor de Oliveira Leal","InformacoesAdicionais"=>"Detalhamento no Fala.BR pelo usuário logado"]],["HistoricoAcao"=>["DescTipoAcaoManifestacao"=>"Análise","DataHoraAcao"=>"24/11/2020 09=>17","Responsavel"=>"Tércio Victor de Oliveira Leal","InformacoesAdicionais"=>"Usuário responsável pela análise=> Tércio Victor de Oliveira Leal"]],["HistoricoAcao"=>["DescTipoAcaoManifestacao"=>"Registro Resposta","DataHoraAcao"=>"24/11/2020 09=>18","Responsavel"=>"Tércio Victor de Oliveira Leal","InformacoesAdicionais"=>" - Prazo de resposta suspenso até que uma complementação seja feita. Prazo anterior=> 28/12/2020"],"Resposta"=>["IdRespostaManifestacao"=>2655789,"TipoRespostaManifestacao"=>["IdTipoRespostaManifestacao"=>1,"DescTipoRespostaManifestacao"=>"Pedido de Complementação"],"TxtResposta"=>"Bom dia,\r\n\r\nPara o correto encaminhamento de sua reclamação à área finalística, precisamos saber qual o curso e campus (unidade do IFCE) você é aluna.\r\n\r\nAtenciosamente,","RespostaPublicavel"=>false,"Decisao"=>null,"DataCompromisso"=>null]]],"TipoIdentificacaoManifestante"=>["IdTTipoIdentificacaoManifestanteDTO"=>4,"DescTipoIdentificacaoManifestanteDTO"=>"Identificadas sem Restrição"],"Manifestante"=>["TipoPessoa"=>["IdTipoPessoa"=>1,"DescTipoPessoa"=>"Pessoa Física"],"Pais"=>["IdPais"=>1058,"Descricao"=>"Brasil"],"TipoDocumentoIdentificacao"=>["IdTipoDocumentoIdentificacao"=>1,"DescTipoDocumentoIdentificacao"=>"CPF","IndAtivo"=>true],"NumeroDocumentoIdentificacao"=>"60413183378","Nome"=>"Luana Albuquerque","Email"=>"luanaalbuquerquev@gmail.com","DataNascimento"=>null,"Telefone"=>null,"Endereco"=>["CEP"=>null,"Municipio"=>null,"Logradouro"=>null,"Numero"=>null,"Complemento"=>null,"Bairro"=>null],"genero"=>null,"FaixaEtaria"=>null,"corRaça"=>null,"Profissao"=>null,"Escolaridade"=>null,"RazaoSocial"=>null,"TipoInstituicao"=>null,"AreaAtuacao"=>null,"NomeRepresentante"=>null,"CargoRepresentante"=>null,"EmailRepresentante"=>null],"IndAcessoRestrito"=>false];
+        //$arrDetalheManifestacao = ["IndRestricaoConteudo"=>true,"ResumoSolicitacao"=>"","Links"=>[["rel"=>"eouv","href"=>"https://sistema.ouvidorias.gov.br/publico/Manifestacao/ServicoDetalharManifestacao?id=pB2mXMQNO4o=&idsol=+AOAFbvA0/Gyd/H8cmotUB+g9L7hrlDu"]],"IndPossuiIdentidadePreservada"=>false,"IdManifestacao"=>2670732,"NumerosProtocolo"=>["23546059531202007"],"OuvidoriaDestino"=>["IdOuvidoria"=>65,"IdOrgaoSiorg"=>100911,"NomeOuvidoria"=>"IFCE – Instituto Federal de Educação, Ciência e Tecnologia do Ceará"],"Assunto"=>["IdAssunto"=>57,"DescAssunto"=>"Defesa do Consumidor"],"Servico"=>null,"TipoFormulario"=>["IdTipoFormulario"=>1,"DescTipoFormulario"=>"Padrão"],"TipoManifestacao"=>["IdTipoManifestacao"=>2,"DescTipoManifestacao"=>"Reclamação"],"EmailManifestante"=>"luanaalbuquerquev@gmail.com","DataCadastro"=>"24/11/2020","PrazoAtendimento"=>null,"Situacao"=>["IdSituacaoManifestacao"=>5,"DescSituacaoManifestacao"=>"Complementação Solicitada"],"ResponsavelAnalise"=>"Tércio Victor de Oliveira Leal","OrgaoInteresse"=>null,"SubAssunto"=>null,"Tag"=>null,"RegistradoPor"=>"Luana Albuquerque","CanalEntrada"=>["IdCanalEntrada"=>13,"DescCanalEntrada"=>"Internet"],"ModoResposta"=>["IdModoResposta"=>1,"DescModoResposta"=>"Pelo sistema (com avisos por email)","IndModoRespostaAtivo"=>"S"],"InformacoesAdicionais"=>["Apta"=>"","EnvolveEmpresa"=>"","EnvolveServidorPublico"=>"","EnvolveCargoComissionadoDAS4OuSuperior"=>""],"dadosExtraJson"=>[],"ObservacoesOuvidoria"=>null,"Teor"=>["DescricaoAtosOuFatos"=>"Bom dia!\r\nFico muitíssimo chateada todas as vezes que preciso resolver algo no SETOR DE ESTÁGIOS do IFCE, sempre me tratam com descaso e eu demoro MESES para conseguir assinaturas que deveriam levar minutos. Os e-mails demoram muito a serem respondidos, preciso entrar em contato com o coordenador do curso para tentar agilizar o processo.\r\nUltimamente eu tive que entregar os relatórios de estágio obrigatório, peguei o modelo no SITE OFICIAL do IFCE e ele ficou minimamente diferente do original pois editei no .pages e não no .word, eu passei meses escrevendo esses relatórios e agora preciso refazer em um computador com windows. A instituição que precisa me dar um documento oficial em .pages, ou aceitar o que eu consegui editar (O MELHOR POSSÍVEL E A MUITO CUSTO), eu solicitei este documento e não existe. E mais, o recebimento destes relatórios está diretamente ligado a continuidade do meu estágio em 2021, preciso da assinatura do termo aditivo que ainda não me foi concedida.\r\nMais um adendo, no semestre passado o coordenador de estágios fez com que eu retirasse duas cadeiras porque as aulas voltariam em março e eu não poderia conciliar o estágio com o trabalho, não voltamos, COMO PREVISTO. Eu perdi duas cadeiras que já tinha feito provas presencialmente, sem motivo algum. É isto, espero ter sido clara. Obrigada!","PropostaMelhoria"=>null,"Anexos"=>[],"LocalFato"=>["Municipio"=>["IdMunicipio"=>230440,"DescMunicipio"=>"Fortaleza","Uf"=>["SigUf"=>"CE","DescUf"=>"CEARÁ"]],"DescricaoLocalFato"=>"IFCE","GeoReferencia"=>null],"EnvolvidosManifestacao"=>[],"CamposAdicionaisManifestacao"=>[]],"Historico"=>[["HistoricoAcao"=>["DescTipoAcaoManifestacao"=>"Cadastro","DataHoraAcao"=>"24/11/2020 09=>14","Responsavel"=>"Luana Albuquerque","InformacoesAdicionais"=>"Registro dos dados da manifestação"]],["HistoricoAcao"=>["DescTipoAcaoManifestacao"=>"Visualização","DataHoraAcao"=>"24/11/2020 09=>15","Responsavel"=>"Tércio Victor de Oliveira Leal","InformacoesAdicionais"=>"Detalhamento no Fala.BR pelo usuário logado"]],["HistoricoAcao"=>["DescTipoAcaoManifestacao"=>"Visualização","DataHoraAcao"=>"24/11/2020 09=>16","Responsavel"=>"Tércio Victor de Oliveira Leal","InformacoesAdicionais"=>"Detalhamento no Fala.BR pelo usuário logado"]],["HistoricoAcao"=>["DescTipoAcaoManifestacao"=>"Análise","DataHoraAcao"=>"24/11/2020 09=>17","Responsavel"=>"Tércio Victor de Oliveira Leal","InformacoesAdicionais"=>"Usuário responsável pela análise=> Tércio Victor de Oliveira Leal"]],["HistoricoAcao"=>["DescTipoAcaoManifestacao"=>"Registro Resposta","DataHoraAcao"=>"24/11/2020 09=>18","Responsavel"=>"Tércio Victor de Oliveira Leal","InformacoesAdicionais"=>" - Prazo de resposta suspenso até que uma complementação seja feita. Prazo anterior=> 28/12/2020"],"Resposta"=>["IdRespostaManifestacao"=>2655789,"TipoRespostaManifestacao"=>["IdTipoRespostaManifestacao"=>1,"DescTipoRespostaManifestacao"=>"Pedido de Complementação"],"TxtResposta"=>"Bom dia,\r\n\r\nPara o correto encaminhamento de sua reclamação à área finalística, precisamos saber qual o curso e campus (unidade do IFCE) você é aluna.\r\n\r\nAtenciosamente,","RespostaPublicavel"=>false,"Decisao"=>null,"DataCompromisso"=>null]]],"TipoIdentificacaoManifestante"=>["IdTTipoIdentificacaoManifestanteDTO"=>4,"DescTipoIdentificacaoManifestanteDTO"=>"Identificadas sem Restrição"],"Manifestante"=>["TipoPessoa"=>["IdTipoPessoa"=>1,"DescTipoPessoa"=>"Pessoa Física"],"Pais"=>["IdPais"=>1058,"Descricao"=>"Brasil"],"TipoDocumentoIdentificacao"=>["IdTipoDocumentoIdentificacao"=>1,"DescTipoDocumentoIdentificacao"=>"CPF","IndAtivo"=>true],"NumeroDocumentoIdentificacao"=>"60413183378","Nome"=>"Luana Albuquerque","Email"=>"luanaalbuquerquev@gmail.com","DataNascimento"=>null,"Telefone"=>null,"Endereco"=>["CEP"=>null,"Municipio"=>null,"Logradouro"=>null,"Numero"=>null,"Complemento"=>null,"Bairro"=>null],"genero"=>null,"FaixaEtaria"=>null,"corRaça"=>null,"Profissao"=>null,"Escolaridade"=>null,"RazaoSocial"=>null,"TipoInstituicao"=>null,"AreaAtuacao"=>null,"NomeRepresentante"=>null,"CargoRepresentante"=>null,"EmailRepresentante"=>null],"IndAcessoRestrito"=>false];
 
         /**
          * Verifica Tipo de Manifestação e-Ouv ou e-Sic
@@ -1048,6 +1123,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                     // Importar anexos do novo recurso
                     try {
+
+                        var_dump('ok');
+                        die();
 
                         $anexoCount = 0;
                         if (isset($arrRecursosManifestacao['Recursos']) && is_array($arrRecursosManifestacao['Recursos'])) {
@@ -1195,6 +1273,136 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 }
                 $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Erro na gravação: ' . $e, 'N', $tipoManifestacao);
             }
+        }
+    }
+
+    public function executarImportacaoLinhaRecursos ($arrRecursosManifestacao, $tipoManifestacao = 'R')
+    {
+
+        global $urlWebServiceEOuv,
+               $objEouvRelatorioImportacaoDTO,
+               $idTipoDocumentoAnexoPadrao,
+               $urlWebServiceESicRecursos,
+               $objProcedimentoDTO,
+               $objTipoProcedimentoDTO,
+               $arrObjAssuntoDTO,
+               $arrObjParticipantesDTO,
+               $idTipoDocumentoAnexoDadosManifestacao,
+               $idUnidadeOuvidoria,
+               $idUnidadeEsicPrincipal,
+               $idUnidadeRecursoPrimeiraInstancia,
+               $idUnidadeRecursoSegundaInstancia,
+               $idUnidadeRecursoTerceiraInstancia,
+               $idUnidadeRecursoPedidoRevisao,
+               $idUsuarioSei,
+               $objWSAnexo,
+               $dataRegistro,
+               $ocorreuErroEmProtocolo,
+               $numProtocoloFormatado,
+               $idRelatorioImportacao,
+               $token;
+
+        $objProcedimentoDTO = new ProcedimentoDTO();
+        $objProtocoloDTO = new ProtocoloDTO();
+        $objProcedimentoRN = new ProcedimentoRN();
+        $objProcedimentoDTO->setDblIdProcedimento(null);
+
+        $numProtocoloFormatado =  $this->formatarProcesso($arrRecursosManifestacao['numProtocolo']);
+        $dataPrazoAtendimento = $arrRecursosManifestacao['prazoAtendimento'];
+
+        /**
+         * Limpa os registros de detalhe de importação com erro para este NUP.
+         * Caso ocorra um novo, será criado novo registro de erro para o NUP no tratamento desta function.
+         */
+        $this->limparErrosParaNup($numProtocoloFormatado);
+
+        /**
+         * Se for Manifestação do e-Sic verificar:houve alteração na data 'PrazoAtendimento' e
+         * gera novo arquivo PDF com as alterações para inserção no mesmo protocolo (NUP) e
+         * importa anexos comparando o hash do arquivo para não duplicidade no processo
+         */
+        // Vefificar se o NUP já existe
+        $objProtocoloDTOExistente = $this->verificarProtocoloExistente($this->formatarProcesso($numProtocoloFormatado));
+
+        // Caso já exista um Protocolo no SEI continua, caso contrário apenas registra o log
+        if (! is_null($objProtocoloDTOExistente)) {
+
+            // Se existir e for e-Sic
+            if ($tipoManifestacao == 'R') {
+
+                // Data do último prazo de atendimento para este protocolo
+                $objUltimaDataPrazoAtendimento = MdCguEouvAgendamentoINT::retornarUltimaDataPrazoAtendimento($numProtocoloFormatado);
+
+                // Verificar se houve alteração na data 'PrazoAtendimento'
+                if ($objUltimaDataPrazoAtendimento->getDthDthPrazoAtendimento() <> $dataPrazoAtendimento) {
+
+                    // Importar anexos do novo recurso
+                    try {
+                        if (isset($arrRecursosManifestacao)) {
+                            $anexoCount = isset($arrRecursosManifestacao['qtdAnexos']) ? $arrRecursosManifestacao['qtdAnexos'] : 0;
+
+                            // Verifica Tipo de Recurso
+                            $tipo_recurso = $this->verificaTipo($arrRecursosManifestacao);
+
+                            // Buscar dados da Manifestação
+                            $numProtocoloSemFormatacao = str_replace(['.', '/', '-'], ['', '', ''], $numProtocoloFormatado);
+                            $retornoWsLinha = $this->executarServicoConsultaManifestacoes($urlWebServiceEOuv, $token, null, null, $numProtocoloSemFormatacao, $idRelatorioImportacao);
+                            $linkDetalheManifestacao = $retornoWsLinha[0]['Links'][0]['href'];
+                            $arrDetalheManifestacao = $this->apiRestRequest($linkDetalheManifestacao, $token, 2);
+
+                            // Carregar documento recurso
+                            $this->gerarPDFPedidoInicialESic($arrDetalheManifestacao, $arrRecursosManifestacao, $objProtocoloDTOExistente->getDblIdProtocolo(), $tipo_recurso);
+                            $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Recurso com protocolo ' . $numProtocoloFormatado . ' importado com sucesso com ' . $anexoCount . ' anexos incluidos no protocolo.', 'S', $tipoManifestacao, $dataPrazoAtendimento);
+                            LogSEI::getInstance()->gravar('Módulo Integração FalaBR - Importação de Recurso ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . $anexoCount, InfraLog::$INFORMACAO);
+
+                            // Carregar anexos
+                            if (count($arrRecursosManifestacao['anexos']) > 0) {
+                                $this->gerarAnexosProtocolo($arrRecursosManifestacao['anexos'], $numProtocoloFormatado, $tipoManifestacao, $objProtocoloDTOExistente->getDblIdProtocolo());
+                            }
+
+                            // Vincular Recursos com as unidades corretas conforme o tipo de recurso
+                            // Se for 1 instância envia processo para ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA
+                            if ($tipo_recurso == 'R1') {
+                                $unidadeDestino = $idUnidadeRecursoPrimeiraInstancia;
+                            } elseif ($tipo_recurso == 'R2') {
+                                $unidadeDestino = $idUnidadeRecursoSegundaInstancia;
+                            } elseif ($tipo_recurso == 'R3' || $tipo_recurso == 'RC') {
+                                $unidadeDestino = $idUnidadeRecursoTerceiraInstancia;
+                            } elseif ($tipo_recurso == 'PR') {
+                                $unidadeDestino = $idUnidadeRecursoPedidoRevisao;
+                            } else {
+                                $unidadeDestino = $idUnidadeOuvidoria;
+                            }
+
+                            try {
+                                $objEntradaEnviarProcesso = new EntradaEnviarProcessoAPI();
+                                $objEntradaEnviarProcesso->setIdProcedimento($objProtocoloDTOExistente->getDblIdProtocolo());
+                                // $objEntradaEnviarProcesso->setProtocoloProcedimento($numProtocoloFormatado);
+                                $objEntradaEnviarProcesso->setUnidadesDestino([$unidadeDestino]);
+                                $objEntradaEnviarProcesso->setSinManterAbertoUnidade('S');
+                                $objEntradaEnviarProcesso->setSinEnviarEmailNotificacao('S');
+                                $objEntradaEnviarProcesso->setSinReabrir('S');
+
+                                $objSeiRN = new SeiRN();
+                                $objSeiRN->enviarProcesso($objEntradaEnviarProcesso);
+                                LogSEI::getInstance()->gravar('Módulo Integração FalaBR - (Recurso primeira instância) Processo ' . $numProtocoloFormatado . ' enviado para unidade ' . $idUnidadeRecursoPrimeiraInstancia, InfraLog::$INFORMACAO);
+
+                            } catch (Exception $e) {
+                                LogSEI::getInstance()->gravar('Módulo Integração FalaBR - (Recurso primeira instância) Não foi possivel abrir o Processo ' . $numProtocoloFormatado . ' na unidade ' . $idUnidadeRecursoPrimeiraInstancia . ' - erro: ' . $e, InfraLog::$INFORMACAO);
+                            }
+                        } else {
+                            $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Sem recursos novos.', 'N', $tipoManifestacao);
+                        }
+                    } catch (Exception $e) {
+                        $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Erro na gravação recurso: ' . $e, 'N', $tipoManifestacao);
+                    }
+                } else {
+                    // Se não houve alteração na data 'PrazoAtendimento' retornar log
+                    $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Já existe um processo (e-Sic) utilizando o número de protocolo e não há alteração para nova importação.', 'S', $tipoManifestacao);
+                }
+            }
+        } else {
+            $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'O recurso para o processo ' . $numProtocoloFormatado . ' ainda não existe no SEI. Provavelmente o Tipo de Manifestação do FalaBR não foi registrada para este módulo.', 'S', $tipoManifestacao);
         }
     }
 
@@ -2026,7 +2234,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $pdf->Cell(0, 20, $menu_count . ". Recursos", true, 0, 'L');
             $pdf->Ln(30);
 
-            $recursos = $retornoWsRecursos['Recursos'];
+            $recursos = isset($retornoWsRecursos['Recursos']) ? $retornoWsRecursos['Recursos'] : [$retornoWsRecursos];
 
             if (count($recursos) > 0) {
                 foreach ($recursos as $recurso) {
@@ -2376,17 +2584,18 @@ class MdCguEouvAgendamentoRN extends InfraRN
                         $objAnexoManifestacao->setIdSerie($idTipoDocumentoAnexoDadosManifestacao);
                         $objAnexoManifestacao->setData(InfraData::getStrDataHoraAtual());
                         $objAnexoManifestacao->setNomeArquivo($strNomeArquivoOriginal);
+                        $objAnexoManifestacao->setNumero($strNomeArquivoOriginal);
                         $objAnexoManifestacao->setConteudo(base64_encode(file_get_contents(DIR_SEI_TEMP . '/' . $strNomeArquivoUpload)));
 
                         if ($this->hashDuplicado(DIR_SEI_TEMP . '/' . $strNomeArquivoUpload, $numProtocoloFormatado)) {
-                            $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Arquivo já anexado ao processo: ' . $strNomeArquivoOriginal, 'S', $tipoManifestacao);
+//                            $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Arquivo já anexado ao processo: ' . $strNomeArquivoOriginal, 'S', $tipoManifestacao);
                         } else {
                             if ($IdProtocolo && $IdProtocolo <> '') {
                                 $objSEIRN = new SeiRN();
                                 $objSEIRN->incluirDocumento($objAnexoManifestacao);
                             }
 
-                            $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Arquivo adicionado como anexo: ' . $strNomeArquivoOriginal, 'S', $tipoManifestacao);
+//                            $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Arquivo adicionado como anexo: ' . $strNomeArquivoOriginal, 'S', $tipoManifestacao);
                             array_push($arrAnexosAdicionados, $objAnexoManifestacao);
                         }
                     } else {
@@ -2532,31 +2741,42 @@ class MdCguEouvAgendamentoRN extends InfraRN
     public function verificaTipo($recursos = null)
     {
         $response = 'P';
-        if (isset($recursos) && is_array($recursos)) {
-            foreach ($recursos as $recurso) {
-                if ($recurso['instancia']['IdInstanciaRecurso'] == 6) {
-                    $response = 'PR'; // Pedido Revisão
-                    break;
+        if (isset($recursos)) {
+            if (isset($recursos['instancia'])) {
+                $response = $this->checkTipoRecurso($recursos);
+            } else {
+                foreach ($recursos as $recurso) {
+                    if ($this->checkTipoRecurso($recurso)) {
+                        $response = $this->checkTipoRecurso($recurso);
+                        break;
+                    }
                 }
-                if ($recurso['instancia']['IdInstanciaRecurso'] == 7) {
-                    $response = 'R3'; // Recurso 3 instância
-                    break;
-                }
-                if ($recurso['instancia']['IdInstanciaRecurso'] == 3) {
-                    $response = 'RC'; // Recurso CGU
-                    break;
-                }
-                if ($recurso['instancia']['IdInstanciaRecurso'] == 2) {
-                    $response = 'R2'; // Recurso 2 instância
-                    break;
-                }
-                if ($recurso['instancia']['IdInstanciaRecurso'] == 1) {
-                    $response = 'R1'; // Recurso 1 instância
-                }
+
             }
         }
 
         return $response;
+    }
+
+    public function checkTipoRecurso($recurso)
+    {
+        if ($recurso['instancia']['IdInstanciaRecurso'] == 6) {
+            return 'PR'; // Pedido Revisão
+        }
+        if ($recurso['instancia']['IdInstanciaRecurso'] == 7) {
+            return 'R3'; // Recurso 3 instância
+        }
+        if ($recurso['instancia']['IdInstanciaRecurso'] == 3) {
+            return 'RC'; // Recurso CGU
+        }
+        if ($recurso['instancia']['IdInstanciaRecurso'] == 2) {
+            return 'R2'; // Recurso 2 instância
+        }
+        if ($recurso['instancia']['IdInstanciaRecurso'] == 1) {
+            return 'R1'; // Recurso 1 instância
+        }
+
+        return null;
     }
 }
 

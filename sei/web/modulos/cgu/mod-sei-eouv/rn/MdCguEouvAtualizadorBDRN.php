@@ -409,7 +409,7 @@ class MdCguEouvAtualizadorBDRN extends InfraRN
          */
         $this->logar('CRIA REGISTROS NA TABELA md_eouv_parametros PARA MANIFESTAÇÕES DO E-SIC (TIPO 8)');
         BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (12, \'ESIC_DATA_INICIAL_IMPORTACAO_MANIFESTACOES\', \'01/01/1900\', \'esic\');');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (13, \'ESIC_URL_WEBSERVICE_IMPORTACAO_RECURSOS\', \'https://treinafalabr.cgu.gov.br/api/recursos?NumProtocolo=\', \'esic\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (13, \'ESIC_URL_WEBSERVICE_IMPORTACAO_RECURSOS\', \'https://treinafalabr.cgu.gov.br/api/recursos\', \'esic\');');
         BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (14, \'ESIC_ID_UNIDADE_PRINCIPAL\', \'110000001\', \'esic\');');
         BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (15, \'ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA\', \'110000001\', \'esic\');');
         BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (16, \'ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA\', \'110000001\', \'esic\');');

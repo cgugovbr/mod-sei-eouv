@@ -59,6 +59,7 @@ class MdCguEouvAgendamentoINT extends InfraINT
         $objEouvRelatorioImportacaoDetalheDTO->retDthDthPrazoAtendimento();
         $objEouvRelatorioImportacaoDetalheDTO->setStrSinSucesso('S');
         $objEouvRelatorioImportacaoDetalheDTO->setStrTipManifestacao('R');
+        $objEouvRelatorioImportacaoDetalheDTO->setOrdDthDthPrazoAtendimento(InfraDTO::$TIPO_ORDENACAO_DESC);
         $objEouvRelatorioImportacaoDetalheDTO->setOrdNumIdRelatorioImportacao(InfraDTO::$TIPO_ORDENACAO_DESC);
         $objEouvRelatorioImportacaoDetalheDTO->setNumMaxRegistrosRetorno(1);
         $objEouvRelatorioImportacaoDetalheDTO->setStrProtocoloFormatado($protocoloFormatado);
