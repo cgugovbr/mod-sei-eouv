@@ -841,8 +841,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
 //            $ultimaDataExecucao = '23/12/2020 01:00:00';
 //            $dataAtual = '23/12/2020 23:59:00';
-            $ultimaDataExecucao = '06/01/2021 00:10:00';
-            $dataAtual = '06/01/2021 11:00:00';
+//            $ultimaDataExecucao = '06/01/2021 00:10:00';
+//            $dataAtual = '06/01/2021 11:00:00';
             $semManifestacoesEncontradas = true;
             $qtdManifestacoesNovas = 0;
             $qtdManifestacoesAntigas = 0;
