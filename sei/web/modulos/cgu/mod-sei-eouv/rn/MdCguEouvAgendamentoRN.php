@@ -2288,7 +2288,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $encaminhamentos = $retornoWsLinha['Historico'];
         if (count($encaminhamentos) > 0) {
             foreach ($encaminhamentos as $encaminhamento) {
-                if ($encaminhamento['Encaminhamento'] <> '') {
+                if (isset($encaminhamento['Encaminhamento'])) {
 
                     $possui_denuncia = true;
 
@@ -2296,13 +2296,13 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     $pdf->SetFont('arial', 'B', 12);
                     $pdf->Cell(180, 20, "Órgão/Entidade de Origem:", 0, 0, 'R');
                     $pdf->setFont('arial', '', 12);
-                    $pdf->Cell(70, 20, $encaminhamento['Encaminhamento']['OuvidoriaOrigem']['NomeOuvidoria'], 0, 1, 'L');
+                    $pdf->Cell(70, 20, $encaminhamento['Encaminhamento']['OuvidoriaOrigem']['NomOuvidoria'], 0, 1, 'L');
 
                     // Órgão Destino
                     $pdf->SetFont('arial', 'B', 12);
                     $pdf->Cell(180, 20, "Órgão/Entidade Destinatária:", 0, 0, 'R');
                     $pdf->setFont('arial', '', 12);
-                    $pdf->Cell(70, 20, $encaminhamento['Encaminhamento']['OuvidoriaDestino']['NomeOuvidoria'], 0, 1, 'L');
+                    $pdf->Cell(70, 20, $encaminhamento['Encaminhamento']['OuvidoriaDestino']['NomOuvidoria'], 0, 1, 'L');
 
                     // Mensagem ao Destinatário
                     $pdf->SetFont('arial', 'B', 12);
