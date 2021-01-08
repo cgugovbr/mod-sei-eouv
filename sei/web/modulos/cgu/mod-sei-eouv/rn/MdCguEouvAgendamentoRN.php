@@ -839,8 +839,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $ultimaDataExecucao = $dataInicialImportacaoManifestacoes;
             }
 
-//            $ultimaDataExecucao = '23/12/2020 01:00:00';
-//            $dataAtual = '23/12/2020 23:59:00';
+//            $ultimaDataExecucao = '04/11/2020 01:00:00';
+//            $dataAtual = '04/11/2020 23:59:00';
 //            $ultimaDataExecucao = '06/01/2021 00:10:00';
 //            $dataAtual = '06/01/2021 11:00:00';
             $semManifestacoesEncontradas = true;
@@ -1095,7 +1095,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                             $tipo_recurso = $this->verificaTipo($arrRecursosManifestacao['Recursos']);
 
                             // Carregar documento recurso
-                            $this->gerarPDFPedidoInicialESic($arrDetalheManifestacao, $arrRecursosManifestacao, $objProtocoloDTOExistente->getDblIdProtocolo(), $tipo_recurso);
+                            $this->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacao, $objProtocoloDTOExistente->getDblIdProtocolo(), $tipo_recurso);
                             LogSEI::getInstance()->gravar('Módulo Integração FalaBR - Importação de Recurso ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . $anexoCount, InfraLog::$INFORMACAO);
                             $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Recurso com protocolo ' . $numProtocoloFormatado . ' importado com sucesso com ' . $anexoCount . ' anexos incluidos no protocolo.', 'S', $tipoManifestacao, $dataPrazoAtendimento);
 
@@ -1213,7 +1213,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                  * Verificar o tipo de documento a ser importado para gerar o PDF conforme tipo de documento
                  */
                 if ($manifestacaoESic) {
-                    $documentoManifestacao = $this->gerarPDFPedidoInicialESic($arrDetalheManifestacao, $arrRecursosManifestacao);
+                    $documentoManifestacao = $this->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacao);
                 } else {
                     $documentoManifestacao = $this->gerarPDFPedidoInicial($arrDetalheManifestacao);
                 }
@@ -1312,7 +1312,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                             $arrDetalheManifestacao = $this->apiRestRequest($linkDetalheManifestacao, $token, 2);
 
                             // Carregar documento recurso
-                            $this->gerarPDFPedidoInicialESic($arrDetalheManifestacao, $arrRecursosManifestacao, $objProtocoloDTOExistente->getDblIdProtocolo(), $tipo_recurso);
+                            $this->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacao, $objProtocoloDTOExistente->getDblIdProtocolo(), $tipo_recurso);
                             $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Recurso com protocolo ' . $numProtocoloFormatado . ' importado com sucesso com ' . $anexoCount . ' anexos incluidos no protocolo.', 'S', $tipoManifestacao, $dataPrazoAtendimento);
                             LogSEI::getInstance()->gravar('Módulo Integração FalaBR - Importação de Recurso ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . $anexoCount, InfraLog::$INFORMACAO);
 
@@ -1717,7 +1717,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         return $objDocumentoManifestacao;
     }
 
-    public function gerarPDFPedidoInicialESic($retornoWsLinha, $retornoWsRecursos = null, $IdProtocolo = false, $tipo_recurso = '')
+    public function gerarPDFDocumentoESic($retornoWsLinha, $retornoWsRecursos = null, $IdProtocolo = false, $tipo_recurso = '')
     {
         global $idTipoDocumentoAnexoDadosManifestacao,
                $ocorreuErroAdicionarAnexo,
@@ -1862,38 +1862,38 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $pdf->MultiCell(0, 20, $retornoWsLinha['Teor']['DescricaoAtosOuFatos'], 0, 'J');
 
         // Proposta de Melhoraia
-        $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(180, 20, "Proposta de Melhoria:", 0, 0, 'R');
-        $pdf->setFont('arial', '', 12);
-        $pdf->Cell(0, 20, $retornoWsLinha['Teor']['PropostaMelhoria'], 0, 1, 'L');
+//        $pdf->SetFont('arial', 'B', 12);
+//        $pdf->Cell(180, 20, "Proposta de Melhoria:", 0, 0, 'R');
+//        $pdf->setFont('arial', '', 12);
+//        $pdf->Cell(0, 20, $retornoWsLinha['Teor']['PropostaMelhoria'], 0, 1, 'L');
 
         // Município do local do fato
-        $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(180, 20, "Município do local do fato:", 0, 0, 'R');
-        if (is_array($retornoWsLinha['Teor']['LocalFato'])) {
-            if (is_array($retornoWsLinha['Teor']['LocalFato']['Municipio'])) {
-                $pdf->setFont('arial', '', 12);
-                $pdf->Cell(70, 20, $retornoWsLinha['Teor']['LocalFato']['Municipio']['DescMunicipio'], 0, 1, 'L');
-            }
-        }
+//        $pdf->SetFont('arial', 'B', 12);
+//        $pdf->Cell(180, 20, "Município do local do fato:", 0, 0, 'R');
+//        if (is_array($retornoWsLinha['Teor']['LocalFato'])) {
+//            if (is_array($retornoWsLinha['Teor']['LocalFato']['Municipio'])) {
+//                $pdf->setFont('arial', '', 12);
+//                $pdf->Cell(70, 20, $retornoWsLinha['Teor']['LocalFato']['Municipio']['DescMunicipio'], 0, 1, 'L');
+//            }
+//        }
 
         // UF do local do fato
-        $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(180, 20, "UF do local do fato:", 0, 0, 'R');
-        if (is_array($retornoWsLinha['Teor']['LocalFato'])) {
-            if (is_array($retornoWsLinha['Teor']['LocalFato']['Municipio'])) {
-                $pdf->setFont('arial', '', 12);
-                $pdf->Cell(70, 20, $retornoWsLinha['Teor']['LocalFato']['Municipio']['Uf']['SigUf'], 0, 1, 'L');
-            }
-        }
+//        $pdf->SetFont('arial', 'B', 12);
+//        $pdf->Cell(180, 20, "UF do local do fato:", 0, 0, 'R');
+//        if (is_array($retornoWsLinha['Teor']['LocalFato'])) {
+//            if (is_array($retornoWsLinha['Teor']['LocalFato']['Municipio'])) {
+//                $pdf->setFont('arial', '', 12);
+//                $pdf->Cell(70, 20, $retornoWsLinha['Teor']['LocalFato']['Municipio']['Uf']['SigUf'], 0, 1, 'L');
+//            }
+//        }
 
         // Descricao Local
-        $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(180, 20, "Local:", 0, 0, 'R');
-        if (is_array($retornoWsLinha['Teor']['LocalFato'])) {
-            $pdf->setFont('arial', '', 12);
-            $pdf->Cell(70, 20, $retornoWsLinha['Teor']['LocalFato']['DescricaoLocalFato'], 0, 1, 'L');
-        }
+//        $pdf->SetFont('arial', 'B', 12);
+//        $pdf->Cell(180, 20, "Local:", 0, 0, 'R');
+//        if (is_array($retornoWsLinha['Teor']['LocalFato'])) {
+//            $pdf->setFont('arial', '', 12);
+//            $pdf->Cell(70, 20, $retornoWsLinha['Teor']['LocalFato']['DescricaoLocalFato'], 0, 1, 'L');
+//        }
 
         /**
          * Anexos
@@ -2108,10 +2108,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     $pdf->Cell(70, 20, $historico['Resposta']['Decisao']['descricaoDecisao'], 0, 1, 'L');
 
                     // Data Compromisso
-                    $pdf->SetFont('arial', 'B', 12);
-                    $pdf->Cell(180, 20, "Compromisso:", 0, 0, 'R');
-                    $pdf->setFont('arial', '', 12);
-                    $pdf->Cell(70, 20, $historico['Resposta']['DataCompromisso'], 0, 1, 'L');
+//                    $pdf->SetFont('arial', 'B', 12);
+//                    $pdf->Cell(180, 20, "Compromisso:", 0, 0, 'R');
+//                    $pdf->setFont('arial', '', 12);
+//                    $pdf->Cell(70, 20, $historico['Resposta']['DataCompromisso'], 0, 1, 'L');
 
                     // Teor da Resposta
                     $pdf->SetFont('arial', 'B', 12);
@@ -2541,7 +2541,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                         if ($IdProtocolo && $IdProtocolo <> '') {
                             $objAnexoManifestacao->setIdProcedimento($IdProtocolo);
                         }
-                        $objAnexoManifestacao->setTipo('R');
+                        $objAnexoManifestacao->setTipo('A');
                         $objAnexoManifestacao->setIdSerie($idTipoDocumentoAnexoDadosManifestacao);
                         $objAnexoManifestacao->setData(InfraData::getStrDataHoraAtual());
                         $objAnexoManifestacao->setNomeArquivo($strNomeArquivoOriginal);
