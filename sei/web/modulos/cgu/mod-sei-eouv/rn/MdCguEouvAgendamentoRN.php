@@ -37,12 +37,12 @@ class MdCguEouvAgendamentoRN extends InfraRN
         curl_setopt_array($curl, array(
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
+            CURLOPT_ENCODING => "UTF-8",
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_POSTFIELDS => "undefined=",
+            CURLOPT_SSLVERSION => 6,
             CURLOPT_HTTPHEADER => array(
                 "Accept: */*",
                 "Authorization: Bearer " . $token,
@@ -107,16 +107,16 @@ class MdCguEouvAgendamentoRN extends InfraRN
         curl_setopt_array($curl, array(
             CURLOPT_URL => $urlAmbiente,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
+            CURLOPT_ENCODING => "UTF-8",
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_SSLVERSION => 6,
             CURLOPT_POSTFIELDS => "client_id=".$client_id."&client_secret=".$client_secret."&grant_type=password&username=".$username."&password=".$password."&undefined=",
             //CURLOPT_POSTFIELDS => "client_id=15&client_secret=rwkp6899&grant_type=password&username=wsIntegracaoSEI&password=teste1235&undefined=",
             CURLOPT_HTTPHEADER => array(
-                "Content-Type: application/x-www-form-urlencoded",
-                "Postman-Token: 65f1b627-4926-49ed-8109-8586ffc4ec53",
+                "Content-Type: application/json",
                 "cache-control: no-cache"
             ),
         ));
@@ -1083,7 +1083,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $objUltimaDataPrazoAtendimento = MdCguEouvAgendamentoINT::retornarUltimaDataPrazoAtendimento($numProtocoloFormatado);
 
                 // 4. Verificar se houve alteração na data 'PrazoAtendimento'
-                if ($objUltimaDataPrazoAtendimento->getDthDthPrazoAtendimento() <> $dataPrazoAtendimento) {
+                if (isset($objUltimaDataPrazoAtendimento) && $objUltimaDataPrazoAtendimento->getDthDthPrazoAtendimento() <> $dataPrazoAtendimento) {
 
                     // Importar anexos do novo recurso
                     try {
