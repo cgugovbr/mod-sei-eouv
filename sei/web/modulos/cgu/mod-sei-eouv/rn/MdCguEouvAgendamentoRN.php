@@ -73,14 +73,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
     function decode_result($array)
     {
-        foreach($array as $key => $value)
-        {
-            if(is_array($value))
-            {
+
+        foreach($array as $key => $value) {
+            if(is_array($value)) {
                 $array[$key] = $this->decode_result($value);
-            }
-            else
-            {
+            } else {
                 //$array[$key] = mb_convert_encoding($value, 'Windows-1252', 'UTF-8');
                 $array[$key] = utf8_decode($value);
             }
@@ -337,7 +334,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $arrResult = array();
         $arrProtocolos = array();
 
-        foreach($objListaErros as $erro){
+        foreach($objListaErros as $erro) {
 
             $numProtocolo = preg_replace("/[^0-9]/", "", $erro->getStrProtocoloFormatado());
 
@@ -729,7 +726,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         // Lista parâmetros
         $objEouvParametroDTO = new MdCguEouvParametroDTO();
-        $objEouvParametroDTO -> retTodos();
+        $objEouvParametroDTO->retTodos();
 
         // Busca parâmetros do banco de dados da tabela md_eouv_parametros
         $objEouvParametroRN = new MdCguEouvParametroRN();
@@ -815,7 +812,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
             }
         }
 
-        // Busca parãmetros do banco de dados da tabela infra_parametros
+        // Busca parâmetros do banco de dados da tabela infra_parametros
         $objInfraParametro = new InfraParametro(BancoSEI::getInstance());
         $idUsuarioSei = $objInfraParametro->getValor('ID_USUARIO_SEI');
         $dataAtual = InfraData::getStrDataHoraAtual();
@@ -880,6 +877,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                         //Chama novamente a execução da ConsultaManifestacao que deu errado por causa do Token
                         $retornoWs = $this->executarServicoConsultaManifestacoes($urlWebServiceEOuv, $token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
+                        $retornoWsRecursos = $this->executarServicoConsultaRecursos($urlWebServiceESicRecursos, $token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
                     }
                 }
             }
@@ -1726,7 +1724,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         /***********************************************************************************************
          * DADOS INICIAIS DA MANIFESTAÇÃO
          * Primeiro é gerado o PDF com todas as informações referentes a Manifestação e mais abaixo
-         * é incluindo como um anexo do novo Processo Gerado
+         * é incluído como um anexo do novo Processo Gerado
          * *********************************************************************************************/
 
         $pdf = new InfraPDF("P", "pt", "A4");
@@ -2508,9 +2506,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
             foreach ($this->verificaRetornoWS($retornoWsAnexoLista) as $retornoWsAnexoLinha) {
                 try {
 
-                    $strNomeArquivoOriginal = $retornoWsAnexoLinha['nomeArquivo'];
+                    $strNomeArquivoOriginal = $retornoWsAnexoLinha['NomeArquivo'];
                     if ($strNomeArquivoOriginal == null) {
-                        $strNomeArquivoOriginal = $retornoWsAnexoLinha['NomeArquivo'];
+                        $strNomeArquivoOriginal = $retornoWsAnexoLinha['nomeArquivo'];
                     }
                     $ext = strtoupper(pathinfo($strNomeArquivoOriginal, PATHINFO_EXTENSION));
                     $intIndexExtensao = array_search($ext, $arrExtensoesPermitidas);
@@ -2541,7 +2539,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
                         if ($IdProtocolo && $IdProtocolo <> '') {
                             $objAnexoManifestacao->setIdProcedimento($IdProtocolo);
                         }
-                        $objAnexoManifestacao->setTipo('A');
+//                        $objAnexoManifestacao->setTipo('A');
+                        $objAnexoManifestacao->setTipo('R');
                         $objAnexoManifestacao->setIdSerie($idTipoDocumentoAnexoDadosManifestacao);
                         $objAnexoManifestacao->setData(InfraData::getStrDataHoraAtual());
                         $objAnexoManifestacao->setNomeArquivo($strNomeArquivoOriginal);
