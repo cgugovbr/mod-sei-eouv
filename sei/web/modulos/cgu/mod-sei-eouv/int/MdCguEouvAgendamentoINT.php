@@ -13,29 +13,31 @@ require_once dirname(__FILE__).'/../../../../SEI.php';
 
 class MdCguEouvAgendamentoINT extends InfraINT
 {
-    public static function retornarUltimaExecucaoSucesso($tipManifestacao = 'P'){
+    public static function retornarUltimaExecucaoSucesso($tipManifestacao = 'P')
+    {
 
-    $objEouvRelatorioImportacaoDTO=new MdCguEouvRelatorioImportacaoDTO();
-    $objEouvRelatorioImportacaoDTO->retDthDthImportacao();
-    $objEouvRelatorioImportacaoDTO->retDthDthPeriodoInicial();
-    $objEouvRelatorioImportacaoDTO->retDthDthPeriodoFinal();
-    $objEouvRelatorioImportacaoDTO->retNumIdRelatorioImportacao();
-    $objEouvRelatorioImportacaoDTO->setStrSinSucesso('S');
-    $objEouvRelatorioImportacaoDTO->setStrTipManifestacao($tipManifestacao);
-    $objEouvRelatorioImportacaoDTO->setOrdDthDthImportacao(InfraDTO::$TIPO_ORDENACAO_DESC);
-    $objEouvRelatorioImportacaoDTO->setNumMaxRegistrosRetorno(1);
+        $objEouvRelatorioImportacaoDTO=new MdCguEouvRelatorioImportacaoDTO();
+        $objEouvRelatorioImportacaoDTO->retDthDthImportacao();
+        $objEouvRelatorioImportacaoDTO->retDthDthPeriodoInicial();
+        $objEouvRelatorioImportacaoDTO->retDthDthPeriodoFinal();
+        $objEouvRelatorioImportacaoDTO->retNumIdRelatorioImportacao();
+        $objEouvRelatorioImportacaoDTO->setStrSinSucesso('S');
+        $objEouvRelatorioImportacaoDTO->setStrTipManifestacao($tipManifestacao);
+        $objEouvRelatorioImportacaoDTO->setOrdDthDthImportacao(InfraDTO::$TIPO_ORDENACAO_DESC);
+        $objEouvRelatorioImportacaoDTO->setNumMaxRegistrosRetorno(1);
 
-    $objEouvRelatorioImportacaoRN = new MdCguEouvRelatorioImportacaoRN();
+        $objEouvRelatorioImportacaoRN = new MdCguEouvRelatorioImportacaoRN();
 
-      try{
-          $resultadoObjEouvRelatorioImportacaoDTO = $objEouvRelatorioImportacaoRN->consultar($objEouvRelatorioImportacaoDTO);
-      }catch(Exception $e){
-          throw new InfraException('Erro obtendo última execução da Importacao SEI x EOuv ocorrida com Sucesso.',$e);
-      }
+        try{
+            $resultadoObjEouvRelatorioImportacaoDTO = $objEouvRelatorioImportacaoRN->consultar($objEouvRelatorioImportacaoDTO);
+        } catch(Exception $e) {
+            throw new InfraException('Erro obtendo última execução da Importacao SEI x EOuv ocorrida com Sucesso.',$e);
+        }
 
-      LogSEI::getInstance()->gravar('Última Execução com Sucesso:' . $resultadoObjEouvRelatorioImportacaoDTO);
-    return $resultadoObjEouvRelatorioImportacaoDTO;
-  }
+        LogSEI::getInstance()->gravar('Última Execução com Sucesso:' . $resultadoObjEouvRelatorioImportacaoDTO);
+
+        return $resultadoObjEouvRelatorioImportacaoDTO;
+    }
 
     public static function retornarManifestacoesNaoImportadasPorProblema($idUltimaExecucao, $tipManifestacao = 'P'){
 
