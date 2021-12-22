@@ -54,17 +54,38 @@ class MdCguEouvAgendamentoINT extends InfraINT
        return $arrObjEouvRelatorioImportacaoDetalheDTO;
    }
 
-    public static function retornarUltimaDataPrazoAtendimento($protocoloFormatado)
+    public static function retornarUltimaDataPrazoAtendimento($protocoloFormatado, $tipManifestacao = false, $skipOrdenacaoPrazoAtencimento = true)
     {
         $objEouvRelatorioImportacaoDetalheDTO = new MdCguEouvRelatorioImportacaoDetalheDTO();
         $objEouvRelatorioImportacaoDetalheDTO->retStrProtocoloFormatado();
         $objEouvRelatorioImportacaoDetalheDTO->retDthDthPrazoAtendimento();
         $objEouvRelatorioImportacaoDetalheDTO->setStrSinSucesso('S');
-        $objEouvRelatorioImportacaoDetalheDTO->setStrTipManifestacao('R');
-        $objEouvRelatorioImportacaoDetalheDTO->setOrdDthDthPrazoAtendimento(InfraDTO::$TIPO_ORDENACAO_DESC);
+        if ($tipManifestacao) {
+            $objEouvRelatorioImportacaoDetalheDTO->setStrTipManifestacao($tipManifestacao);
+        }
+        if ($skipOrdenacaoPrazoAtencimento) {
+            $objEouvRelatorioImportacaoDetalheDTO->setOrdDthDthPrazoAtendimento(InfraDTO::$TIPO_ORDENACAO_DESC);
+        }
         $objEouvRelatorioImportacaoDetalheDTO->setOrdNumIdRelatorioImportacao(InfraDTO::$TIPO_ORDENACAO_DESC);
         $objEouvRelatorioImportacaoDetalheDTO->setNumMaxRegistrosRetorno(1);
         $objEouvRelatorioImportacaoDetalheDTO->setStrProtocoloFormatado($protocoloFormatado);
+
+        $objEouvRelatorioImportacaoDetalheRN = new MdCguEouvRelatorioImportacaoDetalheRN();
+
+        $resultadoObjEouvRelatorioImportacaoDetalheDTO = $objEouvRelatorioImportacaoDetalheRN->consultar($objEouvRelatorioImportacaoDetalheDTO);
+
+        return $resultadoObjEouvRelatorioImportacaoDetalheDTO;
+    }
+
+    public static function retornarTipoManifestacao($idRelatorioImportacao, $protocoloFormatado)
+    {
+        $objEouvRelatorioImportacaoDetalheDTO = new MdCguEouvRelatorioImportacaoDetalheDTO();
+        $objEouvRelatorioImportacaoDetalheDTO->retStrProtocoloFormatado();
+        $objEouvRelatorioImportacaoDetalheDTO->retStrTipManifestacao();
+        $objEouvRelatorioImportacaoDetalheDTO->setNumIdRelatorioImportacao($idRelatorioImportacao);
+        $objEouvRelatorioImportacaoDetalheDTO->setStrProtocoloFormatado($protocoloFormatado);
+        $objEouvRelatorioImportacaoDetalheDTO->setStrSinSucesso('S');
+        $objEouvRelatorioImportacaoDetalheDTO->setNumMaxRegistrosRetorno(1);
 
         $objEouvRelatorioImportacaoDetalheRN = new MdCguEouvRelatorioImportacaoDetalheRN();
 
