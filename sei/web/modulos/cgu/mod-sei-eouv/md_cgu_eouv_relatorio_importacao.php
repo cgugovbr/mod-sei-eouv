@@ -120,7 +120,7 @@
 
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDTO[$i]->getNumIdRelatorioImportacao().'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDTO[$i]->getDthDthImportacao().'</td>';
-      $strResultado .= '<td align="center">'.(trim($arrObjEouvRelatorioImportacaoDTO[$i]->getStrTipManifestacao()) =='R' ? 'e-Sic' : 'e-Ouv').'</td>';
+      $strResultado .= '<td align="center">'.(in_array(trim($arrObjEouvRelatorioImportacaoDTO[$i]->getStrTipManifestacao()), ['R', 'R1', 'R2', 'R3', 'RE', 'RC', 'PR']) ? 'e-Sic' : 'e-Ouv').'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDTO[$i]->getStrSinSucesso().'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDTO[$i]->getDthDthPeriodoInicial().'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDTO[$i]->getDthDthPeriodoFinal().'</td>';
