@@ -2249,7 +2249,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $menu_count++;
         $pdf->Ln(30);
         $pdf->SetFont('arial', 'B', 14);
-        $pdf->Cell(0, 20, $menu_count . ". Anexo(s)", true, 0, 'L');
+        $pdf->Cell(0, 20, $menu_count . ". Anexo(s) do Pedido Inicial", true, 0, 'L');
         $pdf->Ln(30);
 
         $anexos = $retornoWsLinha['Teor']['Anexos'];
@@ -2884,7 +2884,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
                         if ($IdProtocolo && $IdProtocolo <> '') {
                             $objAnexoManifestacao->setIdProcedimento($IdProtocolo);
                         }
-//                        $objAnexoManifestacao->setTipo('A');
                         $objAnexoManifestacao->setTipo('R');
                         $objAnexoManifestacao->setIdSerie($idTipoDocumentoAnexoDadosManifestacao);
                         $objAnexoManifestacao->setData(InfraData::getStrDataHoraAtual());
@@ -2908,7 +2907,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
                         LogSEI::getInstance()->gravar('Importação de Manifestação ' . $numProtocoloFormatado . ': Arquivo ' . $strNomeArquivoOriginal . ' possui extensão inválida.', InfraLog::$INFORMACAO);
                         continue;
                     }
-
                 }
                 catch(Exception $e){
                     $ocorreuErroAdicionarAnexo = true;
