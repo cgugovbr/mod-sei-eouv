@@ -32,7 +32,13 @@ class MdCguEouvAgendamentoRN extends InfraRN
      * @throws Exception
      */
 
-    public function apiRestRequest($url, $token, $tipo){
+    public function apiRestRequest($url, $token, $tipo)
+    {
+        /**
+         * Debug do token antes da requisição
+         */
+//        var_dump($token);
+//        die();
 
         $curl = curl_init();
 
@@ -71,10 +77,13 @@ class MdCguEouvAgendamentoRN extends InfraRN
         /**
          * Debug API Request
          */
-//        echo "<hr><hr>>";
+//        echo "<hr>";
 //        echo "<br>token: " . $token;
+//        echo "<hr>";
 //        echo "<br>url: " . $url;
+//        echo "<hr>";
 //        var_dump($response);
+//        echo "<hr>";
 //        var_dump($httpcode);
 //        echo "<hr><hr>";
 //        die();
@@ -189,6 +198,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
     public function executarServicoConsultaManifestacoes($urlConsultaManifestacao, $token, $ultimaDataExecucao, $dataAtual, $numprotocolo = null, $numIdRelatorio = null)
     {
+        /**
+         * Debug do token antes da requisição
+         */
+//        var_dump($token);
+//        die();
 
         $arrParametrosUrl = array(
             'dataCadastroInicio' => $ultimaDataExecucao,
@@ -235,7 +249,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
     public function executarServicoConsultaRecursos($urlConsultaRecurso, $token, $ultimaDataExecucao = null, $dataAtual = null, $numprotocolo = null, $numIdRelatorio = null)
     {
 
-        $debugLocal = false;
+        $debugLocal = true;
         $debugLocal && LogSEI::getInstance()->gravar('[executarServicoConsultaRecursos] Parâmetros: $ultimaDataExecucao: ' . $ultimaDataExecucao . ' | $dataAtual: ' . $dataAtual . ' | $numprotocolo: ' . $numprotocolo);
 
         $arrParametrosUrl = array(
@@ -753,7 +767,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //        InfraDebug::getInstance()->setBolEcho(true);
 //        InfraDebug::getInstance()->limpar();
 
-        $debugLocal = false;
+        $debugLocal = true;
 
         // Log
         LogSEI::getInstance()->gravar('Rotina de Importação de Manifestações do FalaBR (e-Sic)', InfraLog::$INFORMACAO);
@@ -921,9 +935,12 @@ class MdCguEouvAgendamentoRN extends InfraRN
              * Para auxiliar no debug pode-se definir uma data específica para um determinado processo
              */
 //            var_dump($ultimaDataExecucao);
+//            $ultimaDataExecucao = '03/01/2022 00:00:00';
+//            $dataAtual = '03/01/2022 23:59:59';
+//            $ultimaDataExecucao = '06/01/2022 13:20:02';
+//            $dataAtual = '06/01/2022 13:30:02';
+//            var_dump('chegou aqui...');
 //            die();
-//            $ultimaDataExecucao = '15/12/2021 10:45:00';
-//            $dataAtual = '15/12/2021 15:04:08';
 
             $semManifestacoesEncontradas = true;
             $qtdManifestacoesNovas = 0;
@@ -951,6 +968,13 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $textoMensagemErroToken = '';
 
             /**
+             * Debug do token antes da requisição
+             */
+//            var_dump($token);
+//            var_dump('<hr>');
+//            die();
+
+            /**
              * As funções abaixo fazem a busca no webservice dos dados a serem trabalhados na rotina de importação
              */
             $debugLocal && LogSEI::getInstance()->gravar('Iniciando a consulta inicial');
@@ -965,7 +989,13 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //            $retornoWs = [];
 //            $retornoWsRecursos = [];
 //            $retornoWs = "Token Invalidado";
+//            var_dump('<hr>');
+//            var_dump('$retornoWs');
+//            var_dump('<hr>');
 //            var_dump($retornoWs);
+//            var_dump('<hr>');
+//            var_dump('$retornoWsRecursos');
+//            var_dump('<hr>');
 //            var_dump($retornoWsRecursos);
 //            die();
 //            $token = '52ZftR2JOyqJVAcwizPCLIpkX73Tx9yuEONfCFKaVogtxOgwgr73DJyd-nV3Ljb8g1mGN0y7Nzi8hIqgZZF1o3KM5h23aBMVYQjjbZJsJy2Pmu20flbcLkdkYDuGe44ZAFf330ljI4lcJmg1JoiC_me68h9qd-1-OOdFNRSITvgLuHtKBXiFOsDFGumEatFgbniJp1skjDpTBzvMpxh33yiw7cUS-6uS7ifCUmGN2ljyxQFjESvbxEcSB3LyLOcRZn2a2A_saiokC2T7tyJMyzuz8f4W1H2kSY8sIpPPWwG-Nv0b-eBWL9bmYerz0yK1t9gXtaGW9oi1LfbJFqauEJic6mZ_CEK9OHJRXtAnhrmZNc0AZZOGbWwBrTA2q10h6SXZa0viS-PJJjwXVw8qvwmL20K6oSr9T-H5levQOjES-Hfx';
@@ -1128,12 +1158,20 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //                                $debugLocal && LogSEI::getInstance()->gravar('Pulou a idManifestação: ' . $retornoWsLinha['IdManifestacao']);
 //                                continue;
 //                            }
+//                            if ($retornoWsLinha['NumerosProtocolo'][0] <> '00106000003202289') {
+//                                $debugLocal && LogSEI::getInstance()->gravar('Pulou a idManifestação: ' . $retornoWsLinha['IdManifestacao']);
+//                                continue;
+//                            }
+//                            var_dump($retornoWsLinha['NumerosProtocolo']);
+//                            var_dump('passou pra importar...');
+//                            die();
+
                             $debugLocal && LogSEI::getInstance()->gravar('Inicia importação por Linha');
                             $this->executarImportacaoLinha($retornoWsLinha, 'R');
                         }
                     }
                 }
-
+//die();
                 // Importa recursos e-Sic
                 if (count($arrRecursos) > 0) {
                     $semRecursosEncontrados = false;
@@ -1147,7 +1185,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //                        var_dump($retornoWsLinha['numProtocolo']);
 //                        var_dump('<hr>');
 //                        continue;
-//                        if ($retornoWsLinha['numProtocolo'] <> '00106.000002/2021-53') {
+//                        if ($retornoWsLinha['numProtocolo'] <> '00106.000003/2022-89') {
 //                            $debugLocal && LogSEI::getInstance()->gravar('Pulou o recurso do protocolo: ' . $retornoWsLinha['numProtocolo']);
 //                            continue;
 //                        }
@@ -1240,7 +1278,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                $idRelatorioImportacao,
                $token;
 
-        $debugLocal = false;
+        $debugLocal = true;
 
         $objProcedimentoDTO = new ProcedimentoDTO();
         $objProtocoloDTO = new ProtocoloDTO();
@@ -1533,7 +1571,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
     public function executarImportacaoLinhaRecursos ($arrRecursosManifestacao, $tipoManifestacao = 'R')
     {
-        $debugLocal = false;
+        $debugLocal = true;
 
         global $urlWebServiceEOuv,
                $objEouvRelatorioImportacaoDTO,
@@ -1598,6 +1636,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
                  * Debug do prazo de atendimento
                  */
 //                var_dump('<hr>');
+//                var_dump('Protocolo:');
+//                var_dump('<hr>');
+//                var_dump($numProtocoloFormatado);
+//                var_dump('<hr>');
 //                var_dump('$objUltimaDataPrazoAtendimento->getDthDthPrazoAtendimento():<br />');
 //                var_dump(isset($objUltimaDataPrazoAtendimento) ? $objUltimaDataPrazoAtendimento->getDthDthPrazoAtendimento() : 'null');
 //                var_dump('<hr>');
@@ -1640,28 +1682,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
                             // Verifica Tipo de Recurso
                             $tipo_recurso = $this->verificaTipo($arrRecursosManifestacao);
 
-                            $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] Tipo de recurso: ' . $tipo_recurso);
-
-                            // Buscar dados da Manifestação
-                            $numProtocoloSemFormatacao = str_replace(['.', '/', '-'], ['', '', ''], $numProtocoloFormatado);
-                            $retornoWsLinha = $this->executarServicoConsultaManifestacoes($urlWebServiceEOuv, $token, null, null, $numProtocoloSemFormatacao, $idRelatorioImportacao);
-                            $linkDetalheManifestacao = $retornoWsLinha[0]['Links'][0]['href'];
-                            $arrDetalheManifestacao = $this->apiRestRequest($linkDetalheManifestacao, $token, 2);
-
-                            $debugLocal && LogSEI::getInstance()->gravar('Importando Recurso processo: ' . $numProtocoloFormatado . ' | tipo: ' . $tipo_recurso);
-
-                            // Carregar documento recurso
-                            $this->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacao, $objProtocoloDTOExistente->getDblIdProtocolo(), $tipo_recurso);
-                            $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Recurso tipo ' . $tipo_recurso . ' com protocolo ' . $numProtocoloFormatado . ' importado com sucesso com ' . $anexoCount . ' anexos incluidos no protocolo.', 'S', $tipo_recurso, $dataPrazoAtendimento);
-                            $debugLocal && LogSEI::getInstance()->gravar('Importando Recurso processo: ' . $numProtocoloFormatado . ' | tipo: ' . $tipo_recurso . 'depois de gravar log ?!');
-                            // $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Recurso com protocolo ' . $numProtocoloFormatado . ' importado com sucesso com ' . $anexoCount . ' anexos incluidos no protocolo.', 'S', $tipoManifestacao, $dataPrazoAtendimento);
-                            LogSEI::getInstance()->gravar('Módulo Integração FalaBR - Importação de Recurso ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . $anexoCount, InfraLog::$INFORMACAO);
-
-                            // Carregar anexos
-                            if (count($arrRecursosManifestacao['anexos']) > 0) {
-                                $this->gerarAnexosProtocolo($arrRecursosManifestacao['anexos'], $numProtocoloFormatado, $tipoManifestacao, $objProtocoloDTOExistente->getDblIdProtocolo());
-                            }
-
                             // Vincular Recursos com as unidades corretas conforme o tipo de recurso
                             // Se for 1 instância envia processo para ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA
                             if ($tipo_recurso == 'R1') {
@@ -1674,6 +1694,65 @@ class MdCguEouvAgendamentoRN extends InfraRN
                                 $unidadeDestino = $idUnidadeRecursoPedidoRevisao;
                             } else {
                                 $unidadeDestino = $idUnidadeOuvidoria;
+                            }
+
+                            $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] Tipo de recurso: ' . $tipo_recurso);
+
+                            // Buscar dados da Manifestação
+                            $numProtocoloSemFormatacao = str_replace(['.', '/', '-'], ['', '', ''], $numProtocoloFormatado);
+                            $retornoWsLinha = $this->executarServicoConsultaManifestacoes($urlWebServiceEOuv, $token, null, null, $numProtocoloSemFormatacao, $idRelatorioImportacao);
+                            $linkDetalheManifestacao = $retornoWsLinha[0]['Links'][0]['href'];
+                            $arrDetalheManifestacao = $this->apiRestRequest($linkDetalheManifestacao, $token, 2);
+
+                            $debugLocal && LogSEI::getInstance()->gravar('Importando Recurso processo: ' . $numProtocoloFormatado . ' | tipo: ' . $tipo_recurso);
+
+                            /**
+                             * Debug teste de tipod e recurso
+                             */
+//                            var_dump('<hr>');
+//                            var_dump($numProtocoloSemFormatacao);
+//                            var_dump('<hr>');
+//                            var_dump($tipo_recurso);
+//                            die();
+
+                            /**
+                             * Verificar o tipo de recurso de for diferente de segunda instãncia, trazer todos os recursos para o documento pdf
+                             */
+                            if ($tipo_recurso <> 'R1') {
+                                /**
+                                 * Debug recursos disponíveis para o mesmo protocolo que devem retornar no mesmo arquivo
+                                 */
+//                                var_dump('<hr>');
+//                                var_dump($arrRecursosManifestacao);
+//                                var_dump('<hr>');
+//                                var_dump('reverse');
+//                                var_dump('<hr>');
+//                                $arrRecursosManifestacaoComAnteriores = array_reverse($this->executarServicoConsultaRecursos($urlWebServiceESicRecursos, $token, null, null, $numProtocoloSemFormatacao));
+//                                var_dump('<hr>');
+//                                var_dump($arrRecursosManifestacaoComAnteriores['Recursos']);
+//                                var_dump('<hr>');
+//                                var_dump('normal');
+//                                var_dump('<hr>');
+//                                $arrRecursosManifestacaoComAnterioresNormal = $this->executarServicoConsultaRecursos($urlWebServiceESicRecursos, $token, null, null, $numProtocoloSemFormatacao);
+//                                var_dump('<hr>');
+//                                var_dump($arrRecursosManifestacaoComAnterioresNormal['Recursos']);
+//                                var_dump('<hr>');
+//                                die();
+
+                                $arrRecursosManifestacaoComAnteriores = $this->executarServicoConsultaRecursos($urlWebServiceESicRecursos, $token, null, null, $numProtocoloSemFormatacao);
+                                $this->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacaoComAnteriores, $objProtocoloDTOExistente->getDblIdProtocolo(), $tipo_recurso);
+                            } else {
+                                $this->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacao, $objProtocoloDTOExistente->getDblIdProtocolo(), $tipo_recurso);
+                            }
+
+                            $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Recurso tipo ' . $tipo_recurso . ' com protocolo ' . $numProtocoloFormatado . ' importado com sucesso com ' . $anexoCount . ' anexos incluidos no protocolo.', 'S', $tipo_recurso, $dataPrazoAtendimento);
+                            $debugLocal && LogSEI::getInstance()->gravar('Importando Recurso processo: ' . $numProtocoloFormatado . ' | tipo: ' . $tipo_recurso . 'depois de gravar log ?!');
+                            // $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Recurso com protocolo ' . $numProtocoloFormatado . ' importado com sucesso com ' . $anexoCount . ' anexos incluidos no protocolo.', 'S', $tipoManifestacao, $dataPrazoAtendimento);
+                            LogSEI::getInstance()->gravar('Módulo Integração FalaBR - Importação de Recurso ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . $anexoCount, InfraLog::$INFORMACAO);
+
+                            // Carregar anexos
+                            if (count($arrRecursosManifestacao['anexos']) > 0) {
+                                $this->gerarAnexosProtocolo($arrRecursosManifestacao['anexos'], $numProtocoloFormatado, $tipoManifestacao, $objProtocoloDTOExistente->getDblIdProtocolo());
                             }
 
                             try {
@@ -1706,7 +1785,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 }
             }
         } else {
-            $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Existe recuso para o processo ' . $numProtocoloFormatado . ', porém este processo não existe no SEI. Provavelmente é um processo antes da data de início de utilização do módulo ou o Tipo de Manifestação do FalaBR não foi registrada para este módulo.', 'S', $tipoManifestacao);
+            $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Existe recurso para o processo ' . $numProtocoloFormatado . ', porém este processo não existe no SEI. Provavelmente é um processo antes da data de início de utilização do módulo ou o Tipo de Manifestação do FalaBR não foi registrada para este módulo.', 'S', $tipoManifestacao);
         }
     }
 
@@ -2092,7 +2171,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
          */
         $menu_count = 1;
         $pdf->SetFont('arial', 'B', 14);
+//        $pdf->SetDrawColor(135,206,250);
         $pdf->Cell(0, 20, $menu_count . ". Dados Básicos da Manifestação", 1, 0, 'L');
+//        $pdf->SetDrawColor(255,255,255);
         $pdf->Ln(30);
 
         // Tipo de Manifestação
@@ -2541,7 +2622,20 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $recursos = isset($retornoWsRecursos['Recursos']) ? $retornoWsRecursos['Recursos'] : [$retornoWsRecursos];
 
             if (count($recursos) > 0) {
-                foreach ($recursos as $recurso) {
+
+                $reversedRecursos = array_reverse($recursos);
+
+                /**
+                 * Debug de reversão do Array para colocar dados do recurso em ordem crescente
+                 */
+//                var_dump('<hr>');
+//                var_dump($reversedRecursos);
+//                var_dump('<hr>');
+//                var_dump($recusos);
+//                var_dump('<hr>');
+//                die();
+
+                foreach ($reversedRecursos as $recurso) {
 
                     /**
                      * Somente gerará documento caso seja recursos 1ª ou 2ª instancia ou pedido de revisão,
@@ -2582,6 +2676,21 @@ class MdCguEouvAgendamentoRN extends InfraRN
                         $pdf->setFont('arial', '', 12);
                         $pdf->MultiCell(0, 20, $recurso['justificativa'], 0, 'J');
 
+                        // Anexos
+                        $pdf->SetFont('arial', 'B', 12);
+                        $pdf->Cell(180, 20, "Anexos:", 0, 0, 'R');
+                        $pdf->setFont('arial', '', 12);
+                        $anexosRecursos = $recurso['anexos'];
+                        if (is_array($anexosRecursos) && count($anexosRecursos) > 0) {
+                            $pdf->Cell(70, 20, ' ', 0, 1, 'L');
+                            foreach ($anexosRecursos as $anexoRecurso) {
+                                $pdf->Cell(180, 20, '-', 0, 0, 'R');
+                                $pdf->Cell(70, 20, $anexoRecurso['nomeArquivo'], 0, 1, 'L');
+                            }
+                        } else {
+                            $pdf->Cell(70, 20, 'Não possui anexos', 0, 1, 'L');
+                        }
+
                         $pdf->Ln(20);
                     }
                 }
@@ -2620,7 +2729,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         }
 
         /**
-         * Ecaminhamento
+         * Encaminhamento
          */
         $menu_count++;
         $pdf->Ln(30);
@@ -3098,7 +3207,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
      */
     public function permiteImportacaoRecursoAtual($tipoManifestacaoAtual, $ultimoTipoRecursoImportado)
     {
-        $debugLocal = false;
+        $debugLocal = true;
 
         $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Verificando se existe algum recurso anterior');
 
