@@ -249,7 +249,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
     public function executarServicoConsultaRecursos($urlConsultaRecurso, $token, $ultimaDataExecucao = null, $dataAtual = null, $numprotocolo = null, $numIdRelatorio = null)
     {
 
-        $debugLocal = true;
+        $debugLocal = false;
         $debugLocal && LogSEI::getInstance()->gravar('[executarServicoConsultaRecursos] Parâmetros: $ultimaDataExecucao: ' . $ultimaDataExecucao . ' | $dataAtual: ' . $dataAtual . ' | $numprotocolo: ' . $numprotocolo);
 
         $arrParametrosUrl = array(
@@ -767,7 +767,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //        InfraDebug::getInstance()->setBolEcho(true);
 //        InfraDebug::getInstance()->limpar();
 
-        $debugLocal = true;
+        $debugLocal = false;
 
         // Log
         LogSEI::getInstance()->gravar('Rotina de Importação de Manifestações do FalaBR (e-Sic)', InfraLog::$INFORMACAO);
@@ -1278,7 +1278,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                $idRelatorioImportacao,
                $token;
 
-        $debugLocal = true;
+        $debugLocal = false;
 
         $objProcedimentoDTO = new ProcedimentoDTO();
         $objProtocoloDTO = new ProtocoloDTO();
@@ -1331,6 +1331,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         if (!isset($arrDetalheManifestacao['TipoManifestacao']['IdTipoManifestacao'])) {
             $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Tipo de processo não foi informado.', 'N');
+            /**
+             * @todo - não deveria parara aqui? se não tiver um tipo de processo não informado?
+             */
         } else {
             $objEouvDeparaImportacaoDTO = new MdCguEouvDeparaImportacaoDTO();
             $objEouvDeparaImportacaoDTO->retNumIdTipoProcedimento();
@@ -1386,7 +1389,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                 /**
                  * @todo - @teste
-                 * Teste aqui pra validar se o prazo sendo 'maior' na petição inicial já não deve-se importar os recursos.....
+                 * Teste aqui pra validar se o prazo sendo 'maior' na petição inicial já não deve importar os recursos..... (??)
                  */
                 // Data do último prazo de atendimento para este protocolo
 //                $objUltimaDataPrazoAtendimento = MdCguEouvAgendamentoINT::retornarUltimaDataPrazoAtendimento($numProtocoloFormatado, $tipoManifestacao);
@@ -1571,7 +1574,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
     public function executarImportacaoLinhaRecursos ($arrRecursosManifestacao, $tipoManifestacao = 'R')
     {
-        $debugLocal = true;
+        $debugLocal = false;
 
         global $urlWebServiceEOuv,
                $objEouvRelatorioImportacaoDTO,
@@ -2143,7 +2146,18 @@ class MdCguEouvAgendamentoRN extends InfraRN
     {
         global $idTipoDocumentoAnexoDadosManifestacao,
                $ocorreuErroAdicionarAnexo,
-               $importar_dados_manifestante;
+               $importar_dados_manifestante,
+               $idRelatorioImportacao;
+
+        /**
+         * Testa acessar dado da manifestação se não conseguir salva log
+         */
+        try {
+            $IdTipoManifestacao = $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'];
+        } catch (Exception $e) {
+            $this->gravarLogLinha($IdProtocolo ? $IdProtocolo : 'n/a', $idRelatorioImportacao, substr('ERRO-esic|' . $retornoWsLinha . '|' . $e, 0, 500), 'N');
+            return;
+        }
 
         /***********************************************************************************************
          * DADOS INICIAIS DA MANIFESTAÇÃO
@@ -2867,7 +2881,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //        @readfile(DIR_SEI_TEMP . '/' . $strNomeArquivoInicialUpload . '.pdf');
 //        die();
 
-        //Renomeuia tirando a extensï¿½o para o SEI trabalhar o Arquivo
+        //Renomeuia tirando a extencaoo para o SEI trabalhar o Arquivo
         rename(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload);
 
         $objDocumentoManifestacao = new DocumentoAPI();
@@ -2964,6 +2978,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     if ($strNomeArquivoOriginal == null) {
                         $strNomeArquivoOriginal = $retornoWsAnexoLinha['nomeArquivo'];
                     }
+
+                    // Ajustamos aqui o nome do arquivo limitado a 50 caracteres
+                    $strNomeArquivoOriginal = substr($strNomeArquivoOriginal, -50, 50);
+
                     $ext = strtoupper(pathinfo($strNomeArquivoOriginal, PATHINFO_EXTENSION));
                     $intIndexExtensao = array_search($ext, $arrExtensoesPermitidas);
 
@@ -3207,7 +3225,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
      */
     public function permiteImportacaoRecursoAtual($tipoManifestacaoAtual, $ultimoTipoRecursoImportado)
     {
-        $debugLocal = true;
+        $debugLocal = false;
 
         $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Verificando se existe algum recurso anterior');
 
