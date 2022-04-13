@@ -121,6 +121,25 @@ class MdCguEouvParametroRN extends InfraRN {
         }
     }
 
+    protected function listarParametroESicConectado(MdCguEouvParametroDTO $objEouvParametroDTO) {
+        try {
+
+            //Valida Permissao
+            SessaoSEI::getInstance()->validarAuditarPermissao('md_cgu_eouv_parametro_listar_esic',__METHOD__,$objEouvParametroDTO);
+
+            $objEouvParametroBD = new MdCguEouvParametroBD($this->getObjInfraIBanco());
+            $ret = $objEouvParametroBD->listar($objEouvParametroDTO);
+
+
+            //Auditoria
+
+            return $ret;
+
+        }catch(Exception $e){
+            throw new InfraException('Erro listando associações entre Protocolo e Assunto.',$e);
+        }
+    }
+
 
 
 }
