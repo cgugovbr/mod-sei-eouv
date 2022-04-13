@@ -280,6 +280,8 @@ class MdCguEouvAtualizadorBDRN extends InfraRN
         $objServicoDTO->setStrIdentificacao('CadastrarManifestacao');
         $objServicoDTO->setStrDescricao('Cadastrar Manifestação Importada do sistema E-Ouv');
         $objServicoDTO->setStrServidor('*');
+        $objServicoDTO->setStrSinServidor('N');
+        $objServicoDTO->setStrSinChaveAcesso('N');
         $objServicoDTO->setStrSinLinkExterno('N');
         $objServicoDTO->setStrSinAtivo('S');
         $objServicoRN = new ServicoRN();
@@ -403,6 +405,15 @@ class MdCguEouvAtualizadorBDRN extends InfraRN
         $this->logar('CRIANDO COLUNA PARA TIPO DE MANIFESTAÇÃO PARA A TABELA md_eouv_rel_import_det');
         BancoSEI::getInstance()->executarSql('ALTER TABLE md_eouv_rel_import_det ADD tip_manifestacao ' . $objInfraMetaBD->tipoTextoFixo(2) . ' NOT NULL DEFAULT (\'P\');');
         BancoSEI::getInstance()->executarSql('ALTER TABLE md_eouv_rel_import_det ADD dth_prazo_atendimento ' . $objInfraMetaBD->tipoDataHora() . ' NULL;');
+
+        /**
+         * Criar coluna na tabela md_eouv_parametros para identificar qual o tipo de parâmetro
+         *
+         * - 'eouv' (e-Ouv) - parâmetros do e-ouv [padrão]
+         * - 'esicR' (e-Sic) - parâmetros do e-sic
+         */
+        $this->logar('CRIANDO COLUNA PARA TIPO DE PARÂMETRO PARA A TABELA md_eouv_parametros');
+        BancoSEI::getInstance()->executarSql('ALTER TABLE md_eouv_parametros ADD de_tipo ' . $objInfraMetaBD->tipoTextoVariavel(10) . ' NOT NULL DEFAULT (\'eouv\');');
 
         /**
          * Cria parâmetros na tabela md_eouv_parametros para manifestações do e-Sic (tipo 8)

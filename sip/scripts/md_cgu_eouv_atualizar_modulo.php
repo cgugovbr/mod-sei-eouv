@@ -417,6 +417,7 @@ class MdCguEouvAtualizadorSipRN extends InfraRN{
             $objItemMenuDTO->setNumSequencia($numSequencia);
             $objItemMenuDTO->setStrSinNovaJanela('N');
             $objItemMenuDTO->setStrSinAtivo('S');
+            $objItemMenuDTO->setStrIcone('');
 
             $objItemMenuDTO = $objItemMenuRN->cadastrar($objItemMenuDTO);
         }
