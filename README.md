@@ -3,7 +3,7 @@
 
 ## Requisitos
 
-- SEI versão 3.0.0 ou superior (verificar versão do SEI no arquivo /sei/web/SEI.php).
+- SEI versão 4.0.3 ou superior (verificar versão do SEI no arquivo /sei/web/SEI.php).
 
 - Utilizar o Sistema FalaBR do Governo Federal (e-Ouv e e-Sic). Caso ainda não tenha aderido ao FalaBR e queira saber mais informações acesse https://falabr.cgu.gov.br/.
 
@@ -53,7 +53,7 @@ $ git clone git@github.com:cgugovbr/mod-sei-eouv.git
 
 Ou baixar a versão desejada usando o link:
    
-https://github.com/cgugovbr/mod-sei-eouv/archive/4.0.0.zip
+https://github.com/cgugovbr/mod-sei-eouv/archive/v4.0.3.zip
  
 A estrutura de pastas deste módulo é a seguinte:
 
