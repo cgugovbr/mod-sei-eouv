@@ -394,7 +394,7 @@ class MdCguEouvAtualizadorBDRN extends InfraRN
          * - 'R' (e-Sic) - manifestações e-sic com 'R'ecursos - tipo 8
          */
         $this->logar('CRIANDO COLUNA PARA TIPO DE MANIFESTAÇÃO PARA A TABELA md_eouv_rel_import');
-        BancoSEI::getInstance()->executarSql('ALTER TABLE md_eouv_rel_import ADD tipo_manifestacao ' . $objInfraMetaBD->tipoTextoFixo(2) . ' NOT NULL DEFAULT (\'P\');');
+        BancoSEI::getInstance()->executarSql('ALTER TABLE md_eouv_rel_import ADD tip_manifestacao ' . $objInfraMetaBD->tipoTextoFixo(2) . ' NOT NULL DEFAULT (\'P\');');
 
         /**
          * Criar coluna na tabela md_eouv_rel_import_det para identificar qual o tipo de manifestação
