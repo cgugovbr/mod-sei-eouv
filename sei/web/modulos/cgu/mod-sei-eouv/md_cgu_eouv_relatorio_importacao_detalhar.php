@@ -75,6 +75,7 @@
   $objEouvRelatorioImportacaoDetalheDTO->retNumIdRelatorioImportacao();
   $objEouvRelatorioImportacaoDetalheDTO->retStrProtocoloFormatado();
   $objEouvRelatorioImportacaoDetalheDTO->retStrSinSucesso();
+  $objEouvRelatorioImportacaoDetalheDTO->retStrTipManifestacao();
   $objEouvRelatorioImportacaoDetalheDTO->retDthDthImportacao();
   $objEouvRelatorioImportacaoDetalheDTO->retStrDescricaoLog();
 
@@ -114,15 +115,16 @@
 
     $strResultado = '';
 
-    $strResultado .= '<table width="99%" class="infraTable" summary="'.$strSumarioTabela.'">'."\n";
-    $strResultado .= '<caption class="infraCaption">'.PaginaSEI::getInstance()->gerarCaptionTabela($strCaptionTabela,$numRegistros).'</caption>';
+    $strResultado .= '<table width="99%" class="infraTable" summary="' . ($strSumarioTabela ?? '$strSumarioTabela não definido') . '">'."\n";
+    $strResultado .= '<caption class="infraCaption">'.PaginaSEI::getInstance()->gerarCaptionTabela($strCaptionTabela ?? '$strCaptionTabela não definido',$numRegistros).'</caption>';
     $strResultado .= '<tr>';
     if ($bolCheck) {
       $strResultado .= '<th class="infraTh" width="1%">'.PaginaSEI::getInstance()->getThCheck().'</th>'."\n";
     }
 
     $strResultado .= '<th class="infraTh" width="15%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDetalheDTO,'Protocolo Formatado','ProtocoloFormatado',$arrObjEouvRelatorioImportacaoDetalheDTO).'</th>'."\n";
-    $strResultado .= '<th class="infraTh" width="10%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDetalheDTO,'Sucesso','SinSucesso',$arrObjEouvRelatorioImportacaoDetalheDTO).'</th>'."\n";
+    $strResultado .= '<th class="infraTh" width="7%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDetalheDTO,'Tipo','TipManifestacao',$arrObjEouvRelatorioImportacaoDetalheDTO).'</th>'."\n";
+    $strResultado .= '<th class="infraTh" width="7%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDetalheDTO,'Sucesso','SinSucesso',$arrObjEouvRelatorioImportacaoDetalheDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh" width="10%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDetalheDTO,'Data Importacao','DthImportacao',$arrObjEouvRelatorioImportacaoDetalheDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDetalheDTO,'Detalhe','DescricaoLog',$arrObjEouvRelatorioImportacaoDetalheDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh" width="25%">Ações</th>'."\n";
@@ -138,7 +140,8 @@
         $strResultado .= '<td>'.PaginaSEI::getInstance()->getTrCheck($i,trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado()),trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado())).'</td>';
       }
 
-      $strResultado .= '<td>'.trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado()).'</td>';
+      $strResultado .= '<td align="center">'.trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado()).'</td>';
+      $strResultado .= '<td align="center">'.(in_array(trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrTipManifestacao()), ['R', 'R1', 'R2', 'R3', 'RE', 'RC', 'PR']) ? 'e-Sic' : 'e-Ouv').'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrSinSucesso().'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getDthDthImportacao().'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrDescricaoLog().'</td>';

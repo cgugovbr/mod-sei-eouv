@@ -11,13 +11,17 @@ require_once dirname(__FILE__) . '/../../../../SEI.php';
 class MdCguEouvAtualizadorBDRN extends InfraRN
 {
     private $numSeg = 0;
-    private $versaoAtualDesteModulo = '3.0.0';
-    private $nomeDesteModulo = 'EOUV - Integração com sistema E-ouv';
+    private $versaoAtualDesteModulo = '4.0.0';
+    private $nomeDesteModulo = 'EOUV - Integração com sistema FalaBR (E-ouv)';
     private $prefixoParametro = 'MD_CGU_EOUV';
     private $nomeParametroVersaoModulo = 'VERSAO_MODULO_CGU_EOUV';
-    private $historicoVersoes = array('2.0.5', '3.0.0');
-    //Começamos a contralar a partir da versão 2.0.5 que é a última estável para o SEI 3.0
-    //A versão 3.0.0 começa a utilizar a versão REST dos webservices do E-Ouv
+    private $historicoVersoes = array('2.0.5', '3.0.0', '4.0.0');
+    /**
+     * 1. Começamos a contralar a partir da versão 2.0.5 que é a última estável para o SEI 3.0
+     * 2. A versão 3.0.0 começa a utilizar a versão REST dos webservices do E-Ouv
+     * 3. A versão 4.0.0 importa manifestações do tipo 8 (acesso à informação) que são oriundas antigo e-Sic integrado
+     * ao FalaBR, esta versão importa tambem os recursos de 1ª e 2ª instância
+     */
 
     public function __construct()
     {
@@ -121,12 +125,16 @@ class MdCguEouvAtualizadorBDRN extends InfraRN
             if (InfraString::isBolVazia($strVersaoModuloEOuv)) {
                 $this->instalarv205();
                 $this->instalarv300();
+                $this->instalarv400();
                 $this->logar('INSTALAÇÃO/ATUALIZAÇÃO DA VERSÃO ' . $this->versaoAtualDesteModulo . ' DO MODULO ' . $this->nomeDesteModulo . ' INSTALADAS COM SUCESSO NA BASE DO SEI');
                 $this->finalizar('FIM', false);
-            }
-
-            elseif ($strVersaoModuloEOuv == '2.0.5') {
+            } elseif ($strVersaoModuloEOuv == '2.0.5') {
                 $this->instalarv300();
+                $this->instalarv400();
+                $this->logar('INSTALAÇÃO/ATUALIZAÇÃO DA VERSÃO ' . $this->versaoAtualDesteModulo . ' DO MODULO ' . $this->nomeDesteModulo . ' INSTALADAS COM SUCESSO NA BASE DO SEI');
+                $this->finalizar('FIM', false);
+            } elseif ($strVersaoModuloEOuv == '3.0.0') {
+                $this->instalarv400();
                 $this->logar('INSTALAÇÃO/ATUALIZAÇÃO DA VERSÃO ' . $this->versaoAtualDesteModulo . ' DO MODULO ' . $this->nomeDesteModulo . ' INSTALADAS COM SUCESSO NA BASE DO SEI');
                 $this->finalizar('FIM', false);
             }
@@ -144,6 +152,7 @@ class MdCguEouvAtualizadorBDRN extends InfraRN
             $this->finalizar($e, true);
 
         }
+
     }
 
     private function instalarv205()
@@ -158,20 +167,21 @@ class MdCguEouvAtualizadorBDRN extends InfraRN
         $this->logar('CRIANDO A TABELA md_eouv_depara_importacao');
 
         BancoSEI::getInstance()->executarSql('CREATE TABLE md_eouv_depara_importacao(id_tipo_manifestacao_eouv ' . $objInfraMetaBD->tipoNumero() . ' NOT NULL ,
-            id_tipo_procedimento ' . $objInfraMetaBD->tipoNumero() . ' NULL ,
+            id_tipo_procedimento ' . $objInfraMetaBD->tipoNumero() . ' NOT NULL ,
 		    de_tipo_manifestacao_eouv ' . $objInfraMetaBD->tipoTextoVariavel(50) . ' NULL)');
 
-        $objInfraMetaBD->adicionarChavePrimaria('md_eouv_depara_importacao', 'pk_md_eouv_depara_importacao', array('id_tipo_manifestacao_eouv'));
+        $objInfraMetaBD->adicionarChavePrimaria('md_eouv_depara_importacao', 'pk_md_eouv_depara_importacao', array('id_tipo_manifestacao_eouv', 'id_tipo_procedimento'));
         $objInfraMetaBD->adicionarChaveEstrangeira('fk1_md_eouv_tipo_procedimento', 'md_eouv_depara_importacao', array('id_tipo_procedimento'), 'tipo_procedimento', array('id_tipo_procedimento'));
+        $objInfraMetaBD->criarIndice('md_eouv_depara_importacao', 'i01_md_eouv_depara_importacao', array('id_tipo_procedimento'));
 
         $this->logar('CRIANDO REGISTROS PARA A TABELA md_eouv_depara_importacao');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'1\', \'Denúncia\', NULL)');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'2\', \'Reclamação\', NULL)');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'3\', \'Elogio\', NULL)');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'4\', \'Sugestão\', NULL)');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'5\', \'Solicitação\', NULL)');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'6\', \'Simplifique\', NULL)');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'7\', \'Comunicado\', NULL)');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'1\', \'Denúncia\', \'100000335\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'2\', \'Reclamação\', \'100000336\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'3\', \'Elogio\', \'100000333\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'4\', \'Sugestão\', \'100000338\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'5\', \'Solicitação\', \'100000334\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'6\', \'Simplifique\', \'100000334\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'7\', \'Comunicado\', \'100000334\');');
 
         $this->logar('CRIANDO A TABELA md_eouv_rel_import');
         BancoSEI::getInstance()->executarSql('CREATE TABLE md_eouv_rel_import(id_md_eouv_rel_import ' . $objInfraMetaBD->tipoNumero() . ' NOT NULL ,
@@ -203,12 +213,12 @@ class MdCguEouvAtualizadorBDRN extends InfraRN
 
         $this->logar('CRIANDO Parâmetros do Sei');
         $objInfraParametro = new InfraParametro(BancoSEI::getInstance());
-        $objInfraParametro->setValor('EOUV_URL_WEBSERVICE_IMPORTACAO_ANEXO_MANIFESTACAO', 'https://sistema.ouvidorias.gov.br/Servicos/ServicoAnexosManifestacao.svc');
-        $objInfraParametro->setValor('EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO', 'https://sistema.ouvidorias.gov.br/Servicos/ServicoConsultaManifestacao.svc');
+        $objInfraParametro->setValor('EOUV_URL_WEBSERVICE_IMPORTACAO_ANEXO_MANIFESTACAO', 'https://treinafalabr.cgu.gov.br/Servicos/ServicoAnexosManifestacao.svc');
+        $objInfraParametro->setValor('EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO', 'https://treinafalabr.cgu.gov.br/Servicos/ServicoConsultaManifestacao.svc');
         $objInfraParametro->setValor('ID_UNIDADE_OUVIDORIA', '110000001');
         $objInfraParametro->setValor('ID_SERIE_EXTERNO_OUVIDORIA', '92');
         $objInfraParametro->setValor('EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO', '63');
-        $objInfraParametro->setValor('EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES', '01/12/2015');
+        $objInfraParametro->setValor('EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES ', '01/12/2015');
         $objInfraParametro->setValor('EOUV_URL_DETALHE_MANIFESTACAO', '');
         $objInfraParametro->setValor('EOUV_USUARIO_ACESSO_WEBSERVICE', '');
         $objInfraParametro->setValor('EOUV_SENHA_ACESSO_WEBSERVICE', '');
@@ -258,35 +268,35 @@ class MdCguEouvAtualizadorBDRN extends InfraRN
             $objUsuarioDTO->setStrSinAtivo('S');
             $objUsuarioRN = new UsuarioRN();
             $objUsuarioDTO = $objUsuarioRN->cadastrarRN0487($objUsuarioDTO);
-
-
-            $this->logar('Criando Serviço CadastrarManifestacao NA BASE DO SEI...');
-            $objServicoDTO = new ServicoDTO();
-            $objServicoDTO->setNumIdServico(null);
-            $objServicoDTO->setNumIdUsuario($objUsuarioDTO->getNumIdUsuario());
-            $objServicoDTO->setStrIdentificacao('CadastrarManifestacao');
-            $objServicoDTO->setStrDescricao('Cadastrar Manifestação Importada do sistema E-Ouv');
-            $objServicoDTO->setStrServidor('*');
-            $objServicoDTO->setStrSinLinkExterno('N');
-            $objServicoDTO->setStrSinAtivo('S');
-            $objServicoRN = new ServicoRN();
-            $objServicoDTO = $objServicoRN->cadastrar($objServicoDTO);
-
-            $this->logar('Criando Operação NA BASE DO SEI...');
-            $objOperacaoServicoDTO = new OperacaoServicoDTO();
-            $objOperacaoServicoDTO->setNumIdOperacaoServico(null);
-            $objOperacaoServicoDTO->setNumIdServico($objServicoDTO->getNumIdServico());
-            $objOperacaoServicoDTO->setNumStaOperacaoServico(0); //Gerar Procedimento
-            $objOperacaoServicoDTO->setNumIdUnidade(null);
-            $objOperacaoServicoDTO->setNumIdSerie(null);
-            $objOperacaoServicoDTO->setNumIdTipoProcedimento(null);
-            $objOperacaoServicoRN = new OperacaoServicoRN();
-            $objOperacaoServicoDTO = $objOperacaoServicoRN->cadastrar($objOperacaoServicoDTO);
         }
         else{
-                $this->logar('Usuário, Serviço e Operação já existem no SEI, segue para próximo passo');
+            $objUsuarioDTO = $objUsuarioDTOEouv;
         }
-        
+
+        $this->logar('Criando Serviço CadastrarManifestacao NA BASE DO SEI...');
+        $objServicoDTO = new ServicoDTO();
+        $objServicoDTO->setNumIdServico(null);
+        $objServicoDTO->setNumIdUsuario($objUsuarioDTO->getNumIdUsuario());
+        $objServicoDTO->setStrIdentificacao('CadastrarManifestacao');
+        $objServicoDTO->setStrDescricao('Cadastrar Manifestação Importada do sistema E-Ouv');
+        $objServicoDTO->setStrServidor('*');
+        $objServicoDTO->setStrSinServidor('N');
+        $objServicoDTO->setStrSinChaveAcesso('N');
+        $objServicoDTO->setStrSinLinkExterno('N');
+        $objServicoDTO->setStrSinAtivo('S');
+        $objServicoRN = new ServicoRN();
+        $objServicoDTO = $objServicoRN->cadastrar($objServicoDTO);
+
+        $this->logar('Criando Operação NA BASE DO SEI...');
+        $objOperacaoServicoDTO = new OperacaoServicoDTO();
+        $objOperacaoServicoDTO->setNumIdOperacaoServico(null);
+        $objOperacaoServicoDTO->setNumIdServico($objServicoDTO->getNumIdServico());
+        $objOperacaoServicoDTO->setNumStaOperacaoServico(0); //Gerar Procedimento
+        $objOperacaoServicoDTO->setNumIdUnidade(null);
+        $objOperacaoServicoDTO->setNumIdSerie(null);
+        $objOperacaoServicoDTO->setNumIdTipoProcedimento(null);
+        $objOperacaoServicoRN = new OperacaoServicoRN();
+        $objOperacaoServicoDTO = $objOperacaoServicoRN->cadastrar($objOperacaoServicoDTO);
 
         $this->logar('ADICIONANDO PARÂMETRO '.$this->nomeParametroVersaoModulo.' NA TABELA infra_parametro PARA CONTROLAR A VERSÃO DO MÓDULO');
         BancoSEI::getInstance()->executarSql('INSERT INTO infra_parametro (valor, nome ) VALUES( \'2.0.5\',  \'' . $this->nomeParametroVersaoModulo . '\' )');
@@ -311,17 +321,17 @@ class MdCguEouvAtualizadorBDRN extends InfraRN
         $objInfraMetaBD->adicionarChavePrimaria('md_eouv_parametros', 'pk_md_eouv_parametro', array('id_parametro'));
 
         $this->logar('CRIANDO REGISTROS PARA A TABELA md_eouv_parametro');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'1\', \'EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES\', \'01/01/1900\')');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'2\', \'EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO\', \'63\')');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'3\', \'ID_SERIE_EXTERNO_OUVIDORIA\', \'92\')');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'4\', \'EOUV_USUARIO_ACESSO_WEBSERVICE\', \'nomeUsuarioWebService\')');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'5\', \'EOUV_SENHA_ACESSO_WEBSERVICE\', \'senhaUsuarioWebService\')');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'6\', \'CLIENT_ID\', \'XXX\')');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'7\', \'CLIENT_SECRET\', \'XXX\')');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'8\', \'EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO\', \'https://treinamentoouvidorias.cgu.gov.br/api/manifestacoes\')');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'9\', \'ID_UNIDADE_OUVIDORIA\', \'110000001\')');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'10\', \'TOKEN\', \'XXX\')');
-        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'11\', \'IMPORTAR_DADOS_MANIFESTANTE\', \'1\')');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'1\', \'EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES\', \'01/01/1900\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'2\', \'EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO\', \'63\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'3\', \'ID_SERIE_EXTERNO_OUVIDORIA\', \'92\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'4\', \'EOUV_USUARIO_ACESSO_WEBSERVICE\', \'nomeUsuarioWebService\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'5\', \'EOUV_SENHA_ACESSO_WEBSERVICE\', \'senhaUsuarioWebService\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'6\', \'CLIENT_ID\', \'XXX\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'7\', \'CLIENT_SECRET\', \'XXX\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'8\', \'EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO\', \'https://treinamentoouvidorias.cgu.gov.br/api/manifestacoes\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'9\', \'ID_UNIDADE_OUVIDORIA\', \'110000001\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'10\', \'TOKEN\', \'XXX\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'11\', \'IMPORTAR_DADOS_MANIFESTANTE\', \'1\');');
 
         $this->logar('APAGANDO OS REGISTROS DA TABELA INFRA_PARAMETROS USADOS NA VERSÃO 2.0.5 E QUE AGORA NÃO SÃO MAIS NECESSÁRIOS');
 
@@ -352,5 +362,75 @@ class MdCguEouvAtualizadorBDRN extends InfraRN
         $this->logar('ATUALIZANDO PARÂMETRO '.$this->nomeParametroVersaoModulo.' NA TABELA infra_parametro PARA CONTROLAR A VERSÃO DO MÓDULO');
         BancoSEI::getInstance()->executarSql('UPDATE infra_parametro SET valor = \'3.0.0\' WHERE nome = \'' . $this->nomeParametroVersaoModulo . '\' ');
 
+    }
+
+    private function instalarv400()
+    {
+        SessaoInfra::setObjInfraSessao(SessaoSEI::getInstance());
+        BancoInfra::setObjInfraIBanco(BancoSEI::getInstance());
+
+        $objInfraMetaBD = new InfraMetaBD(BancoSEI::getInstance());
+        $this->logar('EXECUTANDO A INSTALACAO DA VERSAO 4.0.0 DO MODULO ' . $this->nomeDesteModulo . ' NA BASE DO SEI');
+
+        /**
+         * @todo - Evert - Inserir no manual para criar o tipo_procedimento via sei e inserir aqui antes de rodar o script
+         */
+        /**
+         * Criar um "tipo_procedimento" para a Manifestação e-Sic
+         */
+        $this->logar('CRIANDO REGISTROS PARA A TABELA tipo_procedimento');
+        BancoSEI::getInstance()->executarSql('INSERT INTO tipo_procedimento (id_tipo_procedimento, nome, descricao, sin_ativo, sta_nivel_acesso_sugestao, sin_interno, sin_ouvidoria, sin_individual, id_hipotese_legal_sugestao, sta_grau_sigilo_sugestao) VALUES (100001514, \'e-Sic Ouvidoria: Acesso à Informação\', \'Ouvidoria: Manifestação Tipo 8\', \'S\', \'0\', \'N\', \'N\', \'N\', NULL, NULL);');
+
+        /**
+         * Criar um "depara_importação" para a Manifestação e-Sic
+         */
+        $this->logar('CRIANDO REGISTROS PARA A TABELA md_eouv_depara_importacao');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, id_tipo_procedimento, de_tipo_manifestacao_eouv) VALUES (8, 100001514, \'Acesso à Informação\');');
+
+        /**
+         * Criar coluna na tabela md_eouv_rel_import para identificar qual o tipo de manifestação
+         *
+         * - 'P' (e-Ouv) - manifestações e-ouv padrão - tipos 1 a 7
+         * - 'R' (e-Sic) - manifestações e-sic com 'R'ecursos - tipo 8
+         */
+        $this->logar('CRIANDO COLUNA PARA TIPO DE MANIFESTAÇÃO PARA A TABELA md_eouv_rel_import');
+        BancoSEI::getInstance()->executarSql('ALTER TABLE md_eouv_rel_import ADD tipo_manifestacao ' . $objInfraMetaBD->tipoTextoFixo(2) . ' NOT NULL DEFAULT (\'P\');');
+
+        /**
+         * Criar coluna na tabela md_eouv_rel_import_det para identificar qual o tipo de manifestação
+         *
+         * - 'P' (e-Ouv) - manifestações e-ouv padrão - tipos 1 a 7
+         * - 'R' (e-Sic) - manifestações e-sic com 'R'ecursos - tipo 8
+         */
+        $this->logar('CRIANDO COLUNA PARA TIPO DE MANIFESTAÇÃO PARA A TABELA md_eouv_rel_import_det');
+        BancoSEI::getInstance()->executarSql('ALTER TABLE md_eouv_rel_import_det ADD tip_manifestacao ' . $objInfraMetaBD->tipoTextoFixo(2) . ' NOT NULL DEFAULT (\'P\');');
+        BancoSEI::getInstance()->executarSql('ALTER TABLE md_eouv_rel_import_det ADD dth_prazo_atendimento ' . $objInfraMetaBD->tipoDataHora() . ' NULL;');
+
+        /**
+         * Criar coluna na tabela md_eouv_parametros para identificar qual o tipo de parâmetro
+         *
+         * - 'eouv' (e-Ouv) - parâmetros do e-ouv [padrão]
+         * - 'esicR' (e-Sic) - parâmetros do e-sic
+         */
+        $this->logar('CRIANDO COLUNA PARA TIPO DE PARÂMETRO PARA A TABELA md_eouv_parametros');
+        BancoSEI::getInstance()->executarSql('ALTER TABLE md_eouv_parametros ADD de_tipo ' . $objInfraMetaBD->tipoTextoVariavel(10) . ' NOT NULL DEFAULT (\'eouv\');');
+
+        /**
+         * Cria parâmetros na tabela md_eouv_parametros para manifestações do e-Sic (tipo 8)
+         */
+        $this->logar('CRIA REGISTROS NA TABELA md_eouv_parametros PARA MANIFESTAÇÕES DO E-SIC (TIPO 8)');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (12, \'ESIC_DATA_INICIAL_IMPORTACAO_MANIFESTACOES\', \'01/01/1900\', \'esic\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (13, \'ESIC_URL_WEBSERVICE_IMPORTACAO_RECURSOS\', \'https://treinafalabr.cgu.gov.br/api/recursos\', \'esic\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (14, \'ESIC_ID_UNIDADE_PRINCIPAL\', \'110000001\', \'esic\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (15, \'ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA\', \'110000001\', \'esic\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (16, \'ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA\', \'110000001\', \'esic\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (17, \'ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA\', \'110000001\', \'esic\');');
+        BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (18, \'ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO\', \'110000001\', \'esic\');');
+
+        /**
+         * Atualizar versão do módulo na tabela infra-parametro do SEI
+         */
+        $this->logar('ATUALIZANDO PARÂMETRO '.$this->nomeParametroVersaoModulo.' NA TABELA infra_parametro PARA CONTROLAR A VERSÃO DO MÓDULO');
+        BancoSEI::getInstance()->executarSql('UPDATE infra_parametro SET valor = \'4.0.0\' WHERE nome = \'' . $this->nomeParametroVersaoModulo . '\' ');
     }
 }

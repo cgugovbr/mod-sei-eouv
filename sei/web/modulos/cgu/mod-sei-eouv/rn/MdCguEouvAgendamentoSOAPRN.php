@@ -324,7 +324,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
         return $obj;
     }
 
-
     public function executarImportacaoManifestacaoEOuv()
     {
 
@@ -473,7 +472,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
             die;
         }
-
     }
 
     public function executarImportacaoLinha($retornoWsLinha){
@@ -598,7 +596,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $erro->setStrSinSucesso('C');
             $objEouvRelatorioImportacaoDetalheRN->alterar($erro);
         }
-
     }
 
     public function gerarPDFPedidoInicial($retornoWsLinha){
@@ -886,8 +883,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $objDocumentoManifestacao->setData($retornoWsLinha['DataCadastro']);
         $objDocumentoManifestacao->setNomeArquivo('RelatórioDadosManifestação.pdf');
         $objDocumentoManifestacao->setConteudo(base64_encode(file_get_contents(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload)));
-        return $objDocumentoManifestacao;
 
+        return $objDocumentoManifestacao;
     }
 
     public function gerarAnexosProtocolo($numProtocoloFormatado){
@@ -988,9 +985,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                         array_push($arrAnexos, $objAnexoManifestacao);
                         $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Arquivo adicionado como anexo: ' . $strNomeArquivoOriginal, '');
-                    }
-                    else
-                    {
+                    } else {
                         $ocorreuErroAdicionarAnexo = true;
                         LogSEI::getInstance()->gravar('Importação de Manifestação ' . $numProtocoloFormatado . ': Arquivo ' . $strNomeArquivoOriginal . ' possui extensão inválida.', InfraLog::$INFORMACAO);
                         continue;
@@ -1009,7 +1004,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
             return $arrAnexos;
         }
-
     }
 
     public function excluirProcessoComErro($idProcedimento){

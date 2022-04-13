@@ -11,13 +11,17 @@ require_once dirname(__FILE__).'/../web/Sip.php';
 class MdCguEouvAtualizadorSipRN extends InfraRN{
 
     private $numSeg = 0;
-    private $versaoAtualDesteModulo = '3.0.0';
-    private $nomeDesteModulo = 'EOUV - Integração com sistema E-ouv';
+    private $versaoAtualDesteModulo = '4.0.0';
+    private $nomeDesteModulo = 'EOUV - Integração com sistema FalaBR (E-ouv)';
     private $prefixoParametro = 'MD_CGU_EOUV';
     private $nomeParametroVersaoModulo = 'VERSAO_MODULO_CGU_EOUV';
-    private $historicoVersoes = array('2.0.5', '3.0.0');
-    //Começamos a contralar a partir da versão 2.0.5 que é a última estável para o SEI 3.0
-    //A versão 3.0.0 começa a utilizar a versão REST dos webservices do E-Ouv
+    private $historicoVersoes = array('2.0.5', '3.0.0', '4.0.0');
+    /**
+     * 1. Começamos a contralar a partir da versão 2.0.5 que é a última estável para o SEI 3.0
+     * 2. A versão 3.0.0 começa a utilizar a versão REST dos webservices do E-Ouv
+     * 3. A versão 4.0.0 importa manifestações do tipo 8 (acesso à informação) que são oriundas antigo e-Sic integrado
+     * ao FalaBR, esta versão importa tambem os recursos de 1ª e 2ª instância
+     */
 
     public function __construct(){
         parent::__construct();
@@ -106,12 +110,17 @@ class MdCguEouvAtualizadorSipRN extends InfraRN{
             if (InfraString::isBolVazia($strVersaoModuloEOuv)){
                 $this->instalarv205();
                 $this->instalarv300();
+                $this->instalarv400();
                 $this->logar('INSTALAÇÃO/ATUALIZAÇÃO DA VERSÃO '. $this->versaoAtualDesteModulo .' DO MODULO '. $this->nomeDesteModulo .' INSTALADAS COM SUCESSO NA BASE DO SIP');
                 $this->finalizar('FIM', false);
-            }
-            elseif ($strVersaoModuloEOuv == '2.0.5') {
+            } elseif ($strVersaoModuloEOuv == '2.0.5') {
                 $this->instalarv300();
+                $this->instalarv400();
                 $this->logar('INSTALAÇÃO/ATUALIZAÇÃO DA VERSÃO ' . $this->versaoAtualDesteModulo . ' DO MODULO ' . $this->nomeDesteModulo . ' INSTALADAS COM SUCESSO NA BASE DO SEI');
+                $this->finalizar('FIM', false);
+            } elseif ($strVersaoModuloEOuv == '3.0.0') {
+                $this->instalarv400();
+                $this->logar('INSTALAÇÃO/ATUALIZAÇÃO DA VERSÃO ' . $this->versaoAtualDesteModulo . ' DO MODULO ' . $this->nomeDesteModulo . ' INSTALADAS COM SUCESSO NA BASE DO SIP');
                 $this->finalizar('FIM', false);
             }
 
@@ -209,7 +218,6 @@ class MdCguEouvAtualizadorSipRN extends InfraRN{
 
     }
 
-
     protected function instalarv300()
     {
 
@@ -297,9 +305,77 @@ class MdCguEouvAtualizadorSipRN extends InfraRN{
 
     }
 
+    protected function instalarv400()
+    {
+
+        $this->logar('EXECUTANDO A INSTALAÇÃO/ATUALIZAÇÃO DA VERSÃO 4.0.0 DO ' . $this->nomeDesteModulo . ' NA BASE DO SIP');
+
+        $objSistemaRN = new SistemaRN();
+        $objPerfilRN = new PerfilRN();
+        $objMenuRN = new MenuRN();
+        $objItemMenuRN = new ItemMenuRN();
+        $objRecursoRN = new RecursoRN();
+
+        $objSistemaDTO = new SistemaDTO();
+        $objSistemaDTO->retNumIdSistema();
+        $objSistemaDTO->setStrSigla('SEI');
+
+        $objSistemaDTO = $objSistemaRN->consultar($objSistemaDTO);
+
+        if ($objSistemaDTO == null) {
+            throw new InfraException('Sistema SEI não encontrado.');
+        }
+
+        $numIdSistemaSei = $objSistemaDTO->getNumIdSistema();
+
+        $objPerfilDTO = new PerfilDTO();
+        $objPerfilDTO->retNumIdPerfil();
+        $objPerfilDTO->setNumIdSistema($numIdSistemaSei);
+        $objPerfilDTO->setStrNome('Administrador');
+        $objPerfilDTO = $objPerfilRN->consultar($objPerfilDTO);
+
+        if ($objPerfilDTO == null) {
+            throw new InfraException('Perfil Administrador do sistema SEI não encontrado.');
+        }
+
+        $objMenuDTO = new MenuDTO();
+        $objMenuDTO->retNumIdMenu();
+        $objMenuDTO->setNumIdSistema($numIdSistemaSei);
+        $objMenuDTO->setStrNome('Principal');
+        $objMenuDTO = $objMenuRN->consultar($objMenuDTO);
+
+        if ($objMenuDTO == null){
+            throw new InfraException('Menu do sistema SEI não encontrado.');
+        }
+        $numIdMenuSei = $objMenuDTO->getNumIdMenu();
+
+        $numIdPerfilSeiAdministrador = $objPerfilDTO->getNumIdPerfil();
+
+        $numIdRecursoParametro = $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
+            'md_cgu_eouv_parametro_listar_esic', 'Lista de Parâmetros módulo SEI x e-Sic',
+            'controlador.php?acao=md_cgu_eouv_parametro_listar_esic');
+
+        $this->logar('RECUPERANDO MENU DO E-OUV');
+        $objItemMenuDTOEouv = new ItemMenuDTO();
+        $objItemMenuDTOEouv->retNumIdItemMenu();
+        $objItemMenuDTOEouv->setNumIdSistema($numIdSistemaSei);
+        $objItemMenuDTOEouv->setStrRotulo('E-Ouv');
+        $objItemMenuDTOEouv = $objItemMenuRN->consultar( $objItemMenuDTOEouv );
+
+        $this->logar('CRIANDO e VINCULANDO ITEM MENU A PERFIL - E-Ouv->Parâmetros');
+
+        $this->adicionarItemMenu($numIdSistemaSei, $numIdPerfilSeiAdministrador,
+            $numIdMenuSei, $objItemMenuDTOEouv->getNumIdItemMenu(),
+            $numIdRecursoParametro, 'Parâmetros do Módulo e-Sic', 'Parâmetros', 30);
+
+        $this->logar('ATUALIZANDO PARÂMETRO '.$this->nomeParametroVersaoModulo.' NA TABELA infra_parametro PARA CONTROLAR A VERSÃO DO MÓDULO');
+        BancoSip::getInstance()->executarSql('UPDATE infra_parametro SET valor = \'4.0.0\' WHERE nome = \''. $this->nomeParametroVersaoModulo .'\' ' );
+    }
+
     private function adicionarItemMenu($numIdSistema, $numIdPerfil, $numIdMenu, $numIdItemMenuPai, $numIdRecurso, $strRotulo, $strDescricao, $numSequencia ){
 
         $objItemMenuDTO = new ItemMenuDTO();
+        $objItemMenuDTO->retNumIdMenu();
         $objItemMenuDTO->retNumIdItemMenu();
         $objItemMenuDTO->setNumIdMenu($numIdMenu);
         $objItemMenuDTO->setNumIdMenuPai($numIdMenu);
@@ -315,10 +391,13 @@ class MdCguEouvAtualizadorSipRN extends InfraRN{
         $objItemMenuDTO->setNumIdRecurso($numIdRecurso);
         $objItemMenuDTO->setStrRotulo($strRotulo);
 
+
+
         $objItemMenuRN = new ItemMenuRN();
         $objItemMenuDTO = $objItemMenuRN->consultar($objItemMenuDTO);
 
         if ($objItemMenuDTO==null){
+
             $objItemMenuDTO = new ItemMenuDTO();
             $objItemMenuDTO->setNumIdItemMenu(null);
             $objItemMenuDTO->setNumIdMenu($numIdMenu);
@@ -338,11 +417,15 @@ class MdCguEouvAtualizadorSipRN extends InfraRN{
             $objItemMenuDTO->setNumSequencia($numSequencia);
             $objItemMenuDTO->setStrSinNovaJanela('N');
             $objItemMenuDTO->setStrSinAtivo('S');
+            $objItemMenuDTO->setStrIcone('');
 
             $objItemMenuDTO = $objItemMenuRN->cadastrar($objItemMenuDTO);
         }
 
+
         if ($numIdPerfil!=null && $numIdRecurso!=null){
+
+
             $objRelPerfilRecursoDTO = new RelPerfilRecursoDTO();
             $objRelPerfilRecursoDTO->setNumIdSistema($numIdSistema);
             $objRelPerfilRecursoDTO->setNumIdPerfil($numIdPerfil);
@@ -397,8 +480,8 @@ class MdCguEouvAtualizadorSipRN extends InfraRN{
             $objRecursoDTO->setStrSinAtivo('S');
             $objRecursoDTO = $objRecursoRN->cadastrar($objRecursoDTO);
         }
-
         if ($numIdPerfil!=null){
+
             $objRelPerfilRecursoDTO = new RelPerfilRecursoDTO();
             $objRelPerfilRecursoDTO->setNumIdSistema($numIdSistema);
             $objRelPerfilRecursoDTO->setNumIdPerfil($numIdPerfil);
@@ -414,8 +497,6 @@ class MdCguEouvAtualizadorSipRN extends InfraRN{
         return $objRecursoDTO->getNumIdRecurso();
 
     }
-
-
 }
 
 
