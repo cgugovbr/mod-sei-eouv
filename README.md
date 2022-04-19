@@ -19,7 +19,7 @@
 
 Acesse no SUPER o menu *Administração > Tipos de Processos > Listar* para verificar os tipos já existentes, conforme tela abaixo:
 
-![SUPER - Listar tipos de documentos](https://github.com/cgugovbr/imagens/blob/main/listar_tipo_documentos.jpg?raw=true) > ATUALIZAR IMAGEM
+![SUPER - Listar tipos de documentos](https://github.com/cgugovbr/imagens/blob/main/super_listar_tipo_documento.png?raw=true)
 
 > Você poderá criar um novo tipo de documento para cada tipo de manifestação do FalaBR se for o caso. 
 
@@ -30,7 +30,7 @@ Anote os IDs de cada *Tipo de Processo* que será vinculado os processos importa
 Abaixo os tipos de manifestações do FalaBR que serão importadas para o SEI:
 
 |id_tipo_manifestacao_eouv |id_tipo_procedimento    |de_tipo_manifestacao_eouv |
-| :-: 			   | :-: 		    | :-- 		       |
+| :-: 			   		   | :-: 		            | :-- 	         	       |
 |1                         |`xxx`                   |Denúncia                  |
 |2                         |`xxx`                   |Reclamação                |
 |3                         |`xxx`                   |Elogio                    |
@@ -38,7 +38,7 @@ Abaixo os tipos de manifestações do FalaBR que serão importadas para o SEI:
 |5                         |`xxx`                   |Solicitação               |
 |6                         |`xxx`                   |Simplifique               |
 |7                         |`xxx`                   |Comunicado                |
-|8 			   |`xxx`		    |Acesso à Informação       |
+|8 						   |`xxx`				    |Acesso à Informação       |
 
 ### Download do módulo
 
