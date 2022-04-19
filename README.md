@@ -1,9 +1,9 @@
 
-# Módulo de Integração SEI & FalaBR (e-Ouv e e-Sic)
+# Módulo de Integração SUPER & FalaBR (e-Ouv e e-Sic)
 
 ## Requisitos
 
-- SEI versão 4.0.3 ou superior (verificar versão do SEI no arquivo /sei/web/SEI.php).
+- SUPER versão 4.0.3.1 ou superior (verificar versão do SUPER no arquivo /sei/web/SEI.php).
 
 - Utilizar o Sistema FalaBR do Governo Federal (e-Ouv e e-Sic). Caso ainda não tenha aderido ao FalaBR e queira saber mais informações acesse https://falabr.cgu.gov.br/.
 
@@ -15,11 +15,11 @@
 
 1. Fazer backup completo dos bancos de dados do SEI e do SIP.
 
-2. **[IMPORTANTE]** Inserir os Tipos de Procedimento para cada tipo de Manifestação no SEI
+2. **[IMPORTANTE]** Inserir os Tipos de Procedimento para cada tipo de Manifestação no SUPER
 
-Acesse no SEI o menu *Administração > Tipos de Processos > Listar* para verificar os tipos já existentes, conforme tela abaixo:
+Acesse no SUPER o menu *Administração > Tipos de Processos > Listar* para verificar os tipos já existentes, conforme tela abaixo:
 
-![SEI - Listar tipos de documentos](https://github.com/cgugovbr/imagens/blob/main/listar_tipo_documentos.jpg?raw=true)
+![SUPER - Listar tipos de documentos](https://github.com/cgugovbr/imagens/blob/main/super_listar_tipo_documento.png?raw=true)
 
 > Você poderá criar um novo tipo de documento para cada tipo de manifestação do FalaBR se for o caso. 
 
@@ -30,7 +30,7 @@ Anote os IDs de cada *Tipo de Processo* que será vinculado os processos importa
 Abaixo os tipos de manifestações do FalaBR que serão importadas para o SEI:
 
 |id_tipo_manifestacao_eouv |id_tipo_procedimento    |de_tipo_manifestacao_eouv |
-| :-: 			   | :-: 		    | :-- 		       |
+| :-: 			   		   | :-: 		            | :-- 	         	       |
 |1                         |`xxx`                   |Denúncia                  |
 |2                         |`xxx`                   |Reclamação                |
 |3                         |`xxx`                   |Elogio                    |
@@ -38,7 +38,7 @@ Abaixo os tipos de manifestações do FalaBR que serão importadas para o SEI:
 |5                         |`xxx`                   |Solicitação               |
 |6                         |`xxx`                   |Simplifique               |
 |7                         |`xxx`                   |Comunicado                |
-|8 			   |`xxx`		    |Acesso à Informação       |
+|8 						   |`xxx`				    |Acesso à Informação       |
 
 ### Download do módulo
 
@@ -226,5 +226,6 @@ Para executar o *script* execute o seguinte comando:
 Criamos um vídeo com a demonstração do funcionamento do módulo focado na parte negocial:
 
 [![Tutorial módulo integração SEI & FalaBR](https://img.youtube.com/vi/geUCx7H79Gw/0.jpg)](https://www.youtube.com/watch?v=geUCx7H79Gw)
+> Atualizar video
 
 > Em caso dúvidas favor enviar um email para [SESOL - sesol@cgu.gov.br](mailto:sesol@cgu.gov.br?subject=[DUVIDA]%20SEI%20-%20módulo%20FalaBR)
