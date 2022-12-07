@@ -23,7 +23,7 @@ Acesse no SUPER o menu *Administração > Tipos de Processos > Listar* para veri
 
 > Você poderá criar um novo tipo de documento para cada tipo de manifestação do FalaBR se for o caso. 
 
-Anote os IDs de cada *Tipo de Processo* que será vinculado os processos importados do FalaBR. Estes código deverão ser atualizados no arquivo `./sei/web/modulos/cgu/mod-se-eouv/rn/MdCguEouvAtualizadorBDRN.php` conforme descrito no item 7
+Anote os IDs de cada *Tipo de Processo* que será vinculado os processos importados do FalaBR. Estes código deverão ser atualizados no arquivo `./sei/scripts/md_cgu_eouv_atualizar_modulo.php` conforme descrito no item 7
 
 > Este ítem é pré-requisito para a execução do script no item 9
 
@@ -112,7 +112,7 @@ $ cp /sei/web/modulos/cgu/mod-sei-eouv/scripts/sip/md_cgu_eouv_atualizar_modulo_
 
 > Utilize sempre editores de texto que não altere o *charset* do arquivo
 
-7. **[IMPORTANTE]** Atualizar as informações do tipo de procedimento, inseridas no SEI conforme item 2, no arquivo `./sei/web/modulos/cgu/mod-sei-eouv/rn/MdCguEouvAtualizadorBDRN.php`, conforme segue:
+7. **[IMPORTANTE]** Atualizar as informações do tipo de procedimento, inseridas no SEI conforme item 2, no arquivo `./sei/scripts/md_cgu_eouv_atualizar_modulo.php`, conforme segue:
 
 	7.1 Dentro do método **instalarv205** atualizar onde está 'XXXXXXXX' com o *ID* correspondente para o 'tipo de procedimento' referente aos tipos de 1 à 7, conforme *ID* abaixo:
 
