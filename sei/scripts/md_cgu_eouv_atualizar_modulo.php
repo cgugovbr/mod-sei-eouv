@@ -41,7 +41,7 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
     return BancoSEI::getInstance();
   }
 
-  private function instalarv205()
+  protected function instalarv205()
   {
     SessaoInfra::setObjInfraSessao(SessaoSEI::getInstance());
     BancoInfra::setObjInfraIBanco(BancoSEI::getInstance());
@@ -183,7 +183,7 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
     $objOperacaoServicoDTO = $objOperacaoServicoRN->cadastrar($objOperacaoServicoDTO);
   }
 
-  private function instalarv300()
+  protected function instalarv300()
   {
     SessaoInfra::setObjInfraSessao(SessaoSEI::getInstance());
     BancoInfra::setObjInfraIBanco(BancoSEI::getInstance());
@@ -238,7 +238,7 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
     $objInfraParametroRN->excluir($arrObjInfraParametroDTO);
   }
 
-  private function instalarv400()
+  protected function instalarv400()
   {
     SessaoInfra::setObjInfraSessao(SessaoSEI::getInstance());
     BancoInfra::setObjInfraIBanco(BancoSEI::getInstance());
