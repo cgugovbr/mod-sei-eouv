@@ -7,7 +7,7 @@
 
 - Utilizar o Sistema FalaBR do Governo Federal (e-Ouv e e-Sic). Caso ainda não tenha aderido ao FalaBR e queira saber mais informações acesse https://falabr.cgu.gov.br/.
 
-- [IMPORTANTE] Para executar os scripts de instalação/atualização (itens 8 e 9 abaixo), o usuário configurado nos arquivos **ConfiguracaoSEI.php** e **ConfiguracaoSip.php**, deverá ter permissão de acesso total ao banco de dados do SEI e do SIP, permitindo criação e exclusão de tabelas.
+- [IMPORTANTE] Ao executar os scripts de instalação/atualização (itens 7 e 8 abaixo), você precisará informar um usuário e senha para se conectar ao banco de dados do SEI e do SIP. Tal usuário precisa ter permissão de acesso total, sendo capaz de criar e excluir tabelas.
 
 ## Instalação/atualização e configuração
 
@@ -23,9 +23,9 @@ Acesse no SUPER o menu *Administração > Tipos de Processos > Listar* para veri
 
 > Você poderá criar um novo tipo de documento para cada tipo de manifestação do FalaBR se for o caso. 
 
-Anote os IDs de cada *Tipo de Processo* que será vinculado os processos importados do FalaBR. Estes código deverão ser atualizados no arquivo `./sei/scripts/md_cgu_eouv_atualizar_modulo.php` conforme descrito no item 7
+Anote os IDs de cada *Tipo de Processo* que será vinculado os processos importados do FalaBR. Estes código deverão ser atualizados no arquivo `./sei/scripts/md_cgu_eouv_atualizar_modulo.php` conforme descrito no item 6
 
-> Este ítem é pré-requisito para a execução do script no item 9
+> Este ítem é pré-requisito para a execução do script no item 8
 
 Abaixo os tipos de manifestações do FalaBR que serão importadas para o SEI:
 
@@ -81,21 +81,7 @@ $ unzip mod-sei-eouv-VERSAO.zip
  
 ### Instalação/atualização
 
-5. Copiar os scripts de instalação para as pastas do *sip* e do *sei*, conforme segue:
-
-*SEI*
-```bash
-$ cp /sei/web/modulos/cgu/mod-sei-eouv/scripts/sei/md_cgu_eouv_atualizar_modulo_sei.php /sei/scripts/
-```
-
-*SIP*
-```bash
-$ cp /sei/web/modulos/cgu/mod-sei-eouv/scripts/sip/md_cgu_eouv_atualizar_modulo_sip.php /sip/scripts/
-```
-
-> Repare que são **DOIS** scripts, um para o SEI e outro para o SIP, é necessário copiar os dois para suas respectivas pastas
-
-6. Caso esteja instalando pela primeira vez o módulo adicionar o móduloo **'MdCguEouvIntegracao' => 'cgu/mod-sei-eouv'** no *array* 'Modulos' no arquivo */sei/config/ConfiguracaoSEI.php* conforme abaixo:
+5. Caso esteja instalando pela primeira vez o módulo adicionar o móduloo **'MdCguEouvIntegracao' => 'cgu/mod-sei-eouv'** no *array* 'Modulos' no arquivo */sei/config/ConfiguracaoSEI.php* conforme abaixo:
 
 ```text
 'SEI' => array(
@@ -112,9 +98,9 @@ $ cp /sei/web/modulos/cgu/mod-sei-eouv/scripts/sip/md_cgu_eouv_atualizar_modulo_
 
 > Utilize sempre editores de texto que não altere o *charset* do arquivo
 
-7. **[IMPORTANTE]** Atualizar as informações do tipo de procedimento, inseridas no SEI conforme item 2, no arquivo `./sei/scripts/md_cgu_eouv_atualizar_modulo.php`, conforme segue:
+6. **[IMPORTANTE]** Atualizar as informações do tipo de procedimento, inseridas no SEI conforme item 2, no arquivo `./sei/scripts/md_cgu_eouv_atualizar_modulo.php`, conforme segue:
 
-	7.1 Dentro do método **instalarv205** atualizar onde está 'XXXXXXXX' com o *ID* correspondente para o 'tipo de procedimento' referente aos tipos de 1 à 7, conforme *ID* abaixo:
+	6.1 Dentro do método **instalarv205** atualizar onde está 'XXXXXXXX' com o *ID* correspondente para o 'tipo de procedimento' referente aos tipos de 1 à 7, conforme *ID* abaixo:
 
 	```bash
 	$this->logar('CRIANDO REGISTROS PARA A TABELA md_eouv_depara_importacao');
@@ -129,7 +115,7 @@ $ cp /sei/web/modulos/cgu/mod-sei-eouv/scripts/sip/md_cgu_eouv_atualizar_modulo_
 
 	> Caso esteja atualizando a versão, já deverá constar os *ids* corretos, portanto siga para o próximo item
 
-	7.2 Dentro do método **instalarv400** atualizar onde está 'XXXXXXXX' com o *ID* correspondente para o 'tipo de procedimento' referente ao tipo 8, acesso à informação, conforme abaixo:
+	6.2 Dentro do método **instalarv400** atualizar onde está 'XXXXXXXX' com o *ID* correspondente para o 'tipo de procedimento' referente ao tipo 8, acesso à informação, conforme abaixo:
 
 	```bash
 	/**
@@ -139,7 +125,7 @@ $ cp /sei/web/modulos/cgu/mod-sei-eouv/scripts/sip/md_cgu_eouv_atualizar_modulo_
 	BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, id_tipo_procedimento, de_tipo_manifestacao_eouv) VALUES (8, XXXXXXXX, \'Acesso à Informação\');');
 	```
 
-8. Execute o *script* '*/sip/scripts/md_cgu_eouv_atualizar_modulo_sip.php*' em linha de comando no servidor SIP, verificando se não houve erro durante a execução. Ao final deve aparecer a mensagem "FIM".
+7. Execute o *script* '*/sip/scripts/md_cgu_eouv_atualizar_modulo_sip.php*' em linha de comando no servidor SIP, verificando se não houve erro durante a execução. Ao final deve aparecer a mensagem "FIM".
 
 Para executar o *script* execute o seguinte comando:
 
@@ -147,7 +133,7 @@ Para executar o *script* execute o seguinte comando:
 /usr/bin/php -c /etc/php.ini sip/scripts/md_cgu_eouv_atualizar_modulo.php > md_cgu_eouv_atualizar_modulo_sip.log
 ```
 
-9. Execute o *script* '*/sei/scripts/md_cgu_eouv_atualizar_modulo_sei.php*' em linha de comando no servidor SEI, verificando se não houve erro durante a execução. Ao final deve aparecer a mensagem "FIM".
+8. Execute o *script* '*/sei/scripts/md_cgu_eouv_atualizar_modulo_sei.php*' em linha de comando no servidor SEI, verificando se não houve erro durante a execução. Ao final deve aparecer a mensagem "FIM".
 
 Para executar o *script* execute o seguinte comando:
 
@@ -157,13 +143,13 @@ Para executar o *script* execute o seguinte comando:
 
 > **[IMPORTANTE]** Ao final da execução dos dois *scripts* acima deve constar o termo "FIM" e informação de que a instalação ocorreu com sucesso (SEM ERROS). Do contrário, o script não foi executado até o final e algum dado não foi inserido/atualizado nos bancos de dados correspondentes. Neste caso, deve-se restaurar o backup do banco pertinente e repetir o procedimento.
 
-> Constando o termo "FIM" e informação de que a instalação ocorreu com sucesso, pode logar no SEI e SIP e verificar no menu *Infra > Módulos* se consta o módulo "Módulo de Integração entre o sistema SEI e o E-ouv(Sistema de Ouvidorias)" com o valor da última versão do módulo.
+> Constando o termo "FIM" e informação de que a instalação ocorreu com sucesso, pode logar no SEI e verificar no menu *Infra > Módulos* se consta o módulo "Módulo de Integração entre o sistema SEI e o FalaBR (Sistema de Ouvidorias - e-Ouv|e-Sic)" com o valor da última versão do módulo.
 
 ### Configurações
 
-10. Parametrizar o módulo, usando o usuário com perfil "Administrador" do SEI, conforme descrito abaixo:
+9. Parametrizar o módulo, usando o usuário com perfil "Administrador" do SEI, conforme descrito abaixo:
 
-	10.1 Acessar o menu *E-Ouv > Parâmetros do Módulo E-ouv* ajustando os seguintes parâmetros:
+	9.1 Acessar o menu *E-Ouv > Parâmetros do Módulo E-ouv* ajustando os seguintes parâmetros:
 
 	- **EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES** - Inserir neste campo a Data Inicial, no formato (DD/MM/AAAA), para carregar as manifestações do FalaBR (e-Ouv) dos tipos 1 à 7, conforme *Tabela 1 - Tipo de Manifestação*. Sugerimos que seja colocada a **data atual** para que apenas as novas manifestações sejam importadas para o SEI.
 
@@ -189,7 +175,7 @@ Para executar o *script* execute o seguinte comando:
 
 	> Caso esteja atualizando a versão, já deverá constar os *ids* corretos, portanto siga para o próximo item
 
-	10.2 Acessar o menu *E-Ouv > Parâmetros do Módulo e-Sic* ajustando os seguintes parâmetros:
+	9.2 Acessar o menu *E-Ouv > Parâmetros do Módulo e-Sic* ajustando os seguintes parâmetros:
 
 	- **ESIC_DATA_INICIAL_IMPORTACAO_MANIFESTACOES** - Inserir neste campo a Data Inicial, no formato (DD/MM/AAAA), para carregar as manifestações do FalaBR (e-Sic) dos tipos 8, conforme *Tabela 1 - Tipo de Manifestação*. Sugerimos que seja colocada a **data atual** para que apenas as novas manifestações sejam importadas para o SEI.
 
@@ -203,15 +189,15 @@ Para executar o *script* execute o seguinte comando:
 
 	- **ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA** - Código da Unidade no SEI que deverá registrar os recursos de **segunda** instância
 
-11. Criar agendamento para as funções desejadas
+10. Criar agendamento para as funções desejadas
 
 	Este móduo possui duas funções para importação das manifestações 'e-Ouv' (tipo 1 a 7) e 'e-Sic' (tipo 8). Segue abaixo as respectivas funções para agendamento:
 
-	11.1 Para importar do FalaBR as manifestações 'e-Ouv' faça o agendamento da função:
+	10.1 Para importar do FalaBR as manifestações 'e-Ouv' faça o agendamento da função:
 	
 	- **MdCguEouvAgendamentoRN::executarImportacaoManifestacaoEOuv**
 
-	11.2 Para importar do FalaBR as manifestações 'e-Sic' faça o agendamento da função 
+	10.2 Para importar do FalaBR as manifestações 'e-Sic' faça o agendamento da função
 	
 	- **MdCguEouvAgendamentoRN::executarImportacaoManifestacaoESic**
 
