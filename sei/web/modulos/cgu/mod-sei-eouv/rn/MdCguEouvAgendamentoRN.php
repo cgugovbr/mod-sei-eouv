@@ -1853,14 +1853,17 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $sexo = $retornoWsLinha['Manifestante']['genero'];
             $desc_documento_identificacao = $retornoWsLinha['Manifestante']['TipoDocumentoIdentificacao'];
             $numero_documento_identificacao = $retornoWsLinha['Manifestante']['NumeroDocumentoIdentificacao'];
-            $endereco = $retornoWsLinha['Manifestante']['Endereco']['Logradouro'] . " " . $retornoWsLinha['Manifestante']['Endereco']['Complemento'];
-            $bairro = $retornoWsLinha['Manifestante']['Endereco']['Bairro'];
 
-            if (is_array($retornoWsLinha['Manifestante']['Endereco']['Municipio'])) {
-                $desc_municipio = $retornoWsLinha['Manifestante']['Endereco']['Municipio']['DescMunicipio'] . " / " . $retornoWsLinha['Manifestante']['Endereco']['Municipio']['Uf']['SigUf'] . " - " . $retornoWsLinha['Manifestante']['Endereco']['Municipio']['Uf']['DescUf'];
+            if (is_array($retornoWsLinha['Manifestante']['Endereco'])) {
+                $endereco = $retornoWsLinha['Manifestante']['Endereco']['Logradouro'] . " " . $retornoWsLinha['Manifestante']['Endereco']['Complemento'];
+                $bairro = $retornoWsLinha['Manifestante']['Endereco']['Bairro'];
+
+                if (is_array($retornoWsLinha['Manifestante']['Endereco']['Municipio'])) {
+                    $desc_municipio = $retornoWsLinha['Manifestante']['Endereco']['Municipio']['DescMunicipio'] . " / " . $retornoWsLinha['Manifestante']['Endereco']['Municipio']['Uf']['SigUf'] . " - " . $retornoWsLinha['Manifestante']['Endereco']['Municipio']['Uf']['DescUf'];
+                }
+
+                $cep = $retornoWsLinha['Manifestante']['Endereco']['Cep'];
             }
-
-            $cep = $retornoWsLinha['Manifestante']['Endereco']['Cep'];
 
             if(is_array($retornoWsLinha['Manifestante']['Telefone'])) {
                 $telefone = "(" . $retornoWsLinha['Manifestante']['Telefone']['ddd'] . ") " . $retornoWsLinha['Manifestante']['Telefone']['Numero'];
