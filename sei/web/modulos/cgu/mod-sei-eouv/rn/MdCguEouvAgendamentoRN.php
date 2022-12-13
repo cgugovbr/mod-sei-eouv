@@ -893,7 +893,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         /**
          * Função para buscar o 'restante' do token sem o limite de 255 caracteres do SEI
          */
-        $tokenPart2 = BancoSEI::getInstance()->consultarSql('select substring(de_valor_parametro, 256, 455) from md_eouv_parametros where no_parametro="TOKEN";')[0]['computed'];
+        $tokenPart2 = BancoSEI::getInstance()->consultarSql("select substring(de_valor_parametro, 256, 455) from md_eouv_parametros where no_parametro='TOKEN';")[0]['computed'];
         $token = $token . $tokenPart2;
 
         // Debugar Token
