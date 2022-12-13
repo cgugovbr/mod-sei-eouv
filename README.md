@@ -179,9 +179,9 @@ Para executar o *script* execute o seguinte comando:
 
 	- **ESIC_DATA_INICIAL_IMPORTACAO_MANIFESTACOES** - Inserir neste campo a Data Inicial, no formato (DD/MM/AAAA), para carregar as manifestações do FalaBR (e-Sic) dos tipos 8, conforme *Tabela 1 - Tipo de Manifestação*. Sugerimos que seja colocada a **data atual** para que apenas as novas manifestações sejam importadas para o SEI.
 
-	- **ESIC_URL_WEBSERVICE_IMPORTACAO_RECURSOS** - Já vem configurado para o ambiente de produção do FalaBR com 'https://falabr.cgu.gov.br/api/recursos?NumProtocolo='
+	- **ESIC_URL_WEBSERVICE_IMPORTACAO_RECURSOS** - Já vem configurado para o ambiente de produção do FalaBR com 'https://falabr.cgu.gov.br/api/recursos'
 
-	> Para efeitos de testes e homologação utilizar o ambiente de treinamento: https://treinafalabr.cgu.gov.br/api/recursos?NumProtocolo=
+	> Para efeitos de testes e homologação utilizar o ambiente de treinamento: https://treinafalabr.cgu.gov.br/api/recursos
 
 	- **ESIC_ID_UNIDADE_PRINCIPAL** - Código da Unidade no SEI que deverá registrar os novos processos 'e-Sic' importados do FalaBR
 

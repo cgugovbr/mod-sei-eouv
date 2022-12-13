@@ -207,7 +207,7 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
     BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'5\', \'EOUV_SENHA_ACESSO_WEBSERVICE\', \'senhaUsuarioWebService\');');
     BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'6\', \'CLIENT_ID\', \'XXX\');');
     BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'7\', \'CLIENT_SECRET\', \'XXX\');');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'8\', \'EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO\', \'https://treinamentoouvidorias.cgu.gov.br/api/manifestacoes\');');
+    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'8\', \'EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO\', \'https://falabr.cgu.gov.br/api/manifestacoes\');');
     BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'9\', \'ID_UNIDADE_OUVIDORIA\', \'110000001\');');
     BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'10\', \'TOKEN\', \'XXX\');');
     BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'11\', \'IMPORTAR_DADOS_MANIFESTANTE\', \'1\');');
@@ -284,7 +284,7 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
      */
     $this->logar('CRIA REGISTROS NA TABELA md_eouv_parametros PARA MANIFESTAÇÕES DO E-SIC (TIPO 8)');
     BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (12, \'ESIC_DATA_INICIAL_IMPORTACAO_MANIFESTACOES\', \'01/01/1900\', \'esic\');');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (13, \'ESIC_URL_WEBSERVICE_IMPORTACAO_RECURSOS\', \'https://treinafalabr.cgu.gov.br/api/recursos\', \'esic\');');
+    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (13, \'ESIC_URL_WEBSERVICE_IMPORTACAO_RECURSOS\', \'https://falabr.cgu.gov.br/api/recursos\', \'esic\');');
     BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (14, \'ESIC_ID_UNIDADE_PRINCIPAL\', \'110000001\', \'esic\');');
     BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (15, \'ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA\', \'110000001\', \'esic\');');
     BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (16, \'ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA\', \'110000001\', \'esic\');');
