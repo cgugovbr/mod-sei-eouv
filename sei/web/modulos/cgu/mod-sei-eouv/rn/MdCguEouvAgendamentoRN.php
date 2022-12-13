@@ -1834,7 +1834,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $desc_tipo_manifestacao = $retornoWsLinha['TipoManifestacao']['DescTipoManifestacao'];
         $envolve_das4_superior = $retornoWsLinha['InformacoesAdicionais']['EnvolveCargoComissionadoDAS4OuSuperior'];
         $dt_prazo_atendimento = $retornoWsLinha['PrazoAtendimento'];
-        $nome_orgao = $retornoWsLinha['OuvidoriaDestino']['NomeOuvidoria'];
+        $nome_orgao = $retornoWsLinha['OuvidoriaDestino']['NomOuvidoria'];
 
         if(is_array($retornoWsLinha['CanalEntrada'])) {
             $canal_entrada = $retornoWsLinha['CanalEntrada']['IdCanalEntrada'] . " - " . $retornoWsLinha['CanalEntrada']['DescCanalEntrada'];
@@ -1848,21 +1848,30 @@ class MdCguEouvAgendamentoRN extends InfraRN
         if (is_array($retornoWsLinha['Manifestante'])) {
 
             $nome = $retornoWsLinha['Manifestante']['Nome'];
-            $desc_faixa_etaria = $retornoWsLinha['Manifestante']['FaixaEtaria'];
-            $desc_raca_cor = $retornoWsLinha['Manifestante']['corRaça'];
+            if (is_array($retornoWsLinha['Manifestante']['FaixaEtaria'])) {
+                $desc_faixa_etaria = $retornoWsLinha['Manifestante']['FaixaEtaria']['DescFaixaEtaria'];
+            }
+            if (is_array($retornoWsLinha['Manifestante'][utf8_encode('corRaça')])) {
+                $desc_raca_cor = $retornoWsLinha['Manifestante'][utf8_encode('corRaça')]['DescRacaCor'];
+            }
             $sexo = $retornoWsLinha['Manifestante']['genero'];
-            $desc_documento_identificacao = $retornoWsLinha['Manifestante']['TipoDocumentoIdentificacao'];
+            if (is_array($retornoWsLinha['Manifestante']['TipoDocumentoIdentificacao'])) {
+                $desc_documento_identificacao = $retornoWsLinha['Manifestante']['TipoDocumentoIdentificacao']['DescTipoDocumentoIdentificacao'];
+            }
             $numero_documento_identificacao = $retornoWsLinha['Manifestante']['NumeroDocumentoIdentificacao'];
 
             if (is_array($retornoWsLinha['Manifestante']['Endereco'])) {
-                $endereco = $retornoWsLinha['Manifestante']['Endereco']['Logradouro'] . " " . $retornoWsLinha['Manifestante']['Endereco']['Complemento'];
+                $endereco = $retornoWsLinha['Manifestante']['Endereco']['Logradouro'] . ", " . $retornoWsLinha['Manifestante']['Endereco']['Numero'];
+                if ($retornoWsLinha['Manifestante']['Endereco']['Complemento']) {
+                    $endereco .= ", " . $retornoWsLinha['Manifestante']['Endereco']['Complemento'];
+                }
                 $bairro = $retornoWsLinha['Manifestante']['Endereco']['Bairro'];
 
                 if (is_array($retornoWsLinha['Manifestante']['Endereco']['Municipio'])) {
                     $desc_municipio = $retornoWsLinha['Manifestante']['Endereco']['Municipio']['DescMunicipio'] . " / " . $retornoWsLinha['Manifestante']['Endereco']['Municipio']['Uf']['SigUf'] . " - " . $retornoWsLinha['Manifestante']['Endereco']['Municipio']['Uf']['DescUf'];
                 }
 
-                $cep = $retornoWsLinha['Manifestante']['Endereco']['Cep'];
+                $cep = $retornoWsLinha['Manifestante']['Endereco']['CEP'];
             }
 
             if(is_array($retornoWsLinha['Manifestante']['Telefone'])) {
@@ -1889,10 +1898,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $envolvidos = array();
         if (is_array($retornoWsLinha['Teor']['EnvolvidosManifestacao']) && isset($retornoWsLinha['Teor']['EnvolvidosManifestacao'])) {
             $iEnvolvido = 0;
-            foreach ($this->verificaRetornoWS($retornoWsLinha['EnvolvidosManifestacao']) as $envolvidosFatoManifestacao) {
-                $envolvidos[$iEnvolvido][0] = $envolvidosFatoManifestacao['EnvolvidosManifestacao']['IdFuncaoEnvolvidoManifestacao'] . " - " . $envolvidosFatoManifestacao['EnvolvidosManifestacao']['Funcao'];
-                $envolvidos[$iEnvolvido][1] = $envolvidosFatoManifestacao['EnvolvidosManifestacao']['Nome'];
-                $envolvidos[$iEnvolvido][2] = $envolvidosFatoManifestacao['EnvolvidosManifestacao']['Orgao'];
+            foreach ($this->verificaRetornoWS($retornoWsLinha['Teor']['EnvolvidosManifestacao']) as $envolvidosFatoManifestacao) {
+                $envolvidos[$iEnvolvido][0] = $envolvidosFatoManifestacao['IdFuncaoEnvolvidoManifestacao'] . " - " . $envolvidosFatoManifestacao['Funcao'];
+                $envolvidos[$iEnvolvido][1] = $envolvidosFatoManifestacao['Nome'];
+                $envolvidos[$iEnvolvido][2] = $envolvidosFatoManifestacao['Orgao'];
                 $iEnvolvido++;
             }
         }
@@ -1901,7 +1910,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         if (is_array($retornoWsLinha['Teor']['CamposAdicionaisManifestacao']) && isset($retornoWsLinha['Teor']['CamposAdicionaisManifestacao'])) {
             $iCamposAdicionais = 0;
-            foreach ($this->verificaRetornoWS($retornoWsLinha['CamposAdicionaisManifestacao']) as $camposAdicionais) {
+            foreach ($this->verificaRetornoWS($retornoWsLinha['Teor']['CamposAdicionaisManifestacao']) as $camposAdicionais) {
                 $campos_adicionais[$iCamposAdicionais][0] = $camposAdicionais['NomeExibido'];
                 $campos_adicionais[$iCamposAdicionais][1] = $camposAdicionais['Valor'];
                 $iCamposAdicionais++;
