@@ -1115,6 +1115,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //                    var_dump('<hr>');
                 }
 
+                $arrRecursos = array();
                 if (isset($retornoWsRecursos) && is_array($retornoWsRecursos)) {
                     $debugLocal && LogSEI::getInstance()->gravar('Possui recursos qtd: ' . count($retornoWsRecursos['Recursos']));
                     $arrRecursos = $retornoWsRecursos['Recursos'];
