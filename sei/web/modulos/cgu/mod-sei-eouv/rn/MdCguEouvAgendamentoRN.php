@@ -1819,7 +1819,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
          * Primeiro é gerado o PDF com todas as informações referentes a Manifestação, e mais abaixo
          * é incluindo como um anexo do novo Processo Gerado
          * **********************************************************************************************/
-        $urlEouvDetalhesManifestacao = $retornoWsLinha['Links'][0]['href'];
         $nup = $retornoWsLinha['NumerosProtocolo'][0];
         $dt_cadastro = $retornoWsLinha['DataCadastro'];
 
@@ -2131,11 +2130,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $pdf->SetFont('arial', '', 12);
             $pdf->MultiCell(0, 20, "Um ou mais anexos da manifestação não foram importados para o SEI devido a restrições da extensão do arquivo. Acesse a manifestação através do link abaixo para mais detalhes. ", 0, 'J');
         }
-
-        $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(115, 20, "Link para manifestação no E-ouv:", 0, 1, 'L');
-        $pdf->setFont('arial', '', 12);
-        $pdf->Cell(0, 20, $urlEouvDetalhesManifestacao, 0, 1, 'L');
 
         $objAnexoRN = new AnexoRN();
         $strNomeArquivoInicialUpload = $objAnexoRN->gerarNomeArquivoTemporario();
@@ -2869,17 +2863,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $pdf->SetFont('arial', '', 12);
             $pdf->MultiCell(0, 20, "Um ou mais anexos da manifestação não foram importados para o SEI devido a restrições da extensão do arquivo. Acesse a manifestação através do link abaixo para mais detalhes. ", 0, 'J');
         }
-
-        // e-Sic fim
-        $pdf->Ln(30);
-        $pdf->MultiCell(0, 1, '', 1, 'J', 1);
-//        $pdf->Cell(0, 20, "FIM", true, 1, 'C');
-//        $pdf->Ln(30);
-
-        $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(115, 20, "Link para manifestação no FalaBR:", 0, 1, 'L');
-        $pdf->setFont('arial', '', 12);
-        $pdf->Write(20, 'https://falabr.cgu.gov.br/', $retornoWsLinha['Links'][0]['href']);
 
         $objAnexoRN = new AnexoRN();
         $strNomeArquivoInicialUpload = $objAnexoRN->gerarNomeArquivoTemporario();
