@@ -695,8 +695,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $arrManifestacoes = array();
 
                 if (is_array($retornoWs)) {
-                    $qtdManifestacoesNovas = count($retornoWs);
-                    $arrManifestacoes = $retornoWs;
+                    // Filtra as manifestações e-Ouv
+                    $arrManifestacoes = array_filter($retornoWs, function($manifestacao) {
+                        return $manifestacao['TipoManifestacao']['IdTipoManifestacao'] <> 8;
+                    });
+                    $qtdManifestacoesNovas = count($arrManifestacoes);
                 }
 
                 if (is_array($arrComErro)) {
@@ -707,9 +710,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 if (count($arrManifestacoes) > 0) {
                     $semManifestacoesEncontradas = false;
                     foreach ($arrManifestacoes as $retornoWsLinha) {
-                        if ($retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'] <> 8) {
-                            $this->executarImportacaoLinha($retornoWsLinha);
-                        }
+                        $this->executarImportacaoLinha($retornoWsLinha);
                     }
                 }
 
@@ -719,7 +720,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 if ($semManifestacoesEncontradas) {
                     $textoMensagemFinal = $textoMensagemFinal . ' Não foram encontradas manifestações para o período.';
                 } else {
-                    $textoMensagemFinal = $textoMensagemFinal . '<br>Quantidade de Manifestações novas encontradas (e-Ouv|e-Sic): ' . $qtdManifestacoesNovas . '<br>Quantidade de Manifestações encontadas que ocorreram erro em outras importações: ' . $qtdManifestacoesAntigas;
+                    $textoMensagemFinal = $textoMensagemFinal . '<br>Quantidade de Manifestações novas encontradas (e-Ouv): ' . $qtdManifestacoesNovas . '<br>Quantidade de Manifestações encontadas que ocorreram erro em outras importações: ' . $qtdManifestacoesAntigas;
                 }
 
                 if ($ocorreuErroEmProtocolo) {
@@ -1106,9 +1107,12 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $arrManifestacoes = array();
 
                 if (is_array($retornoWs)) {
-                    $debugLocal && LogSEI::getInstance()->gravar('Possui retornoWS qtd: ' . count($retornoWs));
-                    $qtdManifestacoesNovas = count($retornoWs);
-                    $arrManifestacoes = $retornoWs;
+                    // Filtra as manifestações e-Sic
+                    $arrManifestacoes = array_filter($retornoWs, function($manifestacao) {
+                        return $manifestacao['TipoManifestacao']['IdTipoManifestacao'] == 8;
+                    });
+                    $qtdManifestacoesNovas = count($arrManifestacoes);
+                    $debugLocal && LogSEI::getInstance()->gravar('Possui novas manifestações qtd: ' . $qtdManifestacoesNovas);
 //                    var_dump('<hr>');
 //                    var_dump('Qtd retornoWS: <br />');
 //                    var_dump(count($retornoWs));
@@ -1140,8 +1144,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 if (count($arrManifestacoes) > 0) {
                     $semManifestacoesEncontradas = false;
                     foreach ($arrManifestacoes as $retornoWsLinha) {
-                        if ($retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'] == 8) {
-
                             /**
                              * Para fazer debug de uma Manifestação por ID (IdManifestacao)
                              * descomente o if abaixo e coloque o número do IdManifestacao
@@ -1167,9 +1169,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //                            var_dump('passou pra importar...');
 //                            die();
 
-                            $debugLocal && LogSEI::getInstance()->gravar('Inicia importação por Linha');
-                            $this->executarImportacaoLinha($retornoWsLinha, 'R');
-                        }
+                        $debugLocal && LogSEI::getInstance()->gravar('Inicia importação por Linha');
+                        $this->executarImportacaoLinha($retornoWsLinha, 'R');
                     }
                 }
 //die();
@@ -1212,7 +1213,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 if ($semManifestacoesEncontradas) {
                     $textoMensagemFinal = $textoMensagemFinal . ' Não foram encontradas manifestações para o período.';
                 } else {
-                    $textoMensagemFinal = $textoMensagemFinal . '<br>Quantidade de Manifestações novas encontradas (e-Ouv|e-Sic): ' . $qtdManifestacoesNovas . '<br>Quantidade de Manifestações encontadas que ocorreram erro em outras importações: ' . $qtdManifestacoesAntigas;
+                    $textoMensagemFinal = $textoMensagemFinal . '<br>Quantidade de Manifestações novas encontradas (e-Sic): ' . $qtdManifestacoesNovas . '<br>Quantidade de Manifestações encontadas que ocorreram erro em outras importações: ' . $qtdManifestacoesAntigas;
                 }
 
                 if ($semRecursosEncontrados) {
