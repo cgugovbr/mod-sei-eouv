@@ -154,7 +154,7 @@
       $strResultado .= '<td align="center">';
 
       if ($bolAcaoExcluir){
-        $strResultado .= '<a href="#ID-'.trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado()).'"  onclick="acaoExcluir(\''.trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado()).'\',\''.PaginaSEI::tratarHTML(trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado())).'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="imagens/excluir.gif" title="Excluir Registro" alt="Excluir Registro" class="infraImg" /></a>&nbsp;';
+        $strResultado .= '<a href="#ID-'.trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado()).'"  onclick="acaoExcluir(\''.trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado()).'\',\''.PaginaSEI::tratarHTML(trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado())).'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeExcluir().'" title="Excluir Registro" alt="Excluir Registro" class="infraImg" /></a>&nbsp;';
       }
 
       $strResultado .= '</td></tr>'."\n";

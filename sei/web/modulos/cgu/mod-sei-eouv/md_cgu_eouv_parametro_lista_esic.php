@@ -164,25 +164,25 @@ try {
       $strResultado .= PaginaSEI::getInstance()->getAcaoTransportarItem($i,$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro());
       
       if ($bolAcaoConsultar){
-        $strResultado .= '<a href="'.SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_consultar&acao_origem='.$_GET['acao'].'&acao_retorno='.$_GET['acao'].'&id_md_cgu_eouv_parametro='.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro()).'" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="imagens/consultar.gif" title="Consultar Paramêtro" alt="Consultar Paramêtro" class="infraImg" /></a>&nbsp;';
+        $strResultado .= '<a href="'.SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_consultar&acao_origem='.$_GET['acao'].'&acao_retorno='.$_GET['acao'].'&id_md_cgu_eouv_parametro='.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro()).'" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeConsultar().'" title="Consultar Paramêtro" alt="Consultar Paramêtro" class="infraImg" /></a>&nbsp;';
       }
 
       if ($bolAcaoAlterar){
-        $strResultado .= '<a href="'.SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_alterar&acao_origem='.$_GET['acao'].'&acao_retorno='.$_GET['acao'].'&id_md_cgu_eouv_parametro='.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro()).'" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="imagens/alterar.gif" title="Alterar Paramêtro" alt="Alterar Paramêtro" class="infraImg" /></a>&nbsp;';
+        $strResultado .= '<a href="'.SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_alterar&acao_origem='.$_GET['acao'].'&acao_retorno='.$_GET['acao'].'&id_md_cgu_eouv_parametro='.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro()).'" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeAlterar().'" title="Alterar Paramêtro" alt="Alterar Paramêtro" class="infraImg" /></a>&nbsp;';
       }
 
 
       if ($bolAcaoDesativar){
-        $strResultado .= '<a href="#ID-'.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'"  onclick="acaoDesativar(\''.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'\',\''.$arrObjMdCguEouvParametroDTO[$i]->getStrNoParametro().'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="imagens/desativar.gif" title="Desativar Paramêtro" alt="Desativar Paramêtro" class="infraImg" /></a>&nbsp;';
+        $strResultado .= '<a href="#ID-'.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'"  onclick="acaoDesativar(\''.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'\',\''.$arrObjMdCguEouvParametroDTO[$i]->getStrNoParametro().'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeDesativar().'" title="Desativar Paramêtro" alt="Desativar Paramêtro" class="infraImg" /></a>&nbsp;';
       }
 
       if ($bolAcaoReativar){
-        $strResultado .= '<a href="#ID-'.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'"  onclick="acaoReativar(\''.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'\',\''.$arrObjMdCguEouvParametroDTO[$i]->getStrNoParametro().'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="imagens/reativar.gif" title="Reativar Paramêtro" alt="Reativar Paramêtro" class="infraImg" /></a>&nbsp;';
+        $strResultado .= '<a href="#ID-'.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'"  onclick="acaoReativar(\''.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'\',\''.$arrObjMdCguEouvParametroDTO[$i]->getStrNoParametro().'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeReativar().'" title="Reativar Paramêtro" alt="Reativar Paramêtro" class="infraImg" /></a>&nbsp;';
       }
 
 
       if ($bolAcaoExcluir){
-        $strResultado .= '<a href="#ID-'.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'"  onclick="acaoExcluir(\''.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'\',\''.$arrObjMdCguEouvParametroDTO[$i]->getStrNoParametro().'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="imagens/excluir.gif" title="Excluir Paramêtro" alt="Excluir Paramêtro" class="infraImg" /></a>&nbsp;';
+        $strResultado .= '<a href="#ID-'.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'"  onclick="acaoExcluir(\''.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'\',\''.$arrObjMdCguEouvParametroDTO[$i]->getStrNoParametro().'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeExcluir().'" title="Excluir Paramêtro" alt="Excluir Paramêtro" class="infraImg" /></a>&nbsp;';
       }
 
       $strResultado .= '</td></tr>'."\n";
