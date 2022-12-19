@@ -84,6 +84,14 @@ class MdCguEouvIntegracao extends SeiIntegracao
             case 'md_cgu_eouv_parametro_alterar':
                 require_once dirname(__FILE__).'/md_cgu_eouv_parametro_cadastro.php';
                 return true;
+
+            case 'md_cgu_eouv_depara_importacao_listar':
+                require_once dirname(__FILE__).'/md_cgu_eouv_depara_importacao_lista.php';
+                return true;
+
+            case 'md_cgu_eouv_depara_importacao_alterar':
+                require_once dirname(__FILE__).'/md_cgu_eouv_depara_importacao_cadastro.php';
+                return true;
         }
         return false;
 

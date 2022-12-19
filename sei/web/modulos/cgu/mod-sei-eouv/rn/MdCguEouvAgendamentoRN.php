@@ -1342,7 +1342,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $objEouvDeparaImportacaoDTO->setNumIdTipoManifestacaoEouv($arrDetalheManifestacao['TipoManifestacao']['IdTipoManifestacao']);
 
             $objEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
-            $objEouvDeparaImportacaoDTO = $objEouvDeparaImportacaoRN->consultarRN0186($objEouvDeparaImportacaoDTO);
+            $objEouvDeparaImportacaoDTO = $objEouvDeparaImportacaoRN->consultar($objEouvDeparaImportacaoDTO);
 
             if (!$objEouvDeparaImportacaoDTO == null) {
                 $idTipoManifestacaoSei = $objEouvDeparaImportacaoDTO->getNumIdTipoProcedimento();
