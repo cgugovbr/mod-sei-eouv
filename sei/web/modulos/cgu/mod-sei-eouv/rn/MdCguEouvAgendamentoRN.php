@@ -1311,6 +1311,15 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $dataRegistro = $arrDetalheManifestacao['DataCadastro'];
         $numProtocoloFormatado =  $this->formatarProcesso($arrDetalheManifestacao['NumerosProtocolo'][0]);
 
+        // Verifica se o tipo de manifestação é suportado
+        $numIdTipoManifestacao = $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'];
+        if ($numIdTipoManifestacao > 8) {
+            // Se não for marca como sucesso para evitar reimportação na próxima execução.
+            $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao,
+                'Tipo de manifestação não suportado (ID = '.$numIdTipoManifestacao.'). Não será importada.', 'S');
+            return;
+        }
+
 
         /**
          * Esta data é gravada na tabela de log detalhada
