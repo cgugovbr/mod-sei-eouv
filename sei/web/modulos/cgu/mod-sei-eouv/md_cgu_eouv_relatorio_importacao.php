@@ -93,9 +93,10 @@
 
     $strResultado = '';
 
+    $strCaptionTabela = 'Importações';
 
     $strResultado .= '<table width="99%" class="infraTable" summary="' . ($strSumarioTabela ?? '$strSumarioTabela não definido') . '">'."\n";
-    $strResultado .= '<caption class="infraCaption">'.PaginaSEI::getInstance()->gerarCaptionTabela($strCaptionTabela ?? '$strCaptionTabela não definido',$numRegistros).'</caption>';
+    $strResultado .= '<caption class="infraCaption">'.PaginaSEI::getInstance()->gerarCaptionTabela($strCaptionTabela,$numRegistros).'</caption>';
     $strResultado .= '<tr>';
 
     $strResultado .= '<th class="infraTh" width="5%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'ID','IdRelatorioImportacao',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
