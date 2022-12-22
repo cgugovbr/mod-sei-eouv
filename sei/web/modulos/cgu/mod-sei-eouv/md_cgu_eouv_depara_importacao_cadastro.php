@@ -27,7 +27,16 @@ try {
     case 'md_cgu_eouv_depara_importacao_alterar':
       $strTitulo = 'Alterar Tipo de Processo Associado ao Tipo de Manifestação';
 
+      // Lista as opções de tipos de processo disponíveis
+      $objSeiRN = new SeiRN();
+      $arrTipoProcAPI = $objSeiRN->listarTiposProcedimento();
+
       $arrComandos[] = '<button type="submit" accesskey="S" name="sbmAlterarMdCguEouvDeparaImportacao" value="Salvar" class="infraButton"><span class="infraTeclaAtalho">S</span>alvar</button>';
+      $strLinkCancelar = SessaoSEI::getInstance()->assinarLink('controlador.php?'.
+        'acao='.PaginaSEI::getInstance()->getAcaoRetorno().'&'.
+        'acao_origem='.$_GET['acao']
+      );
+      $arrComandos[] = '<button type="button" accesskey="C" name="btnCancelar" value="Cancelar" onclick="location.href=\''.$strLinkCancelar.'\';" class="infraButton"><span class="infraTeclaAtalho">C</span>ancelar</button>';
 
       if (isset($_GET['id_md_cgu_eouv_tipo_manifestacao'])) {
         // Busca o tipo de manifestacao
@@ -39,10 +48,6 @@ try {
         if ($objDeParaDTO == null) {
           throw new InfraException("Registro não encontrado.");
         }
-
-        // Lista as opções de tipos de processo disponíveis
-        $objSeiRN = new SeiRN();
-        $arrTipoProcAPI = $objSeiRN->listarTiposProcedimento();
       } else if (isset($_POST['sbmAlterarMdCguEouvDeparaImportacao'])) {
         // Verifica parâmetros necessários
         if (!isset($_POST['hdnIdEouv']) || !isset($_POST['selTipoProc'])) {
@@ -74,13 +79,6 @@ try {
       } else {
         throw new InfraException("Parâmetros inválidos");
       }
-
-      $strLinkCancelar = SessaoSEI::getInstance()->assinarLink('controlador.php?'.
-        'acao='.PaginaSEI::getInstance()->getAcaoRetorno().'&'.
-        'acao_origem='.$_GET['acao'].
-        '#ID-'.$objDeParaDTO->getNumIdTipoManifestacaoEouv()
-      );
-      $arrComandos[] = '<button type="button" accesskey="C" name="btnCancelar" value="Cancelar" onclick="location.href=\''.$strLinkCancelar.'\';" class="infraButton"><span class="infraTeclaAtalho">C</span>ancelar</button>';
 
       break;
 
@@ -115,13 +113,11 @@ PaginaSEI::getInstance()->montarJavaScript();
 PaginaSEI::getInstance()->abrirJavaScript();
 
 ?>
-//<script>
 
 function inicializar() {
 
 }
 
-//</script>
 <?
 PaginaSEI::getInstance()->fecharJavaScript();
 PaginaSEI::getInstance()->fecharHead();
@@ -140,6 +136,7 @@ PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
 
       <label id="lblTipoProc" for="selTipoProc" accesskey="T" class="infraLabelObrigatorio"><span class="infraTeclaAtalho">T</span>ipo de Processo:</label>
       <select id="selTipoProc" name="selTipoProc" class="infraSelect">
+        <option value=""></option>
         <?
         // Gera as opções
         $numIdTipoProcAtual = $objDeParaDTO->getNumIdTipoProcedimento();
