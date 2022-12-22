@@ -15,34 +15,9 @@
 
 1. Fazer backup completo dos bancos de dados do SEI e do SIP.
 
-2. **[IMPORTANTE]** Inserir os Tipos de Procedimento para cada tipo de Manifestação no SUPER
-
-Acesse no SUPER o menu *Administração > Tipos de Processos > Listar* para verificar os tipos já existentes, conforme tela abaixo:
-
-![SUPER - Listar tipos de documentos](https://github.com/cgugovbr/imagens/blob/main/super_listar_tipo_documento.png?raw=true)
-
-> Você poderá criar um novo tipo de documento para cada tipo de manifestação do FalaBR se for o caso. 
-
-Anote os IDs de cada *Tipo de Processo* que será vinculado os processos importados do FalaBR. Estes código deverão ser atualizados no arquivo `./sei/scripts/md_cgu_eouv_atualizar_modulo.php` conforme descrito no item 6
-
-> Este ítem é pré-requisito para a execução do script no item 8
-
-Abaixo os tipos de manifestações do FalaBR que serão importadas para o SEI:
-
-|id_tipo_manifestacao_eouv |id_tipo_procedimento    |de_tipo_manifestacao_eouv |
-| :-: 			   		   | :-: 		            | :-- 	         	       |
-|1                         |`xxx`                   |Denúncia                  |
-|2                         |`xxx`                   |Reclamação                |
-|3                         |`xxx`                   |Elogio                    |
-|4                         |`xxx`                   |Sugestão                  |
-|5                         |`xxx`                   |Solicitação               |
-|6                         |`xxx`                   |Simplifique               |
-|7                         |`xxx`                   |Comunicado                |
-|8 						   |`xxx`				    |Acesso à Informação       |
-
 ### Download do módulo
 
-3. Baixar os arquivos deste repositório
+2. Baixar os arquivos deste repositório
  
 Poderá baixar usando *git*, para isso recomendamos usar uma pasta temporária:
    
@@ -51,9 +26,9 @@ $ cd /temp
 $ git clone git@github.com:cgugovbr/mod-sei-eouv.git
 ```
 
-Ou baixar a versão desejada usando o link:
+Ou baixar o arquivo zip da versão desejada na página:
    
-https://github.com/cgugovbr/mod-sei-eouv/archive/v4.0.3.zip
+https://github.com/cgugovbr/mod-sei-eouv/releases
  
 A estrutura de pastas deste módulo é a seguinte:
 
@@ -64,11 +39,11 @@ A estrutura de pastas deste módulo é a seguinte:
  --/README.md
 ```
   
-> Os arquivos contidos dentro dos diretórios sei e sip não substituem nenhum código-fonte original do sistema. Eles apenas posicionam os arquivos do módulo nas pastas corretas de *scripts*, configurações e pasta de módulos, todos posicionados dentro de um diretório específico denominado '*cgu/mod-sei-eouv*' para deixar claro quais scripts fazem parte do módulo.
+> Os arquivos contidos dentro dos diretórios sei e sip não substituem nenhum código-fonte original do sistema. Eles apenas posicionam os arquivos do módulo nas pastas corretas de *scripts*, configurações e pasta de módulos, todos posicionados dentro de um diretório específico denominado '*cgu/mod-sei-eouv*' para deixar claro quais arquivos fazem parte do módulo.
   
-4. Copiar os arquivos do módulo para a pasta de destino
+3. Copiar os arquivos do módulo para a pasta de destino
   
-- Caso estiver usando o arquivo 'zip', os arquivos do módulo poderá ser descompactados e mesclados no diretório raiz de instalação do SEI. Lembrando de substituir o termo **'VERSAO'** no nome do arquivo 'zip' com a versão que está sendo instalada.
+- Caso estiver usando o arquivo 'zip', os arquivos do módulo poderão ser descompactados e mesclados no diretório raiz de instalação do SEI. Lembrando de substituir o termo **'VERSAO'** no nome do arquivo 'zip' com a versão que está sendo instalada.
   
 ```bash
 $ cd <DIRETORIDIO_RAZ_DE_INSTALAÇÃO_DO_SEI>
@@ -81,7 +56,7 @@ $ unzip mod-sei-eouv-VERSAO.zip
  
 ### Instalação/atualização
 
-5. Caso esteja instalando pela primeira vez o módulo adicionar o móduloo **'MdCguEouvIntegracao' => 'cgu/mod-sei-eouv'** no *array* 'Modulos' no arquivo */sei/config/ConfiguracaoSEI.php* conforme abaixo:
+4. Caso esteja instalando pela primeira vez o módulo, adicionar a linha **'MdCguEouvIntegracao' => 'cgu/mod-sei-eouv'** no *array* 'Modulos' do arquivo */sei/config/ConfiguracaoSEI.php* conforme abaixo:
 
 ```text
 'SEI' => array(
@@ -96,36 +71,9 @@ $ unzip mod-sei-eouv-VERSAO.zip
 
 ```
 
-> Utilize sempre editores de texto que não altere o *charset* do arquivo
+> Utilize sempre editores de texto que não alterem o *charset* do arquivo
 
-6. **[IMPORTANTE]** Atualizar as informações do tipo de procedimento, inseridas no SEI conforme item 2, no arquivo `./sei/scripts/md_cgu_eouv_atualizar_modulo.php`, conforme segue:
-
-	6.1 Dentro do método **instalarv205** atualizar onde está 'XXXXXXXX' com o *ID* correspondente para o 'tipo de procedimento' referente aos tipos de 1 à 7, conforme *ID* abaixo:
-
-	```bash
-	$this->logar('CRIANDO REGISTROS PARA A TABELA md_eouv_depara_importacao');
-		BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'1\', \'Denúncia\', \'XXXXXXXX\');');
-		BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'2\', \'Reclamação\', \'XXXXXXXX\');');
-		BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'3\', \'Elogio\', \'XXXXXXXX\');');
-		BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'4\', \'Sugestão\', \'XXXXXXXX\');');
-		BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'5\', \'Solicitação\', \'XXXXXXXX\');');
-		BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'6\', \'Simplifique\', \'XXXXXXXX\');');
-		BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'7\', \'Comunicado\', \'XXXXXXXX\');');
-	```
-
-	> Caso esteja atualizando a versão, já deverá constar os *ids* corretos, portanto siga para o próximo item
-
-	6.2 Dentro do método **instalarv400** atualizar onde está 'XXXXXXXX' com o *ID* correspondente para o 'tipo de procedimento' referente ao tipo 8, acesso à informação, conforme abaixo:
-
-	```bash
-	/**
-	 * Criar um "depara_importação" para a Manifestação e-Sic
-	 */
-	$this->logar('CRIANDO REGISTROS PARA A TABELA md_eouv_depara_importacao');
-	BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, id_tipo_procedimento, de_tipo_manifestacao_eouv) VALUES (8, XXXXXXXX, \'Acesso à Informação\');');
-	```
-
-7. Execute o *script* '*/sip/scripts/md_cgu_eouv_atualizar_modulo_sip.php*' em linha de comando no servidor SIP, verificando se não houve erro durante a execução. Ao final deve aparecer a mensagem "FIM".
+5. Execute o *script* '*/sip/scripts/md_cgu_eouv_atualizar_modulo_sip.php*' em linha de comando no servidor SIP, verificando se não houve erro durante a execução. Ao final deve aparecer a mensagem "FIM".
 
 Para executar o *script* execute o seguinte comando:
 
@@ -133,7 +81,7 @@ Para executar o *script* execute o seguinte comando:
 /usr/bin/php -c /etc/php.ini sip/scripts/md_cgu_eouv_atualizar_modulo.php > md_cgu_eouv_atualizar_modulo_sip.log
 ```
 
-8. Execute o *script* '*/sei/scripts/md_cgu_eouv_atualizar_modulo_sei.php*' em linha de comando no servidor SEI, verificando se não houve erro durante a execução. Ao final deve aparecer a mensagem "FIM".
+6. Execute o *script* '*/sei/scripts/md_cgu_eouv_atualizar_modulo_sei.php*' em linha de comando no servidor SEI, verificando se não houve erro durante a execução. Ao final deve aparecer a mensagem "FIM".
 
 Para executar o *script* execute o seguinte comando:
 
@@ -147,13 +95,32 @@ Para executar o *script* execute o seguinte comando:
 
 ### Configurações
 
-9. Parametrizar o módulo, usando o usuário com perfil "Administrador" do SEI, conforme descrito abaixo:
+7. Parametrizar o módulo, usando o usuário com perfil "Administrador" do SEI, conforme descrito abaixo:
 
-	9.1 Acessar o menu *E-Ouv > Parâmetros do Módulo E-ouv* ajustando os seguintes parâmetros:
+	7.1 Acessar o menu *E-Ouv > Tipos de Manifestação* e associar cada tipo de manifestação do FalaBR com um tipo de processo existente no SEI.
 
-	- **EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES** - Inserir neste campo a Data Inicial, no formato (DD/MM/AAAA), para carregar as manifestações do FalaBR (e-Ouv) dos tipos 1 à 7, conforme *Tabela 1 - Tipo de Manifestação*. Sugerimos que seja colocada a **data atual** para que apenas as novas manifestações sejam importadas para o SEI.
+> Você poderá criar um novo tipo de processo para cada tipo de manifestação do FalaBR se for o caso.
 
-	- **EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO** - Quando a rotina de importação for executada será gerado um documento PDF com os dados da manifestação que será anexado ao processo com o mesmo número de identificação do FalaBR. Este parâmetro será usado para indicar qual o Tipo de Documento no SEI será utilizado para este PDF. Lembrando que deve ser do Grupo de **Documentos Externos**. Para verificar os tipos existentes acesse *Administração > Tipos de Documento > Listar*.
+Abaixo estão os tipos de manifestações do FalaBR que serão importadas para o SEI:
+
+| ID FalaBR                | Tipo de Manifestação |
+| :-:                      | :-:                  |
+|1                         |Denúncia              |
+|2                         |Reclamação            |
+|3                         |Elogio                |
+|4                         |Sugestão              |
+|5                         |Solicitação           |
+|6                         |Não Classificada      |
+|7                         |Comunicado            |
+|8                         |Acesso à Informação   |
+
+> Obs: manifestações do tipo "Simplifique" não são suportadas.
+
+	7.2 Acessar o menu *E-Ouv > Parâmetros do Módulo E-ouv* ajustando os seguintes parâmetros:
+
+	- **EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES** - Inserir neste campo a Data Inicial, no formato (DD/MM/AAAA), para carregar as manifestações do FalaBR (e-Ouv) dos tipos 1 à 7. Sugerimos que seja colocada a **data atual** para que apenas as novas manifestações sejam importadas para o SEI.
+
+	- **EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO** - Quando a rotina de importação for executada, será gerado um documento PDF com os dados da manifestação que será anexado ao processo com o mesmo número de identificação do FalaBR. Este parâmetro será usado para indicar qual o Tipo de Documento no SEI será utilizado para este PDF. Lembrando que deve ser do Grupo de **Documentos Externos**. Para verificar os tipos existentes acesse *Administração > Tipos de Documento > Listar*.
 
 	- **ID_SERIE_EXTERNO_OUVIDORIA** - Este parâmetro não está sendo utilizado, poderá ser ignorado.
 
@@ -175,9 +142,9 @@ Para executar o *script* execute o seguinte comando:
 
 	> Caso esteja atualizando a versão, já deverá constar os *ids* corretos, portanto siga para o próximo item
 
-	9.2 Acessar o menu *E-Ouv > Parâmetros do Módulo e-Sic* ajustando os seguintes parâmetros:
+	7.3 Acessar o menu *E-Ouv > Parâmetros do Módulo e-Sic* ajustando os seguintes parâmetros:
 
-	- **ESIC_DATA_INICIAL_IMPORTACAO_MANIFESTACOES** - Inserir neste campo a Data Inicial, no formato (DD/MM/AAAA), para carregar as manifestações do FalaBR (e-Sic) dos tipos 8, conforme *Tabela 1 - Tipo de Manifestação*. Sugerimos que seja colocada a **data atual** para que apenas as novas manifestações sejam importadas para o SEI.
+	- **ESIC_DATA_INICIAL_IMPORTACAO_MANIFESTACOES** - Inserir neste campo a Data Inicial, no formato (DD/MM/AAAA), para carregar as manifestações do FalaBR (e-Sic) do tipo 8. Sugerimos que seja colocada a **data atual** para que apenas as novas manifestações sejam importadas para o SEI.
 
 	- **ESIC_URL_WEBSERVICE_IMPORTACAO_RECURSOS** - Já vem configurado para o ambiente de produção do FalaBR com 'https://falabr.cgu.gov.br/api/recursos'
 
@@ -189,21 +156,19 @@ Para executar o *script* execute o seguinte comando:
 
 	- **ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA** - Código da Unidade no SEI que deverá registrar os recursos de **segunda** instância
 
-10. Criar agendamento para as funções desejadas
+	- **ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA** - Código da Unidade no SEI que deverá registrar os recursos de **terceira** instância
 
-	Este móduo possui duas funções para importação das manifestações 'e-Ouv' (tipo 1 a 7) e 'e-Sic' (tipo 8). Segue abaixo as respectivas funções para agendamento:
+	- **ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO** - Código da Unidade no SEI que deverá registrar os pedidos de **revisão**
 
-	10.1 Para importar do FalaBR as manifestações 'e-Ouv' faça o agendamento da função:
-	
+8. Ajustar agendamentos de importação
+
+	Este móduo possui duas funções para importação das manifestações 'e-Ouv' (tipo 1 a 7) e 'e-Sic' (tipo 8), indicadas abaixo:
+
 	- **MdCguEouvAgendamentoRN::executarImportacaoManifestacaoEOuv**
-
-	10.2 Para importar do FalaBR as manifestações 'e-Sic' faça o agendamento da função
-	
 	- **MdCguEouvAgendamentoRN::executarImportacaoManifestacaoESic**
 
-	> Sugerimos fazer o agendamento para ser executado uma vez por dia
-
-	> Os agendamentos podem ser acessados em Infra > Agendamentos
+	Os agendamentos são criados automaticamente pelos scripts de instalação. Ajuste a periodicidade de execução das importações no menu Infra > Agendamentos.
+	> Sugerimos que os agendamentos sejam executados uma vez por dia
 
 ## Orientações Gerais
 
