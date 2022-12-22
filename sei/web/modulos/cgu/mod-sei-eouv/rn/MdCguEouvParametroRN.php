@@ -32,7 +32,7 @@ class MdCguEouvParametroRN extends InfraRN {
 
             $objInfraException->lancarValidacoes();
 
-            $objEouvParametroBD = new MdEouvParametroBD($this->getObjInfraIBanco());
+            $objEouvParametroBD = new MdCguEouvParametroBD($this->getObjInfraIBanco());
             $ret = $objEouvParametroBD->cadastrar($objEouvParametroDTO);
 
             //Auditoria

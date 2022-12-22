@@ -18,6 +18,31 @@ class MdCguEouvDeparaImportacaoRN extends InfraRN
     return BancoSEI::getInstance();
   }
 
+  protected function cadastrarControlado(MdCguEouvDeparaImportacaoDTO $objEouvDeparaImportacaoDTO)
+  {
+    try {
+      //Valida Permissao
+      SessaoSEI::getInstance()->validarAuditarPermissao('md_cgu_eouv_depara_importacao_cadastrar',__METHOD__,$objEouvDeparaImportacaoDTO);
+
+      //Regras de Negocio
+      $objInfraException = new InfraException();
+
+      if ($objEouvDeparaImportacaoDTO->isSetNumIdTipoManifestacaoEouv()){
+        $this->validarNumIdTipoManifestacaoEouv($objEouvDeparaImportacaoDTO, $objInfraException);
+      }
+
+      $objInfraException->lancarValidacoes();
+
+      $objEouvDeparaImportacaoBD = new MdEouvDeparaImportacaoBD($this->getObjInfraIBanco());
+      $objEouvDeparaImportacaoBD->cadastrar($objEouvDeparaImportacaoDTO);
+
+      //Auditoria
+
+    } catch (Exception $e) {
+      throw new InfraException('Erro cadastrando DePara Eouv Importação.',$e);
+    }
+  }
+
   protected function alterarControlado(MdCguEouvDeparaImportacaoDTO $objEouvDeparaImportacaoDTO)
   {
     try {

@@ -245,11 +245,34 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
 
     $objInfraMetaBD = new InfraMetaBD(BancoSEI::getInstance());
 
+    // Atualiza chave primária da tabela depara_importacao para deixar apenas o campo de id_tipo_manifestacao_eouv
+    $this->logar('ATUALIZANDO CHAVE PRIMÁRIA DA TABELA md_eouv_depara_importacao');
+    $objInfraMetaBD->excluirChavePrimaria('md_eouv_depara_importacao', 'pk_md_eouv_depara_importacao');
+    $objInfraMetaBD->adicionarChavePrimaria('md_eouv_depara_importacao', 'pk_md_eouv_depara_importacao', array('id_tipo_manifestacao_eouv'));
+
+    // Atualiza coluna id_tipo_procedimento na tabela depara_importacao para permitir nulos
+    $objInfraMetaBD->alterarColuna('md_eouv_depara_importacao', 'id_tipo_procedimento', $objInfraMetaBD->tipoNumero(), 'null');
+
+    // Atualiza descrição do depara_importacao tipo 6
+    $this->logar('ATUALIZANDO TIPO DE MANIFESTACAO COM ID = 6 PARA NÃO CLASSIFICADA');
+    $objDeParaDTO = new MdCguEouvDeparaImportacaoDTO();
+    $objDeParaDTO->setNumIdTipoManifestacaoEouv(6);
+    $objDeParaDTO->retTodos();
+    $objDeParaRN = new MdCguEouvDeparaImportacaoRN();
+    $objDeParaDTO = $objDeParaRN->consultar($objDeParaDTO);
+    if ($objDeParaDTO != null) {
+      $objDeParaDTO->setStrDeTipoManifestacaoEouv('Não Classificada');
+      $objDeParaRN->alterar($objDeParaDTO);
+    }
+
     /**
      * Criar um "depara_importação" para a Manifestação e-Sic
      */
-    $this->logar('CRIANDO REGISTROS PARA A TABELA md_eouv_depara_importacao');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, id_tipo_procedimento, de_tipo_manifestacao_eouv) VALUES (8, 100001514, \'Acesso à Informação\');');
+    $this->logar('CRIANDO REGISTRO DE ACESSO À INFORMAÇÃO PARA A TABELA md_eouv_depara_importacao');
+    $objDeParaDTO = new MdCguEouvDeparaImportacaoDTO();
+    $objDeParaDTO->setNumIdTipoManifestacaoEouv(8);
+    $objDeParaDTO->setStrDeTipoManifestacaoEouv('Acesso à Informação');
+    $objDeParaRN->cadastrar($objDeParaDTO);
 
     /**
      * Criar coluna na tabela md_eouv_rel_import para identificar qual o tipo de manifestação
@@ -258,7 +281,9 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
      * - 'R' (e-Sic) - manifestações e-sic com 'R'ecursos - tipo 8
      */
     $this->logar('CRIANDO COLUNA PARA TIPO DE MANIFESTAÇÃO PARA A TABELA md_eouv_rel_import');
-    BancoSEI::getInstance()->executarSql('ALTER TABLE md_eouv_rel_import ADD tip_manifestacao ' . $objInfraMetaBD->tipoTextoFixo(2) . ' NOT NULL DEFAULT (\'P\');');
+    $objInfraMetaBD->adicionarColuna('md_eouv_rel_import', 'tip_manifestacao', $objInfraMetaBD->tipoTextoFixo(2), 'null');
+    BancoSEI::getInstance()->executarSql('UPDATE md_eouv_rel_import SET tip_manifestacao = \'P\'');
+    $objInfraMetaBD->alterarColuna('md_eouv_rel_import', 'tip_manifestacao', $objInfraMetaBD->tipoTextoFixo(2), 'not null');
 
     /**
      * Criar coluna na tabela md_eouv_rel_import_det para identificar qual o tipo de manifestação
@@ -267,8 +292,10 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
      * - 'R' (e-Sic) - manifestações e-sic com 'R'ecursos - tipo 8
      */
     $this->logar('CRIANDO COLUNA PARA TIPO DE MANIFESTAÇÃO PARA A TABELA md_eouv_rel_import_det');
-    BancoSEI::getInstance()->executarSql('ALTER TABLE md_eouv_rel_import_det ADD tip_manifestacao ' . $objInfraMetaBD->tipoTextoFixo(2) . ' NOT NULL DEFAULT (\'P\');');
-    BancoSEI::getInstance()->executarSql('ALTER TABLE md_eouv_rel_import_det ADD dth_prazo_atendimento ' . $objInfraMetaBD->tipoDataHora() . ' NULL;');
+    $objInfraMetaBD->adicionarColuna('md_eouv_rel_import_det', 'tip_manifestacao', $objInfraMetaBD->tipoTextoFixo(2), 'null');
+    BancoSEI::getInstance()->executarSql('UPDATE md_eouv_rel_import_det SET tip_manifestacao = \'P\'');
+    $objInfraMetaBD->alterarColuna('md_eouv_rel_import_det', 'tip_manifestacao', $objInfraMetaBD->tipoTextoFixo(2), 'not null');
+    $objInfraMetaBD->adicionarColuna('md_eouv_rel_import_det', 'dth_prazo_atendimento', $objInfraMetaBD->tipoDataHora(), 'null');
 
     /**
      * Criar coluna na tabela md_eouv_parametros para identificar qual o tipo de parâmetro
@@ -277,19 +304,51 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
      * - 'esicR' (e-Sic) - parâmetros do e-sic
      */
     $this->logar('CRIANDO COLUNA PARA TIPO DE PARÂMETRO PARA A TABELA md_eouv_parametros');
-    BancoSEI::getInstance()->executarSql('ALTER TABLE md_eouv_parametros ADD de_tipo ' . $objInfraMetaBD->tipoTextoVariavel(10) . ' NOT NULL DEFAULT (\'eouv\');');
+    $objInfraMetaBD->adicionarColuna('md_eouv_parametros', 'de_tipo', $objInfraMetaBD->tipoTextoVariavel(10), 'null');
+    BancoSEI::getInstance()->executarSql('UPDATE md_eouv_parametros SET de_tipo = \'eouv\'');
+    $objInfraMetaBD->alterarColuna('md_eouv_parametros', 'de_tipo', $objInfraMetaBD->tipoTextoVariavel(10), 'not null');
 
     /**
      * Cria parâmetros na tabela md_eouv_parametros para manifestações do e-Sic (tipo 8)
      */
-    $this->logar('CRIA REGISTROS NA TABELA md_eouv_parametros PARA MANIFESTAÇÕES DO E-SIC (TIPO 8)');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (12, \'ESIC_DATA_INICIAL_IMPORTACAO_MANIFESTACOES\', \'01/01/1900\', \'esic\');');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (13, \'ESIC_URL_WEBSERVICE_IMPORTACAO_RECURSOS\', \'https://falabr.cgu.gov.br/api/recursos\', \'esic\');');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (14, \'ESIC_ID_UNIDADE_PRINCIPAL\', \'110000001\', \'esic\');');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (15, \'ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA\', \'110000001\', \'esic\');');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (16, \'ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA\', \'110000001\', \'esic\');');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (17, \'ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA\', \'110000001\', \'esic\');');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro, de_tipo) VALUES (18, \'ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO\', \'110000001\', \'esic\');');
+    $this->logar('CRIA REGISTROS NA TABELA md_eouv_parametros PARA MANIFESTAÇÕES E-SIC (TIPO 8)');
+    $objParametroRN = new MdCguEouvParametroRN();
+    $arrNovosParametros = [
+      ['id' => 12, 'parametro' => 'ESIC_DATA_INICIAL_IMPORTACAO_MANIFESTACOES', 'valor' => date('d/m/Y')],
+      ['id' => 13, 'parametro' => 'ESIC_URL_WEBSERVICE_IMPORTACAO_RECURSOS', 'valor' => 'https://falabr.cgu.gov.br/api/recursos'],
+      ['id' => 14, 'parametro' => 'ESIC_ID_UNIDADE_PRINCIPAL', 'valor' => '110000001'],
+      ['id' => 15, 'parametro' => 'ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA', 'valor' => '110000001'],
+      ['id' => 16, 'parametro' => 'ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA', 'valor' => '110000001'],
+      ['id' => 17, 'parametro' => 'ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA', 'valor' => '110000001'],
+      ['id' => 18, 'parametro' => 'ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO', 'valor' => '110000001']
+    ];
+    foreach ($arrNovosParametros as $arrParametro) {
+      $objParametroDTO = new MdCguEouvParametroDTO();
+      $objParametroDTO->setNumIdParametro($arrParametro['id']);
+      $objParametroDTO->setStrNoParametro($arrParametro['parametro']);
+      $objParametroDTO->setStrDeValorParametro($arrParametro['valor']);
+      $objParametroDTO->setStrDeTipo('esic');
+      $objParametroRN->cadastrarParametro($objParametroDTO);
+    }
+
+    // Cria agendamento para importação de tarefas e-Sic
+    $this->logar('CRIA AGENDAMENTO PARA IMPORTAR MANIFESTAÇÕES E-SIC');
+    $objInfraAgendamentoTarefaDTO = new InfraAgendamentoTarefaDTO();
+    $objInfraAgendamentoTarefaDTO->setStrDescricao('Rotina responsável pela execução da '.
+      'importação de manifestações de acesso à informação (e-Sic) cadastradas no FalaBR '.
+      'que serão importadas para o SEI/SUPER como um novo processo. Se baseia na data da '.
+      'última execução com sucesso até a data atual.');
+    $objInfraAgendamentoTarefaDTO->setStrComando('MdCguEouvAgendamentoRN::executarImportacaoManifestacaoESic');
+    $objInfraAgendamentoTarefaDTO->setStrParametro('');
+    $objInfraAgendamentoTarefaDTO->setStrStaPeriodicidadeExecucao('D');
+    $objInfraAgendamentoTarefaDTO->setStrPeriodicidadeComplemento('1');
+    $objInfraAgendamentoTarefaDTO->setStrSinSucesso('N');
+    $objInfraAgendamentoTarefaDTO->setDthUltimaExecucao(null);
+    $objInfraAgendamentoTarefaDTO->setDthUltimaConclusao(null);
+    $objInfraAgendamentoTarefaDTO->setStrEmailErro('');
+    $objInfraAgendamentoTarefaDTO->setStrSinAtivo('S');
+    $objInfraAgendamentoTarefaRN = new InfraAgendamentoTarefaRN();
+    $objInfraAgendamentoTarefaDTO = $objInfraAgendamentoTarefaRN->cadastrar($objInfraAgendamentoTarefaDTO);
   }
 }
 
