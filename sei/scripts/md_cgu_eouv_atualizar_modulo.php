@@ -111,7 +111,9 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
     $this->logar('CRIANDO Agendamento da tarefa no Sei');
     $objInfraAgendamentoTarefaDTO = new InfraAgendamentoTarefaDTO();
     $objInfraAgendamentoTarefaDTO->setNumIdInfraAgendamentoTarefa(null);
-    $objInfraAgendamentoTarefaDTO->setStrDescricao('Rotina responsável pela execução da importação de manifestações cadastradas no E-Ouv que serão importadas para o SEI como um novo processo. Se baseia na data da última execução com sucesso até a data atual.');
+    $objInfraAgendamentoTarefaDTO->setStrDescricao('Rotina responsável pela execução da importação de manifestações '.
+      'e-Ouv cadastradas no FalaBR que serão importadas para o SEI/SUPER como um novo processo. '.
+      'Se baseia na data da última execução com sucesso até a data atual.');
     $objInfraAgendamentoTarefaDTO->setStrComando('MdCguEouvAgendamentoRN::executarImportacaoManifestacaoEOuv');
     $objInfraAgendamentoTarefaDTO->setStrStaPeriodicidadeExecucao('D');
 
