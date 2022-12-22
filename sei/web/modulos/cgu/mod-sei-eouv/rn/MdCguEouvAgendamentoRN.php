@@ -512,7 +512,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
                $objInfraParametro,
                $urlWebServiceEOuv,
                $urlWebServiceAnexosEOuv,
-               $idTipoDocumentoAnexoPadrao,
                $idTipoDocumentoAnexoDadosManifestacao,
                $idUnidadeOuvidoria,
                $idUsuarioSei,
@@ -549,10 +548,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                     case "EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO":
                         $idTipoDocumentoAnexoDadosManifestacao = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
-                        break;
-
-                    case "ID_SERIE_EXTERNO_OUVIDORIA":
-                        $idTipoDocumentoAnexoPadrao = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
                         break;
 
                     case "EOUV_USUARIO_ACESSO_WEBSERVICE":
@@ -779,7 +774,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
                $urlWebServiceEOuv,
                $urlWebServiceESicRecursos,
                $urlWebServiceAnexosEOuv,
-               $idTipoDocumentoAnexoPadrao,
                $idTipoDocumentoAnexoDadosManifestacao,
                $idUnidadeOuvidoria,
                $idUnidadeEsicPrincipal,
@@ -824,10 +818,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                     case "EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO":
                         $idTipoDocumentoAnexoDadosManifestacao = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
-                        break;
-
-                    case "ID_SERIE_EXTERNO_OUVIDORIA":
-                        $idTipoDocumentoAnexoPadrao = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
                         break;
 
                     case "EOUV_USUARIO_ACESSO_WEBSERVICE":
@@ -1259,7 +1249,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
     {
 
         global $objEouvRelatorioImportacaoDTO,
-               $idTipoDocumentoAnexoPadrao,
                $urlWebServiceESicRecursos,
                $objProcedimentoDTO,
                $objTipoProcedimentoDTO,
@@ -1589,7 +1578,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         global $urlWebServiceEOuv,
                $objEouvRelatorioImportacaoDTO,
-               $idTipoDocumentoAnexoPadrao,
                $urlWebServiceESicRecursos,
                $objProcedimentoDTO,
                $objTipoProcedimentoDTO,
@@ -2923,8 +2911,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
     public function gerarAnexosProtocolo($arrAnexosManifestacao, $numProtocoloFormatado, $tipoManifestacao = 'P', $IdProtocolo = false)
     {
-        global $idTipoDocumentoAnexoPadrao,
-               $objProcedimentoDTO,
+        global $objProcedimentoDTO,
                $objTipoProcedimentoDTO,
                $arrObjAssuntoDTO,
                $arrObjParticipantesDTO,

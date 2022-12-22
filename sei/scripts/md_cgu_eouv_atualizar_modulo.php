@@ -349,6 +349,16 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
     $objInfraAgendamentoTarefaDTO->setStrSinAtivo('S');
     $objInfraAgendamentoTarefaRN = new InfraAgendamentoTarefaRN();
     $objInfraAgendamentoTarefaDTO = $objInfraAgendamentoTarefaRN->cadastrar($objInfraAgendamentoTarefaDTO);
+
+    // Remove parâmetro ID_SERIE_EXTERNO_OUVIDORIA (não mais utilizado)
+    $this->logar('REMOVE PARÂMETRO ID_SERIE_EXTERNO_OUVIDORIA (NÃO UTILIZADO)');
+    $objParametroDTO = new MdCguEouvParametroDTO();
+    $objParametroDTO->setStrNoParametro('ID_SERIE_EXTERNO_OUVIDORIA');
+    $objParametroDTO->retTodos();
+    $objParametroDTO = $objParametroRN->consultarParametro($objParametroDTO);
+    if ($objParametroDTO) {
+      $objParametroRN->excluirParametro($objParametroDTO);
+    }
   }
 }
 

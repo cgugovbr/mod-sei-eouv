@@ -60,21 +60,19 @@ class MdCguEouvParametroRN extends InfraRN {
         }
     }
 
-    protected function excluirRN0224Controlado($arrObjMdCguEouvParametroDTO){
+    protected function excluirParametroControlado(MdCguEouvParametroDTO $objEouvParametroDTO){
         try {
 
             //Valida Permissao
-            SessaoSEI::getInstance()->validarAuditarPermissao('rel_protocolo_assunto_excluir',__METHOD__,$arrObjMdCguEouvParametroDTO);
+            SessaoSEI::getInstance()->validarAuditarPermissao('md_cgu_eouv_parametro_excluir',__METHOD__,$objEouvParametroDTO);
 
             //Regras de Negocio
             //$objInfraException = new InfraException();
 
             //$objInfraException->lancarValidacoes();
 
-            $objEouvParametroBD = new RelProtocoloAssuntoBD($this->getObjInfraIBanco());
-            for($i=0;$i<count($arrObjMdCguEouvParametroDTO);$i++){
-                $objEouvParametroBD->excluir($arrObjMdCguEouvParametroDTO[$i]);
-            }
+            $objEouvParametroBD = new MdCguEouvParametroBD($this->getObjInfraIBanco());
+            $objEouvParametroBD->excluir($objEouvParametroDTO);
 
             //Auditoria
 
