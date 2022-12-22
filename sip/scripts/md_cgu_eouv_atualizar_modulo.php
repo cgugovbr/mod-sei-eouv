@@ -236,7 +236,7 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
     $numIdPerfilSeiAdministrador = $objPerfilDTO->getNumIdPerfil();
 
     $numIdRecursoParametro = $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
-      'md_cgu_eouv_parametro_listar_esic', 'Lista de Parâmetros módulo SEI x e-Sic',
+      'md_cgu_eouv_parametro_listar_esic', 'Lista de Parâmetros e-Sic',
       'controlador.php?acao=md_cgu_eouv_parametro_listar_esic');
 
     $this->logar('RECUPERANDO MENU DO E-OUV');
@@ -251,6 +251,18 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
     $this->adicionarItemMenu($numIdSistemaSei, $numIdPerfilSeiAdministrador,
       $numIdMenuSei, $objItemMenuDTOEouv->getNumIdItemMenu(),
       $numIdRecursoParametro, 'Parâmetros do Módulo e-Sic', 'Parâmetros', 30);
+
+    // Recursos e menu para edição do De Para entre tipos FalaBR e Processo
+    $this->logar('ADICIONANDO MENU DE CONFIGURAÇÃO DE TIPOS DE MANIFESTAÇÃO E PROCESSOS');
+    $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
+      'md_cgu_eouv_depara_importacao_alterar', 'Alterar uma Associação entre Tipo de Manifestação FalaBR e Processo',
+      'controlador.php?acao=md_cgu_eouv_depara_importacao_alterar');
+    $numIdRecursoDeParaListar = $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
+      'md_cgu_eouv_depara_importacao_listar', 'Listar Associações entre o Tipo de Manifestação FalaBR e Processo',
+      'controlador.php?acao=md_cgu_eouv_depara_importacao_listar');
+    $this->adicionarItemMenu($numIdSistemaSei, $numIdPerfilSeiAdministrador,
+      $numIdMenuSei, $objItemMenuDTOEouv->getNumIdItemMenu(),
+      $numIdRecursoDeParaListar, 'Tipos de Manifestação', 'Associações entre o Tipo de Manifestação no Falabr e o Tipo de Processo', 40);
   }
 
   private function adicionarItemMenu($numIdSistema, $numIdPerfil, $numIdMenu, $numIdItemMenuPai, $numIdRecurso, $strRotulo, $strDescricao, $numSequencia)
