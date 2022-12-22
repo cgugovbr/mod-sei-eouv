@@ -55,7 +55,7 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
       id_tipo_procedimento ' . $objInfraMetaBD->tipoNumero() . ' NULL ,
       de_tipo_manifestacao_eouv ' . $objInfraMetaBD->tipoTextoVariavel(50) . ' NULL)');
 
-    $objInfraMetaBD->adicionarChavePrimaria('md_eouv_depara_importacao', 'pk_md_eouv_depara_importacao', array('id_tipo_manifestacao_eouv', 'id_tipo_procedimento'));
+    $objInfraMetaBD->adicionarChavePrimaria('md_eouv_depara_importacao', 'pk_md_eouv_depara_importacao', array('id_tipo_manifestacao_eouv'));
     $objInfraMetaBD->adicionarChaveEstrangeira('fk1_md_eouv_tipo_procedimento', 'md_eouv_depara_importacao', array('id_tipo_procedimento'), 'tipo_procedimento', array('id_tipo_procedimento'));
     $objInfraMetaBD->criarIndice('md_eouv_depara_importacao', 'i01_md_eouv_depara_importacao', array('id_tipo_procedimento'));
 
@@ -264,6 +264,7 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
     $objDeParaDTO = $objDeParaRN->consultar($objDeParaDTO);
     if ($objDeParaDTO != null) {
       $objDeParaDTO->setStrDeTipoManifestacaoEouv('Não Classificada');
+      $objDeParaDTO->unSetNumIdTipoProcedimento();
       $objDeParaRN->alterar($objDeParaDTO);
     }
 
