@@ -117,7 +117,7 @@ Acessar o menu *E-Ouv > Parâmetros do Módulo E-ouv* ajustando os seguintes par
 
 - **CLIENT_SECRET** - Senha gerada para acesso aos WebServices.
 
-- **TOKEN** - Token gerado para acesso aos WebServices.
+- **TOKEN** - Token gerado para acesso aos WebServices. Se não for preenchido, o módulo pede ao sistema FalaBR um novo token automaticamente.
 
 - **EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO** - Já vem configurado para o ambiente de produção do FalaBR com https://falabr.cgu.gov.br/api/manifestacoes
 
