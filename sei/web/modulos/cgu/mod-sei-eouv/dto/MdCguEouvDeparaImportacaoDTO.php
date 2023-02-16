@@ -33,13 +33,12 @@ class MdCguEouvDeparaImportacaoDTO extends InfraDTO {
 
   	 $this->adicionarAtributoTabelaRelacionada(InfraDTO::$PREFIXO_STR,
                                               'TipoProcedimento',
-                                              'descricao',
+                                              'nome',
                                               'tipo_procedimento');
 
     $this->configurarPK('IdTipoManifestacaoEouv',InfraDTO::$TIPO_PK_INFORMADO);
-    $this->configurarPK('IdTipoProcedimento',InfraDTO::$TIPO_PK_INFORMADO);
 
-    $this->configurarFK('IdTipoProcedimento', 'tipo_procedimento', 'id_tipo_procedimento');
+    $this->configurarFK('IdTipoProcedimento', 'tipo_procedimento', 'id_tipo_procedimento', InfraDTO::$TIPO_FK_OPCIONAL);
 
   }
 }

@@ -15,12 +15,12 @@ class MdCguEouvIntegracao extends SeiIntegracao
 
     public function getNome()
     {
-        return 'Módulo de Integração entre o sistema SEI e o E-ouv(Sistema de Ouvidorias)';
+        return 'Módulo de Integração entre o sistema SEI e o FalaBR (Sistema de Ouvidorias - e-Ouv|e-Sic)';
     }
 
     public function getVersao()
     {
-        return '3.0.0';
+        return '4.0.0';
     }
 
     public function getInstituicao()
@@ -77,8 +77,20 @@ class MdCguEouvIntegracao extends SeiIntegracao
                 require_once dirname(__FILE__).'/md_cgu_eouv_parametro_lista.php';
                 return true;
 
+            case 'md_cgu_eouv_parametro_listar_esic':
+                require_once dirname(__FILE__).'/md_cgu_eouv_parametro_lista_esic.php';
+                return true;
+
             case 'md_cgu_eouv_parametro_alterar':
                 require_once dirname(__FILE__).'/md_cgu_eouv_parametro_cadastro.php';
+                return true;
+
+            case 'md_cgu_eouv_depara_importacao_listar':
+                require_once dirname(__FILE__).'/md_cgu_eouv_depara_importacao_lista.php';
+                return true;
+
+            case 'md_cgu_eouv_depara_importacao_alterar':
+                require_once dirname(__FILE__).'/md_cgu_eouv_depara_importacao_cadastro.php';
                 return true;
         }
         return false;

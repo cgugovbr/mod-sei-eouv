@@ -32,7 +32,7 @@ class MdCguEouvParametroRN extends InfraRN {
 
             $objInfraException->lancarValidacoes();
 
-            $objEouvParametroBD = new MdEouvParametroBD($this->getObjInfraIBanco());
+            $objEouvParametroBD = new MdCguEouvParametroBD($this->getObjInfraIBanco());
             $ret = $objEouvParametroBD->cadastrar($objEouvParametroDTO);
 
             //Auditoria
@@ -60,21 +60,19 @@ class MdCguEouvParametroRN extends InfraRN {
         }
     }
 
-    protected function excluirRN0224Controlado($arrObjMdCguEouvParametroDTO){
+    protected function excluirParametroControlado(MdCguEouvParametroDTO $objEouvParametroDTO){
         try {
 
             //Valida Permissao
-            SessaoSEI::getInstance()->validarAuditarPermissao('rel_protocolo_assunto_excluir',__METHOD__,$arrObjMdCguEouvParametroDTO);
+            SessaoSEI::getInstance()->validarAuditarPermissao('md_cgu_eouv_parametro_excluir',__METHOD__,$objEouvParametroDTO);
 
             //Regras de Negocio
             //$objInfraException = new InfraException();
 
             //$objInfraException->lancarValidacoes();
 
-            $objEouvParametroBD = new RelProtocoloAssuntoBD($this->getObjInfraIBanco());
-            for($i=0;$i<count($arrObjMdCguEouvParametroDTO);$i++){
-                $objEouvParametroBD->excluir($arrObjMdCguEouvParametroDTO[$i]);
-            }
+            $objEouvParametroBD = new MdCguEouvParametroBD($this->getObjInfraIBanco());
+            $objEouvParametroBD->excluir($objEouvParametroDTO);
 
             //Auditoria
 
@@ -107,6 +105,25 @@ class MdCguEouvParametroRN extends InfraRN {
 
             //Valida Permissao
             SessaoSEI::getInstance()->validarAuditarPermissao('md_cgu_eouv_parametro_listar',__METHOD__,$objEouvParametroDTO);
+
+            $objEouvParametroBD = new MdCguEouvParametroBD($this->getObjInfraIBanco());
+            $ret = $objEouvParametroBD->listar($objEouvParametroDTO);
+
+
+            //Auditoria
+
+            return $ret;
+
+        }catch(Exception $e){
+            throw new InfraException('Erro listando associações entre Protocolo e Assunto.',$e);
+        }
+    }
+
+    protected function listarParametroESicConectado(MdCguEouvParametroDTO $objEouvParametroDTO) {
+        try {
+
+            //Valida Permissao
+            SessaoSEI::getInstance()->validarAuditarPermissao('md_cgu_eouv_parametro_listar_esic',__METHOD__,$objEouvParametroDTO);
 
             $objEouvParametroBD = new MdCguEouvParametroBD($this->getObjInfraIBanco());
             $ret = $objEouvParametroBD->listar($objEouvParametroDTO);

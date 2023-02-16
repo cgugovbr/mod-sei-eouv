@@ -75,6 +75,7 @@
   $objEouvRelatorioImportacaoDetalheDTO->retNumIdRelatorioImportacao();
   $objEouvRelatorioImportacaoDetalheDTO->retStrProtocoloFormatado();
   $objEouvRelatorioImportacaoDetalheDTO->retStrSinSucesso();
+  $objEouvRelatorioImportacaoDetalheDTO->retStrTipManifestacao();
   $objEouvRelatorioImportacaoDetalheDTO->retDthDthImportacao();
   $objEouvRelatorioImportacaoDetalheDTO->retStrDescricaoLog();
 
@@ -114,7 +115,9 @@
 
     $strResultado = '';
 
-    $strResultado .= '<table width="99%" class="infraTable" summary="'.$strSumarioTabela.'">'."\n";
+    $strCaptionTabela = 'Manifestações';
+
+    $strResultado .= '<table width="99%" class="infraTable" summary="' . ($strSumarioTabela ?? '$strSumarioTabela não definido') . '">'."\n";
     $strResultado .= '<caption class="infraCaption">'.PaginaSEI::getInstance()->gerarCaptionTabela($strCaptionTabela,$numRegistros).'</caption>';
     $strResultado .= '<tr>';
     if ($bolCheck) {
@@ -122,7 +125,8 @@
     }
 
     $strResultado .= '<th class="infraTh" width="15%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDetalheDTO,'Protocolo Formatado','ProtocoloFormatado',$arrObjEouvRelatorioImportacaoDetalheDTO).'</th>'."\n";
-    $strResultado .= '<th class="infraTh" width="10%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDetalheDTO,'Sucesso','SinSucesso',$arrObjEouvRelatorioImportacaoDetalheDTO).'</th>'."\n";
+    $strResultado .= '<th class="infraTh" width="7%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDetalheDTO,'Tipo','TipManifestacao',$arrObjEouvRelatorioImportacaoDetalheDTO).'</th>'."\n";
+    $strResultado .= '<th class="infraTh" width="7%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDetalheDTO,'Sucesso','SinSucesso',$arrObjEouvRelatorioImportacaoDetalheDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh" width="10%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDetalheDTO,'Data Importacao','DthImportacao',$arrObjEouvRelatorioImportacaoDetalheDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDetalheDTO,'Detalhe','DescricaoLog',$arrObjEouvRelatorioImportacaoDetalheDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh" width="25%">Ações</th>'."\n";
@@ -138,7 +142,8 @@
         $strResultado .= '<td>'.PaginaSEI::getInstance()->getTrCheck($i,trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado()),trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado())).'</td>';
       }
 
-      $strResultado .= '<td>'.trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado()).'</td>';
+      $strResultado .= '<td align="center">'.trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado()).'</td>';
+      $strResultado .= '<td align="center">'.(in_array(trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrTipManifestacao()), ['R', 'R1', 'R2', 'R3', 'RE', 'RC', 'PR']) ? 'e-Sic' : 'e-Ouv').'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrSinSucesso().'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getDthDthImportacao().'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrDescricaoLog().'</td>';
@@ -151,7 +156,7 @@
       $strResultado .= '<td align="center">';
 
       if ($bolAcaoExcluir){
-        $strResultado .= '<a href="#ID-'.trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado()).'"  onclick="acaoExcluir(\''.trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado()).'\',\''.PaginaSEI::tratarHTML(trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado())).'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="imagens/excluir.gif" title="Excluir Registro" alt="Excluir Registro" class="infraImg" /></a>&nbsp;';
+        $strResultado .= '<a href="#ID-'.trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado()).'"  onclick="acaoExcluir(\''.trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado()).'\',\''.PaginaSEI::tratarHTML(trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado())).'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeExcluir().'" title="Excluir Registro" alt="Excluir Registro" class="infraImg" /></a>&nbsp;';
       }
 
       $strResultado .= '</td></tr>'."\n";
