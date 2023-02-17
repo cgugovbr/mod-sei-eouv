@@ -3,7 +3,7 @@
 
 ## Requisitos
 
-- SUPER versão 4.0.3.1 ou superior (verificar versão do SUPER no arquivo /sei/web/SEI.php).
+- SUPER ou SEI versão 4.0.3 ou superior (verificar versão no arquivo /sei/web/SEI.php).
 
 - Utilizar o Sistema FalaBR do Governo Federal (e-Ouv e e-Sic). Caso ainda não tenha aderido ao FalaBR e queira saber mais informações acesse https://falabr.cgu.gov.br/.
 
