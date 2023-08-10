@@ -604,8 +604,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $SiglaSistema = 'EOUV';
         $IdentificacaoServico = 'CadastrarManifestacao';
 
+        $isBolHabilitada = SessaoSEI::getInstance(false)->isBolHabilitada();
         $numIdUsuario = SessaoSEI::getInstance(false)->getNumIdUsuario();
-        if($numIdUsuario != null && $numIdUsuario != 1){
+        if($numIdUsuario != null && $isBolHabilitada){
             SessaoSEI::getInstance()->setBolHabilitada(false);
         }
         // Simula login inicial
@@ -723,7 +724,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
             $objEouvRelatorioImportacaoRN->alterar($objEouvRelatorioImportacaoDTO3);
             //Ao executar manualmente, para não perder a sessão é preciso setar o BolHabilitada para true novamente
-            if($numIdUsuario != null && $numIdUsuario != 1){
+            if($numIdUsuario != null && $isBolHabilitada){
                 SessaoSEI::getInstance()->setBolHabilitada(true);
             }
             PaginaSEI::getInstance()->processarExcecao($e);
@@ -731,7 +732,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
             die;
         }
         //Ao executar manualmente, para não perder a sessão é preciso setar o BolHabilitada para true novamente
-        if($numIdUsuario != null && $numIdUsuario != 1){
+        if($numIdUsuario != null && $isBolHabilitada){
             SessaoSEI::getInstance()->setBolHabilitada(true);
         }
     }
@@ -884,7 +885,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $IdentificacaoServico = 'CadastrarManifestacao';
 
         $numIdUsuario = SessaoSEI::getInstance(false)->getNumIdUsuario();
-        if($numIdUsuario != null && $numIdUsuario != 1){
+        $isBolHabilitada = SessaoSEI::getInstance(false)->isBolHabilitada();
+        if($numIdUsuario != null && $isBolHabilitada){
             SessaoSEI::getInstance()->setBolHabilitada(false);
         }
         // Simula login inicial
@@ -1229,14 +1231,14 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $objEouvRelatorioImportacaoDTO3->setStrDeLogProcessamento($strMensagem);
             $objEouvRelatorioImportacaoRN->alterar($objEouvRelatorioImportacaoDTO3);
             //Ao executar manualmente, para não perder a sessão é preciso setar o BolHabilitada para true novamente
-            if($numIdUsuario != null && $numIdUsuario != 1){
+            if($numIdUsuario != null && $isBolHabilitada){
                 SessaoSEI::getInstance()->setBolHabilitada(true);
             }
             PaginaSEI::getInstance()->processarExcecao($e);
             die;
         }
         //Ao executar manualmente, para não perder a sessão é preciso setar o BolHabilitada para true novamente
-        if($numIdUsuario != null && $numIdUsuario != 1){
+        if($numIdUsuario != null && $isBolHabilitada){
             SessaoSEI::getInstance()->setBolHabilitada(true);
         }
     }
