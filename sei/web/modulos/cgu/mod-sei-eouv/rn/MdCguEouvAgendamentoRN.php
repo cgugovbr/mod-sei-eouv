@@ -605,9 +605,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $IdentificacaoServico = 'CadastrarManifestacao';
 
         $isBolHabilitada = SessaoSEI::getInstance(false)->isBolHabilitada();
-        if($isBolHabilitada){
-            SessaoSEI::getInstance()->setBolHabilitada(false);
-        }
+        SessaoSEI::getInstance()->setBolHabilitada(false);
+
         // Simula login inicial
         $this->simulaLogin($SiglaSistema, $IdentificacaoServico, $idUnidadeOuvidoria);
         LogSEI::getInstance()->gravar('Depois do Simula login:'.$idUnidadeOuvidoria.'- Unidade atual'.SessaoSEI::getInstance()->getNumIdUnidadeAtual().' - User logado'.SessaoSEI::getInstance()->getNumIdUsuario() );
@@ -722,17 +721,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $objEouvRelatorioImportacaoDTO3->setStrDeLogProcessamento($strMensagem);
 
             $objEouvRelatorioImportacaoRN->alterar($objEouvRelatorioImportacaoDTO3);
-            //Ao executar manualmente, para não perder a sessão é preciso setar o BolHabilitada para true novamente
-            if($isBolHabilitada){
-                SessaoSEI::getInstance()->setBolHabilitada(true);
-            }
-            PaginaSEI::getInstance()->processarExcecao($e);
 
-            die;
-        }
-        //Ao executar manualmente, para não perder a sessão é preciso setar o BolHabilitada para true novamente
-        if($isBolHabilitada){
-            SessaoSEI::getInstance()->setBolHabilitada(true);
+            PaginaSEI::getInstance()->processarExcecao($e);
+        } finally {
+            //Restaura a sessão
+            SessaoSEI::getInstance()->setBolHabilitada($isBolHabilitada);
         }
     }
 
@@ -884,9 +877,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $IdentificacaoServico = 'CadastrarManifestacao';
 
         $isBolHabilitada = SessaoSEI::getInstance(false)->isBolHabilitada();
-        if($isBolHabilitada){
-            SessaoSEI::getInstance()->setBolHabilitada(false);
-        }
+        SessaoSEI::getInstance()->setBolHabilitada(false);
+
         // Simula login inicial
         $this->simulaLogin($SiglaSistema, $IdentificacaoServico, $idUnidadeEsicPrincipal);
 
@@ -1228,16 +1220,12 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $strMensagem = substr($strMensagem, 0, 500);
             $objEouvRelatorioImportacaoDTO3->setStrDeLogProcessamento($strMensagem);
             $objEouvRelatorioImportacaoRN->alterar($objEouvRelatorioImportacaoDTO3);
-            //Ao executar manualmente, para não perder a sessão é preciso setar o BolHabilitada para true novamente
-            if($isBolHabilitada){
-                SessaoSEI::getInstance()->setBolHabilitada(true);
-            }
+
             PaginaSEI::getInstance()->processarExcecao($e);
-            die;
-        }
-        //Ao executar manualmente, para não perder a sessão é preciso setar o BolHabilitada para true novamente
-        if($isBolHabilitada){
-            SessaoSEI::getInstance()->setBolHabilitada(true);
+
+        } finally {
+            //Restaura a Sessão
+            SessaoSEI::getInstance()->setBolHabilitada($isBolHabilitada);
         }
     }
 
