@@ -609,7 +609,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         // Simula login inicial
         $this->simulaLogin($SiglaSistema, $IdentificacaoServico, $idUnidadeOuvidoria);
-        LogSEI::getInstance()->gravar('Depois do Simula login:'.$idUnidadeOuvidoria.'- Unidade atual'.SessaoSEI::getInstance()->getNumIdUnidadeAtual().' - User logado'.SessaoSEI::getInstance()->getNumIdUsuario() );
 
         try {
 
