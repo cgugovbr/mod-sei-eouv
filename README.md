@@ -109,7 +109,7 @@ Acessar o menu *E-Ouv > Parâmetros do Módulo E-ouv* ajustando os seguintes par
 
 - **EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO** - Quando a rotina de importação for executada, será gerado um documento PDF com os dados da manifestação que será anexado ao processo com o mesmo número de identificação do FalaBR. Este parâmetro será usado para indicar qual o Tipo de Documento no SEI será utilizado para este PDF. Lembrando que deve ser do Grupo de **Documentos Externos**. Para verificar os tipos existentes acesse *Administração > Tipos de Documento > Listar*.
 
-- **EOUV_USUARIO_ACESSO_WEBSERVICE** - Nome de usuário para acesso aos WebServices do FalaBR, gerado especificamente para cada órgão. Caso ainda não possua este usuário e a senha abaixo, solicitar via e-mail para [Marcos Silva - marcos.silva@cgu.gov.br](mailto:marcos.silva@cgu.gov.br?subject=[SOLICITAÇÃO]%20Usuário%20e%20Senha%20API%20FalaBR)
+- **EOUV_USUARIO_ACESSO_WEBSERVICE** - Nome de usuário para acesso aos WebServices do FalaBR, gerado especificamente para cada órgão. Caso ainda não possua este usuário e a senha abaixo, solicitar via e-mail para o [Suporte Técnico do Fala.BR](https://formularios.cgu.gov.br/index.php/679625?lang=pt-BR)
 
 - **EOUV_SENHA_ACESSO_WEBSERVICE** - Senha do usuário para acesso aos WebServices do FalaBR
 
@@ -165,4 +165,4 @@ Criamos um vídeo com a demonstração do funcionamento do módulo focado na par
 
 [![Tutorial módulo integração SEI & FalaBR](https://img.youtube.com/vi/geUCx7H79Gw/0.jpg)](https://www.youtube.com/watch?v=geUCx7H79Gw)
 
-> Em caso dúvidas favor enviar um email para [SESOL - sesol@cgu.gov.br](mailto:sesol@cgu.gov.br?subject=[DUVIDA]%20SEI%20-%20módulo%20FalaBR)
+> Em caso dúvidas favor enviar um email para [DISOL - disol@cgu.gov.br](mailto:disol@cgu.gov.br?subject=[DUVIDA]%20SEI%20-%20módulo%20FalaBR)
