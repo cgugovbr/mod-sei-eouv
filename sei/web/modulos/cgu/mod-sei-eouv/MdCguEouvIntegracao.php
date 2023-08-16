@@ -20,7 +20,7 @@ class MdCguEouvIntegracao extends SeiIntegracao
 
     public function getVersao()
     {
-        return '4.0.0';
+        return '4.0.1';
     }
 
     public function getInstituicao()

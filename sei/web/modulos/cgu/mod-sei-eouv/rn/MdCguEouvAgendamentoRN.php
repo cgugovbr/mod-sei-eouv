@@ -604,35 +604,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $SiglaSistema = 'EOUV';
         $IdentificacaoServico = 'CadastrarManifestacao';
 
-        //Quando estiver executando agendamento Simula Login
-        if (SessaoSEI::getInstance()->getNumIdUnidadeAtual()==null && SessaoSEI::getInstance()->getNumIdUsuario()==null){
+        $isBolHabilitada = SessaoSEI::getInstance(false)->isBolHabilitada();
+        SessaoSEI::getInstance()->setBolHabilitada(false);
 
-            try{
-
-                InfraDebug::getInstance()->gravar(__METHOD__);
-                InfraDebug::getInstance()->gravar('SIGLA SISTEMA:'.$SiglaSistema);
-                InfraDebug::getInstance()->gravar('IDENTIFICACAO SERVICO:'.$IdentificacaoServico);
-                InfraDebug::getInstance()->gravar('ID UNIDADE:'.$idUnidadeOuvidoria);
-
-                SessaoSEI::getInstance(false);
-
-                $objServicoDTO = $this->obterServico($SiglaSistema, $IdentificacaoServico);
-
-                if ($idUnidadeOuvidoria!=null){
-                    $objUnidadeDTO = $this->obterUnidade($idUnidadeOuvidoria,null);
-                }else{
-                    $objUnidadeDTO = null;
-                }
-
-                // $this->validarAcessoAutorizado(explode(',',str_replace(' ','',$objServicoDTO->getStrServidor())));
-
-                SessaoSEI::getInstance()->simularLogin(null, null, $objServicoDTO->getNumIdUsuario(), $objUnidadeDTO->getNumIdUnidade());
-
-            }catch(Exception $e){
-                LogSEI::getInstance()->gravar('Ocorreu erro simular Login.'.$e);
-                PaginaSEI::getInstance()->processarExcecao($e);
-            }
-        }
+        // Simula login inicial
+        $this->simulaLogin($SiglaSistema, $IdentificacaoServico, $idUnidadeOuvidoria);
 
         try {
 
@@ -746,8 +722,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $objEouvRelatorioImportacaoRN->alterar($objEouvRelatorioImportacaoDTO3);
 
             PaginaSEI::getInstance()->processarExcecao($e);
-
-            die;
+        } finally {
+            //Restaura a sessão
+            SessaoSEI::getInstance()->setBolHabilitada($isBolHabilitada);
         }
     }
 
@@ -897,6 +874,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $dataAtual = InfraData::getStrDataHoraAtual();
         $SiglaSistema = 'EOUV';
         $IdentificacaoServico = 'CadastrarManifestacao';
+
+        $isBolHabilitada = SessaoSEI::getInstance(false)->isBolHabilitada();
+        SessaoSEI::getInstance()->setBolHabilitada(false);
 
         // Simula login inicial
         $this->simulaLogin($SiglaSistema, $IdentificacaoServico, $idUnidadeEsicPrincipal);
@@ -1241,7 +1221,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $objEouvRelatorioImportacaoRN->alterar($objEouvRelatorioImportacaoDTO3);
 
             PaginaSEI::getInstance()->processarExcecao($e);
-            die;
+
+        } finally {
+            //Restaura a Sessão
+            SessaoSEI::getInstance()->setBolHabilitada($isBolHabilitada);
         }
     }
 
@@ -3119,31 +3102,28 @@ class MdCguEouvAgendamentoRN extends InfraRN
      */
     public function simulaLogin($siglaSistema, $idServico, $idUnidade)
     {
-        if (SessaoSEI::getInstance()->getNumIdUnidadeAtual() == null && SessaoSEI::getInstance()->getNumIdUsuario() == null) {
+        try {
 
-            try {
+            InfraDebug::getInstance()->gravar(__METHOD__);
+            InfraDebug::getInstance()->gravar('SIGLA SISTEMA:'.$siglaSistema);
+            InfraDebug::getInstance()->gravar('IDENTIFICACAO SERVICO:'.$idServico);
+            InfraDebug::getInstance()->gravar('ID UNIDADE:'.$idUnidade);
 
-                InfraDebug::getInstance()->gravar(__METHOD__);
-                InfraDebug::getInstance()->gravar('SIGLA SISTEMA:'.$siglaSistema);
-                InfraDebug::getInstance()->gravar('IDENTIFICACAO SERVICO:'.$idServico);
-                InfraDebug::getInstance()->gravar('ID UNIDADE:'.$idUnidade);
+            SessaoSEI::getInstance(false);
 
-                SessaoSEI::getInstance(false);
+            $objServicoDTO = $this->obterServico($siglaSistema, $idServico);
 
-                $objServicoDTO = $this->obterServico($siglaSistema, $idServico);
-
-                if ($idUnidade!=null) {
-                    $objUnidadeDTO = $this->obterUnidade($idUnidade,null);
-                } else {
-                    $objUnidadeDTO = null;
-                }
-
-                SessaoSEI::getInstance()->simularLogin(null, null, $objServicoDTO->getNumIdUsuario(), $objUnidadeDTO->getNumIdUnidade());
-
-            } catch(Exception $e) {
-                LogSEI::getInstance()->gravar('Ocorreu erro simular Login.'.$e);
-                PaginaSEI::getInstance()->processarExcecao($e);
+            if ($idUnidade!=null) {
+                $objUnidadeDTO = $this->obterUnidade($idUnidade,null);
+            } else {
+                $objUnidadeDTO = null;
             }
+
+            SessaoSEI::getInstance()->simularLogin(null, null, $objServicoDTO->getNumIdUsuario(), $objUnidadeDTO->getNumIdUnidade());
+
+        } catch(Exception $e) {
+            LogSEI::getInstance()->gravar('Ocorreu erro simular Login.'.$e);
+            PaginaSEI::getInstance()->processarExcecao($e);
         }
     }
 
