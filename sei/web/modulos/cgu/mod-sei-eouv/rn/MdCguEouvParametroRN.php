@@ -53,8 +53,6 @@ class MdCguEouvParametroRN extends InfraRN {
             $objEouvParametroBD = new MdCguEouvParametroBD($this->getObjInfraIBanco());
             $objEouvParametroBD->alterar($objEouvParametroDTO);
 
-            //Auditoria
-
         }catch(Exception $e){
             throw new InfraException('Erro alterando parâmetro.',$e);
         }
@@ -66,15 +64,8 @@ class MdCguEouvParametroRN extends InfraRN {
             //Valida Permissao
             SessaoSEI::getInstance()->validarAuditarPermissao('md_cgu_eouv_parametro_excluir',__METHOD__,$objEouvParametroDTO);
 
-            //Regras de Negocio
-            //$objInfraException = new InfraException();
-
-            //$objInfraException->lancarValidacoes();
-
             $objEouvParametroBD = new MdCguEouvParametroBD($this->getObjInfraIBanco());
             $objEouvParametroBD->excluir($objEouvParametroDTO);
-
-            //Auditoria
 
         }catch(Exception $e){
             throw new InfraException('Erro excluindo .',$e);
@@ -90,8 +81,6 @@ class MdCguEouvParametroRN extends InfraRN {
 
         $objEouvParametroBD = new MdCguEouvParametroBD($this->getObjInfraIBanco());
         $ret = $objEouvParametroBD->consultar($objEouvParametroDTO);
-
-        //Auditoria
 
         return $ret;
       }catch(Exception $e){
@@ -109,9 +98,6 @@ class MdCguEouvParametroRN extends InfraRN {
             $objEouvParametroBD = new MdCguEouvParametroBD($this->getObjInfraIBanco());
             $ret = $objEouvParametroBD->listar($objEouvParametroDTO);
 
-
-            //Auditoria
-
             return $ret;
 
         }catch(Exception $e){
@@ -127,9 +113,6 @@ class MdCguEouvParametroRN extends InfraRN {
 
             $objEouvParametroBD = new MdCguEouvParametroBD($this->getObjInfraIBanco());
             $ret = $objEouvParametroBD->listar($objEouvParametroDTO);
-
-
-            //Auditoria
 
             return $ret;
 

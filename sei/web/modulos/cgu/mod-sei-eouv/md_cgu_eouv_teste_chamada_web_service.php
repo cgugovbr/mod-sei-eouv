@@ -12,7 +12,6 @@ require_once dirname(__FILE__) . '/../../../SEI.php';
 
 $objEouvWS = new MdCguEouvWS();
 $objEouvWS -> testarAgendamentoEouv('EOuv','CadastrarManifestacao',110000001);
-//$objEouvWS -> testarGerarPDF('EOuv','Cadastrar Manifestacao',110000001);
 
 exit();
 
@@ -37,8 +36,6 @@ if (isset($_GET['id_tipo_procedimento'])){
     $objProtocoloDTO->setNumIdTipoProcedimentoProcedimento($objTipoProcedimentoDTO->getNumIdTipoProcedimento());
     $objProtocoloDTO->setDtaGeracao(InfraData::getStrDataAtual());
     $objProtocoloDTO->setStrStaNivelAcessoLocal(null);
-    //$objProtocoloDTO->setStrStaGrauSigilo(null);
-    //$objProtocoloDTO->setNumIdHipoteseLegal(null);
 }else{
 
     if ($_POST['rdoProtocolo']=='M'){
@@ -133,23 +130,6 @@ $DocumentoRecebido['NomeArquivo'] = 'oficio.txt';
 $DocumentoRecebido['Conteudo'] = base64_encode('conteudo do documento oficio.txt');
 
 //Para MTOM
-//$DocumentoRecebido['Conteudo'] = '';
-//$DocumentoRecebido['ConteudoMTOM'] = file_get_contents(dirname(__FILE__).'/OFIC832014CEF.pdf');
 $DocumentoRecebido['NivelAcesso'] = null;
-//1 - gera processo
-//$ret = $objWS->gerarProcedimento('Corregedoria','Suspeição/Impedimento', $numIdUnidade, $Procedimento, array(),$ProcedimentosRelacionados, $UnidadesEnvio);
 
-//2 - gera processo + documento gerado
-//$ret = $objWS->gerarProcedimento('Corregedoria','Suspeição/Impedimento', $numIdUnidade, $Procedimento, array($DocumentoGerado), array(),$UnidadesEnvio);
-
-//3 - gera processo + documento gerado + documento externo
-//$ret = $objWS->gerarProcedimento('Corregedoria','Suspeição/Impedimento', $numIdUnidade, $Procedimento, array($DocumentoGerado, $DocumentoRecebido));
-
-//4 - inclui documento gerado em processo existente
-//$DocumentoGerado['IdProcedimento'] deve estar com o id preenchido
-//$ret = $objWS->incluirDocumento('Corregedoria','Suspeição/Impedimento', $numIdUnidade, $DocumentoGerado);
-
-//5 -inclui documento externo em processo existente
-//$DocumentoRecebido['IdProcedimento'] deve estar com o id preenchido
-//$ret = $objWS->incluirDocumento('Corregedoria','Suspeição/Impedimento', $numIdUnidade, $DocumentoRecebido);
 ?>
