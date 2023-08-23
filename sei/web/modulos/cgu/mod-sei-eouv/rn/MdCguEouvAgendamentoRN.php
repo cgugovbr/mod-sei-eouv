@@ -13,9 +13,6 @@ require_once dirname(__FILE__) . '/../../../../SEI.php';
 
 class MdCguEouvAgendamentoRN extends InfraRN
 {
-    protected $objEouvRelatorioImportacaoDTO;
-    protected $objEouvRelatorioImportacaoRN;
-    protected $objInfraParametro;
     protected $urlWebServiceEOuv;
     protected $urlWebServiceESicRecursos;
     protected $urlWebServiceAnexosEOuv;
@@ -26,11 +23,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
     protected $idUnidadeRecursoSegundaInstancia;
     protected $idUnidadeRecursoTerceiraInstancia;
     protected $idUnidadeRecursoPedidoRevisao;
-    protected $idUsuarioSei;
-    protected $dataAtual;
-    protected $objUltimaExecucao;
     protected $ocorreuErroEmProtocolo;
-    protected $idRelatorioImportacao;
     protected $usuarioWebService;
     protected $senhaUsuarioWebService;
     protected $client_id;
@@ -38,6 +31,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
     protected $token;
     protected $importar_dados_manifestante;
     protected $dataInicialImportacaoManifestacoes;
+    protected $identificacaoServico = 'CadastrarManifestacao';
+    protected $siglaSistema = 'EOUV';
+
 
     public function __construct()
     {
@@ -186,12 +182,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
         }
     }
 
-    // GZIP DECODE
-    function gzdecode($data)
-    {
-        return gzinflate(substr($data, 10, -8));
-    }
-
     public function gravarLogImportacao($ultimaDataExecucao, $dataAtual, $tipoManifestacao = 'P'){
 
         try {
@@ -246,14 +236,13 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $this->token = $this->token . $tokenPart2;
 
         $dataAtual = InfraData::getStrDataHoraAtual();
-        $SiglaSistema = 'EOUV';
-        $IdentificacaoServico = 'CadastrarManifestacao';
 
         $isBolHabilitada = SessaoSEI::getInstance(false)->isBolHabilitada();
         SessaoSEI::getInstance()->setBolHabilitada(false);
 
+        $mdCguEouvWS = new MdCguEouvWS();
         // Simula login inicial
-        $this->simulaLogin($SiglaSistema, $IdentificacaoServico, $this->idUnidadeOuvidoria);
+        $mdCguEouvWS->simulaLogin($this->siglaSistema, $this->identificacaoServico, $this->idUnidadeOuvidoria);
 
         try {
 
@@ -277,7 +266,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $SinSucessoExecucao = 'N';
             $textoMensagemErroToken = '';
 
-            $retornoWs = $this->executarServicoConsultaManifestacoes($this->urlWebServiceEOuv, $this->token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
+            $retornoWs = $mdCguEouvWS->executarServicoConsultaManifestacoes($this->urlWebServiceEOuv, $this->token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
 
             //Caso retornado algum erro
             if (is_string($retornoWs)) {
@@ -289,17 +278,17 @@ class MdCguEouvAgendamentoRN extends InfraRN
                         $textoMensagemErroToken = 'Não foi possível validar o Token de acesso aos WebServices do E-ouv. <br>Verifique as informações de Usuário, Senha, Client_Id e Client_Secret nas configurações de Parâmetros do Módulo';
 
                     } elseif (isset($tokenValido['access_token'])) {
-                        $this->gravarParametroToken($tokenValido['access_token']);
+                        $mdCguEouvWS->gravarParametroToken($tokenValido['access_token']);
                         $token = $tokenValido['access_token'];
 
                         //Chama novamente a execução da ConsultaManifestacao que deu errado por causa do Token
-                        $retornoWs = $this->executarServicoConsultaManifestacoes($this->urlWebServiceEOuv, $token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
+                        $retornoWs = $mdCguEouvWS->executarServicoConsultaManifestacoes($this->urlWebServiceEOuv, $token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
                     }
                 }
             }
 
             if ($textoMensagemErroToken == '') {
-                $arrComErro = $this->obterManifestacoesComErro($this->urlWebServiceEOuv, $token, $ultimaDataExecucao, $dataAtual, $idRelatorioImportacao);
+                $arrComErro = $mdCguEouvWS->obterManifestacoesComErro($this->urlWebServiceEOuv, $token, $ultimaDataExecucao, $dataAtual, $idRelatorioImportacao);
 
                 $arrManifestacoes = array();
 
@@ -319,7 +308,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 if (count($arrManifestacoes) > 0) {
                     $semManifestacoesEncontradas = false;
                     foreach ($arrManifestacoes as $retornoWsLinha) {
-                        $this->executarImportacaoLinha($retornoWsLinha);
+                        $mdCguEouvWS->executarImportacaoLinha($retornoWsLinha);
                     }
                 }
 
@@ -395,14 +384,13 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         // Busca parâmetros do banco de dados da tabela infra_parametros
         $dataAtual = InfraData::getStrDataHoraAtual();
-        $SiglaSistema = 'EOUV';
-        $IdentificacaoServico = 'CadastrarManifestacao';
 
         $isBolHabilitada = SessaoSEI::getInstance(false)->isBolHabilitada();
         SessaoSEI::getInstance()->setBolHabilitada(false);
 
+        $mdCguEouvWS = new MdCguEouvWS();
         // Simula login inicial
-        $this->simulaLogin($SiglaSistema, $IdentificacaoServico, $this->idUnidadeEsicPrincipal);
+        $mdCguEouvWS->simulaLogin($this->siglaSistema, $this->identificacaoServico, $this->idUnidadeEsicPrincipal);
 
         // Executa a importação dos dados
         try {
@@ -441,8 +429,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
              * As funções abaixo fazem a busca no webservice dos dados a serem trabalhados na rotina de importação
              */
             $debugLocal && LogSEI::getInstance()->gravar('Iniciando a consulta inicial');
-            $retornoWs = $this->executarServicoConsultaManifestacoes($this->urlWebServiceEOuv, $this->token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
-            $retornoWsRecursos = $this->executarServicoConsultaRecursos($this->urlWebServiceESicRecursos, $this->token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
+
+            $retornoWs = $mdCguEouvWS->executarServicoConsultaManifestacoes($this->urlWebServiceEOuv, $this->token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
+            $retornoWsRecursos = $mdCguEouvWS->executarServicoConsultaRecursos($this->urlWebServiceESicRecursos, $this->token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
 
             //Caso retornado algum erro - Manifestações e-Sic
             if (is_string($retornoWs)) {
@@ -460,8 +449,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
                         $token = $tokenValido['access_token'];
 
                         //Chama novamente a execução da ConsultaManifestacao que deu errado por causa do Token
-                        $retornoWs = $this->executarServicoConsultaManifestacoes($this->urlWebServiceEOuv, $token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
-                        $retornoWsRecursos = $this->executarServicoConsultaRecursos($this->urlWebServiceESicRecursos, $token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
+                        $retornoWs = $mdCguEouvWS->executarServicoConsultaManifestacoes($this->urlWebServiceEOuv, $token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
+                        $retornoWsRecursos = $mdCguEouvWS->executarServicoConsultaRecursos($this->urlWebServiceESicRecursos, $token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
                     }
                 }
             }
@@ -477,7 +466,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                  * Comentar a linha abaixo para debugar um retorno manual
                  */
                 $debugLocal && LogSEI::getInstance()->gravar('Inicia busca manifestação com erros');
-                $arrComErro = $this->obterManifestacoesComErro($this->urlWebServiceEOuv, $token, $ultimaDataExecucao, $dataAtual, $idRelatorioImportacao, 'R');
+                $arrComErro = $mdCguEouvWS->obterManifestacoesComErro($this->urlWebServiceEOuv, $token, $ultimaDataExecucao, $dataAtual, $idRelatorioImportacao, 'R');
 
                 $arrManifestacoes = array();
 
@@ -508,7 +497,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     $semManifestacoesEncontradas = false;
                     foreach ($arrManifestacoes as $retornoWsLinha) {
                         $debugLocal && LogSEI::getInstance()->gravar('Inicia importação por Linha');
-                        $this->executarImportacaoLinha($retornoWsLinha, 'R');
+                        $mdCguEouvWS->executarImportacaoLinha($retornoWsLinha, 'R');
                     }
                 }
 
@@ -517,7 +506,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     $semRecursosEncontrados = false;
                     foreach ($arrRecursos as $retornoWsLinha) {
                         $debugLocal && LogSEI::getInstance()->gravar('Inicia importação por linha de Recursos - protocolo: ' . $retornoWsLinha['numProtocolo']);
-                        $this->executarImportacaoLinhaRecursos($retornoWsLinha);
+                        $mdCguEouvWS->executarImportacaoLinhaRecursos($retornoWsLinha);
                     }
                 }
 
@@ -569,354 +558,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
             //Restaura a Sessão
             SessaoSEI::getInstance()->setBolHabilitada($isBolHabilitada);
         }
-    }
-
-
-    public function limparErrosParaNup($numProtocoloComErro){
-        $objEouvRelatorioImportacaoDetalheDTO = new MdCguEouvRelatorioImportacaoDetalheDTO();
-        $objEouvRelatorioImportacaoDetalheDTO->retTodos(true);
-        $objEouvRelatorioImportacaoDetalheDTO->setStrProtocoloFormatado($numProtocoloComErro);
-        $objEouvRelatorioImportacaoDetalheDTO->setStrSinSucesso('N');
-
-        $objEouvRelatorioImportacaoDetalheRN = new MdCguEouvRelatorioImportacaoDetalheRN();
-        $objListaErros = $objEouvRelatorioImportacaoDetalheRN->listar($objEouvRelatorioImportacaoDetalheDTO);
-        foreach($objListaErros as $erro){
-            $erro->setStrSinSucesso('C');
-            $objEouvRelatorioImportacaoDetalheRN->alterar($erro);
-        }
-
-    }
-
-    public function gerarAnexosProtocolo($arrAnexosManifestacao, $numProtocoloFormatado, $tipoManifestacao = 'P', $IdProtocolo = false)
-    {
-        /**********************************************************************************************************************************************
-         * Início da importação de anexos de cada protocolo
-         * Desativado momentaneamente
-         */
-
-        $objInfraParametro = new InfraParametro(BancoSEI::getInstance());
-        $arrAnexosAdicionados = array();
-
-        $intTotAnexos = count($arrAnexosManifestacao);
-
-        if($intTotAnexos == 0){
-            //Não encontrou anexos..
-            return $arrAnexosAdicionados;
-        }
-
-        //Trata as extensÃµes permitidas
-        $objArquivoExtensaoDTO = new ArquivoExtensaoDTO();
-        $objArquivoExtensaoDTO->retNumIdArquivoExtensao();
-        $objArquivoExtensaoDTO->retStrExtensao();
-        $objArquivoExtensaoDTO->retStrDescricao();
-        $objArquivoExtensaoDTO->retNumTamanhoMaximo();
-        $objArquivoExtensaoRN = new ArquivoExtensaoRN();
-        $arrObjArquivoExtensaoDTO = $objArquivoExtensaoRN->listar($objArquivoExtensaoDTO);
-        $arrExtensoesPermitidas = array();
-
-        foreach($arrObjArquivoExtensaoDTO as $extensao){
-            array_push($arrExtensoesPermitidas, strtoupper ($extensao->getStrExtensao()));
-        }
-
-        foreach ($arrAnexosManifestacao as $retornoWsAnexoLista) {
-
-            foreach ($this->verificaRetornoWS($retornoWsAnexoLista) as $retornoWsAnexoLinha) {
-                try {
-
-                    $strNomeArquivoOriginal = $retornoWsAnexoLinha['NomeArquivo'];
-                    if ($strNomeArquivoOriginal == null) {
-                        $strNomeArquivoOriginal = $retornoWsAnexoLinha['nomeArquivo'];
-                    }
-
-                    // Ajustamos aqui o nome do arquivo limitado a 50 caracteres
-                    $strNomeArquivoOriginal = substr($strNomeArquivoOriginal, -50, 50);
-
-                    $ext = strtoupper(pathinfo($strNomeArquivoOriginal, PATHINFO_EXTENSION));
-                    $intIndexExtensao = array_search($ext, $arrExtensoesPermitidas);
-
-                    if (is_numeric($intIndexExtensao)) {
-                        $objAnexoRN = new AnexoRN();
-                        $strNomeArquivoUpload = $objAnexoRN->gerarNomeArquivoTemporario();
-
-                        $fp = fopen(DIR_SEI_TEMP . '/' . $strNomeArquivoUpload, 'w');
-
-                        //Busca o conteúdo do Anexo
-                        $arrDetalheAnexoManifestacao = MdCguEouvWS::apiRestRequest($retornoWsAnexoLinha['Links'][0]['href'], $this->token, 3);
-
-                        $strConteudoCodificado = $arrDetalheAnexoManifestacao['ConteudoZipadoEBase64'];
-
-                        $binConteudoDecodificado = '';
-                        for ($i = 0; $i < ceil(strlen($strConteudoCodificado) / 256); $i++) {
-                            $binConteudoDecodificado = $binConteudoDecodificado . base64_decode(substr($strConteudoCodificado, $i * 256, 256));
-                        }
-
-                        $binConteudoUnzip = $this->gzdecode($binConteudoDecodificado);
-
-                        fwrite($fp, $binConteudoUnzip);
-                        fclose($fp);
-
-                        $objAnexoManifestacao = new DocumentoAPI();
-
-                        if ($IdProtocolo && $IdProtocolo <> '') {
-                            $objAnexoManifestacao->setIdProcedimento($IdProtocolo);
-                        }
-                        $objAnexoManifestacao->setTipo('R');
-                        $objAnexoManifestacao->setIdSerie($this->idTipoDocumentoAnexoDadosManifestacao);
-                        $objAnexoManifestacao->setData(InfraData::getStrDataHoraAtual());
-                        $objAnexoManifestacao->setNomeArquivo($strNomeArquivoOriginal);
-                        $objAnexoManifestacao->setNumero($strNomeArquivoOriginal);
-                        $objAnexoManifestacao->setConteudo(base64_encode(file_get_contents(DIR_SEI_TEMP . '/' . $strNomeArquivoUpload)));
-
-                        if ($this->hashDuplicado(DIR_SEI_TEMP . '/' . $strNomeArquivoUpload, $numProtocoloFormatado)) {
-
-                        } else {
-                            if ($IdProtocolo && $IdProtocolo <> '') {
-                                $objSEIRN = new SeiRN();
-                                $objSEIRN->incluirDocumento($objAnexoManifestacao);
-                            }
-
-                            array_push($arrAnexosAdicionados, $objAnexoManifestacao);
-                        }
-                    } else {
-                        $ocorreuErroAdicionarAnexo = true;
-                        LogSEI::getInstance()->gravar('Importação de Manifestação ' . $numProtocoloFormatado . ': Arquivo ' . $strNomeArquivoOriginal . ' possui extensão inválida.', InfraLog::$INFORMACAO);
-                        continue;
-                    }
-                }
-                catch(Exception $e){
-                    $ocorreuErroAdicionarAnexo = true;
-                    $strMensagemErroAnexos = $strMensagemErroAnexos . " " . $e;
-                }
-            }
-
-            if($ocorreuErroAdicionarAnexo==true){
-                $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Um ou mais documentos anexos não foram importados corretamente: ' . $strMensagemErroAnexos, 'S', $tipoManifestacao);
-            }
-        }
-
-        return $arrAnexosAdicionados;
-    }
-
-    public function excluirProcessoComErro($idProcedimento){
-
-        try{
-            $objProcedimentoExcluirDTO = new ProcedimentoDTO();
-            $objProcedimentoExcluirDTO->setDblIdProcedimento($idProcedimento);
-            $objProcedimentoRN = new ProcedimentoRN();
-            $objProcedimentoRN->excluirRN0280($objProcedimentoExcluirDTO);
-            ProcedimentoINT::removerProcedimentoVisitado($idProcedimento);
-
-        }catch(Exception $e){
-            PaginaSEI::getInstance()->processarExcecao($e);
-        }
-
-    }
-
-    /**
-     * Verifica se já existe um Protocolo no SEI com o número (NUP)
-     */
-    public function verificarProtocoloExistente($numProtocoloFormatado)
-    {
-        $objProtocoloDTOExistente = new ProtocoloDTO();
-        $objProtocoloRNExistente = new ProtocoloRN();
-        $objProtocoloDTOExistente->retDblIdProtocolo();
-        $objProtocoloDTOExistente->retStrProtocoloFormatado();
-        $objProtocoloDTOExistente->setStrProtocoloFormatado($this->formatarProcesso($numProtocoloFormatado));
-        $objProtocoloDTOExistente = $objProtocoloRNExistente->consultarRN0186($objProtocoloDTOExistente);
-
-        return $objProtocoloDTOExistente;
-    }
-
-    /**
-     * Verifica se já existe o hash do arquivo na tabela anexo coluna hash
-     *
-     * @param $strArquivo
-     * @return bool
-     * @throws InfraException
-     */
-    public function hashDuplicado($strArquivo, $numProtocoloFormatado)
-    {
-        // Verifica hash do arquivo
-        $hash = md5_file($strArquivo);
-
-        // Select na tabela Anexe com o hash Criado
-        $consulta = new MdCguEouvConsultarHashBD($this->getObjInfraIBanco());
-        $res = $consulta->consultarHash($hash, $numProtocoloFormatado);
-
-        return count($res) > 0;
-    }
-
-    /**
-     * Função para simular login
-     *
-     * @param $siglaSistema
-     * @param $idServico
-     * @param $idUnidade
-     */
-    public function simulaLogin($siglaSistema, $idServico, $idUnidade)
-    {
-        try {
-
-            InfraDebug::getInstance()->gravar(__METHOD__);
-            InfraDebug::getInstance()->gravar('SIGLA SISTEMA:'.$siglaSistema);
-            InfraDebug::getInstance()->gravar('IDENTIFICACAO SERVICO:'.$idServico);
-            InfraDebug::getInstance()->gravar('ID UNIDADE:'.$idUnidade);
-
-            SessaoSEI::getInstance(false);
-
-            $objServicoDTO = $this->obterServico($siglaSistema, $idServico);
-
-            if ($idUnidade!=null) {
-                $objUnidadeDTO = $this->obterUnidade($idUnidade,null);
-            } else {
-                $objUnidadeDTO = null;
-            }
-
-            SessaoSEI::getInstance()->simularLogin(null, null, $objServicoDTO->getNumIdUsuario(), $objUnidadeDTO->getNumIdUnidade());
-
-        } catch(Exception $e) {
-            LogSEI::getInstance()->gravar('Ocorreu erro simular Login.'.$e);
-            PaginaSEI::getInstance()->processarExcecao($e);
-        }
-    }
-
-    /**
-     * Verifica o tipo de Recuso com base na API do FalaBR
-     *
-     * - IdInstanciaRecurso
-     * - 1 = primeira instância
-     * - 2 = segunda instância
-     *
-     * @param null $recursos
-     * @return string
-     *
-     * - 'P' - Padrão, não possui recursos de primeira ou segunda instância
-     * - 'R1' - Recurso de primeira instância
-     * - 'R2' - Recurso de segunda instância
-     */
-    public function verificaTipo($recursos = null, $default_response = 'P')
-    {
-        $response = $default_response;
-        if (isset($recursos)) {
-            if (isset($recursos['instancia'])) {
-                $response = $this->checkTipoRecurso($recursos);
-            } else {
-                foreach ($recursos as $recurso) {
-                    if ($this->checkTipoRecurso($recurso)) {
-                        $response = $this->checkTipoRecurso($recurso);
-                        break;
-                    }
-                }
-
-            }
-        }
-
-        return $response;
-    }
-
-    public function checkTipoRecurso($recurso)
-    {
-        if ($recurso['instancia']['IdInstanciaRecurso'] == 6) {
-            return 'PR'; // Pedido Revisão
-        }
-        if ($recurso['instancia']['IdInstanciaRecurso'] == 7) {
-            return 'R3'; // Recurso 3 instância
-        }
-        if ($recurso['instancia']['IdInstanciaRecurso'] == 4) {
-            return 'RE'; // Reclamação
-        }
-        if ($recurso['instancia']['IdInstanciaRecurso'] == 3) {
-            return 'RC'; // Recurso CGU
-        }
-        if ($recurso['instancia']['IdInstanciaRecurso'] == 2) {
-            return 'R2'; // Recurso 2 instância
-        }
-        if ($recurso['instancia']['IdInstanciaRecurso'] == 1) {
-            return 'R1'; // Recurso 1 instância
-        }
-
-        return 'R';
-    }
-
-    /**
-     * Verifica se existe recurso 'posterior' cadastrado
-     *
-     * - Posterior está entre aspas pq o recurso deve seguir uma órdem cronológica para se adequar à importação dos
-     * dados no SEI
-     *
-     * @param $idRelatorioImportacao
-     * @param $numProtocolo
-     * @param $tipoManifestacao
-     * @return bool|void
-     */
-    public function permiteImportacaoRecursoAtual($tipoManifestacaoAtual, $ultimoTipoRecursoImportado)
-    {
-        $debugLocal = false;
-
-        $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Verificando se existe algum recurso anterior');
-
-        // Se ja existir no log um recurso anterior verifica se o novo recurso e 'superior' ao já registrado
-        if ($tipoManifestacaoAtual) {
-
-            $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Existe log, validando o tipo de manifestação: ' . $tipoManifestacaoAtual . ' para o anteior existente: ' . $ultimoTipoRecursoImportado);
-
-            /**
-             * [CUIDADO] Nâo é possível utilizar o 'switch > case' aqui - não sei o por quê, mas não funciona....  @study (??)
-             */
-
-            /**
-             * Para criar um R1 (Recurso de Primeira Instância) pode existir somente PR (Pedido de Revisão),
-             * R (Pedido Inicial do e-Sic)
-             */
-            if ($tipoManifestacaoAtual == 'R1' && in_array($ultimoTipoRecursoImportado, ['R2', 'RC', 'R3'])) {
-                $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criação deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
-                return 'bloquear';
-            }
-
-            /**
-             * Para criar um R2 (Recurso de Segunda Instância) pode existir somente R1 (Recurso de Primeira Instância),
-             * PR (Pedido de Revisão), R (Pedido Inicial do e-Sic)
-             */
-            if ($tipoManifestacaoAtual == 'R2' && in_array($ultimoTipoRecursoImportado, ['RC', 'R3'])) {
-                $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criação deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
-                return 'bloquear';
-            }
-
-            /**
-             * Se for tipo 4 - Reclamação - não importar
-             */
-            if ($tipoManifestacaoAtual == 'RE') {
-                $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criação deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
-                return 'bloquear';
-            }
-
-            /**
-             * Para criar um RC ainda não existe regra interna definida
-             */
-//            if ($tipoManifestacaoAtual == 'RC') {}
-
-            /**
-             * Para criar um RC ainda não existe regra interna definida
-             */
-//            if ($tipoManifestacaoAtual == 'R3') {}
-
-            /**
-             * Para criar um PR (Pedido de Revisão) pode existir somente R (Pedido Inicial do e-Sic)
-             */
-            if ($tipoManifestacaoAtual == 'PR' && in_array($ultimoTipoRecursoImportado, ['R1', 'R2', 'RC', 'R3'])) {
-                $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criação deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
-                return 'bloquear';
-            }
-        }
-
-        /**
-         * Se existir algo na tabela, porém, não estiver definido na regra acima ou se não existir nenhum registro na
-         * tabela, a importação será permitida
-         * [CUIDADO] Caso haja duplicidade na importação, pode haver algum tipo de recurso não mapeado no campo
-         * "instancia": { "IdInstanciaRecurso": ## > na API do FalaBR
-         */
-        $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Vai permitir a criação desse recurso!');
-        return 'permitir';
     }
 }
 ?>

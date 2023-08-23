@@ -62,16 +62,6 @@ class MdCguEouvWS extends InfraWS {
         }
     }
 
-    /**
-     * @param $objWS
-     * @param $usuarioWebService
-     * @param $senhaUsuarioWebService
-     * @param $ultimaDataExecucao
-     * @param $dataAtual
-     * @return mixed
-     * @throws Exception
-     */
-
     public static function apiRestRequest($url, $token, $tipo)
     {
         $curl = curl_init();
@@ -171,76 +161,6 @@ class MdCguEouvWS extends InfraWS {
 
         $objEouvParametroRN = new MdCguEouvParametroRN();
         $objEouvParametroRN->alterarParametro($objEouvParametroDTO);
-
-    }
-
-    function  apiRequest($url, $params)
-    {
-
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://treinamentoouvidorias.cgu.gov.br/oauth/token",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_POSTFIELDS => "client_id=15&client_secret=rwkp6899&grant_type=password&username=wsIntegracaoSEI&password=teste123&undefined=",
-            CURLOPT_HTTPHEADER => array(
-                "Content-Type: application/x-www-form-urlencoded",
-                "Postman-Token: fbbee7e4-1efd-47be-b64a-ed2ee2dd4f1b",
-                "cache-control: no-cache"
-            ),
-        ));
-
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-
-        curl_close($curl);
-
-        if ($err) {
-            return "cURL Error #:" . $err;
-        } else {
-            return $response;
-        }
-
-    }
-
-    function apiRequestManifestacao($token){
-
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://treinamentoouvidorias.cgu.gov.br/api/manifestacoes?dataCadastroInicio=31/01/2019%2000:00:00&dataCadastroFim=04/02/2019%2023:59:59",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_POSTFIELDS => "undefined=",
-            CURLOPT_HTTPHEADER => array(
-                "Authorization: Bearer ZwchJxN61InSdNMS1mpN82lvvLCx8i1f24Wkve6wRjk_aHkEHlF3yaVljtndWtEzN2TfhGmhfZxcLMt0PBoksJPve1zcfj5JVW4l-j0C5P_6fclZEVVNZ-pYR_faU1QQBDD23vJnLhIyXZdc11mhS_gcu9SN1fWTWc3S_QD7nPPlhX14aHm4HOPrRcIHp5MO9fc0gLb-y0aOjZ9sNTC6hIFNnWX5HWzK1ZSj3eo0cquweAOC8wmqDXmXy4DWrAWBRvu3mYpF-BNJZXim31E8emjENMcXot6hAuTI-4TdxFSdQZsnn1KgoAmMQUDwRC8jwAeGZU6JXxBPWyUv06kFRv5udw1PeMclLFSF61DvU4FwIQmaRrACkc4a7hZtDlNfSVZ9E1KgQsaf0gHVD-WFOqbT8bMOLfHNSSkZ8lzI18QvpRBufjwhYBu_g4SwqCF6ZNjR_g",
-                "Postman-Token: 0744fa6c-14d5-4da7-9c2d-59c5a63dd47b",
-                "cache-control: no-cache"
-            ),
-        ));
-
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-
-        curl_close($curl);
-
-        if ($err) {
-            echo "cURL Error #:" . $err;
-        } else {
-            $response = utf8_decode($response);
-            echo $response;
-        }
-
-        exit();
 
     }
 
@@ -748,6 +668,7 @@ class MdCguEouvWS extends InfraWS {
 
         return $arrResult;
     }
+
     public function executarImportacaoLinha($retornoWsLinha, $tipoManifestacao = 'P')
     {
         $debugLocal = false;
@@ -936,6 +857,7 @@ class MdCguEouvWS extends InfraWS {
             $this->criarNovoProcesso($idTipoManifestacaoSei, $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'], $manifestacaoESic, $arrDetalheManifestacao, $idUnidadeDestino, $numProtocoloFormatado, $tipoManifestacao, $arrRecursosManifestacao);
         }
     }
+
     public function criarNovoProcesso($idTipoManifestacaoSei, $idTipoManifestacao, bool $manifestacaoESic, $arrDetalheManifestacao, $idUnidadeDestino, $numProtocoloFormatado, $tipoManifestacao, $arrRecursosManifestacao)
     {
         /**
@@ -1167,6 +1089,359 @@ class MdCguEouvWS extends InfraWS {
         } else {
             $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Existe recurso para o processo ' . $numProtocoloFormatado . ', porém este processo não existe no SEI. Provavelmente é um processo antes da data de início de utilização do módulo ou o Tipo de Manifestação do FalaBR não foi registrada para este módulo.', 'S', $tipoManifestacao);
         }
+    }
+
+    public function excluirProcessoComErro($idProcedimento){
+
+        try{
+            $objProcedimentoExcluirDTO = new ProcedimentoDTO();
+            $objProcedimentoExcluirDTO->setDblIdProcedimento($idProcedimento);
+            $objProcedimentoRN = new ProcedimentoRN();
+            $objProcedimentoRN->excluirRN0280($objProcedimentoExcluirDTO);
+            ProcedimentoINT::removerProcedimentoVisitado($idProcedimento);
+
+        }catch(Exception $e){
+            PaginaSEI::getInstance()->processarExcecao($e);
+        }
+
+    }
+
+    /**
+     * Verifica se já existe um Protocolo no SEI com o número (NUP)
+     */
+    public function verificarProtocoloExistente($numProtocoloFormatado)
+    {
+        $objProtocoloDTOExistente = new ProtocoloDTO();
+        $objProtocoloRNExistente = new ProtocoloRN();
+        $objProtocoloDTOExistente->retDblIdProtocolo();
+        $objProtocoloDTOExistente->retStrProtocoloFormatado();
+        $objProtocoloDTOExistente->setStrProtocoloFormatado($this->formatarProcesso($numProtocoloFormatado));
+        $objProtocoloDTOExistente = $objProtocoloRNExistente->consultarRN0186($objProtocoloDTOExistente);
+
+        return $objProtocoloDTOExistente;
+    }
+
+    /**
+     * Verifica se existe recurso 'posterior' cadastrado
+     *
+     * - Posterior está entre aspas pq o recurso deve seguir uma órdem cronológica para se adequar à importação dos
+     * dados no SEI
+     *
+     * @param $idRelatorioImportacao
+     * @param $numProtocolo
+     * @param $tipoManifestacao
+     * @return bool|void
+     */
+    public function permiteImportacaoRecursoAtual($tipoManifestacaoAtual, $ultimoTipoRecursoImportado)
+    {
+        $debugLocal = false;
+
+        $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Verificando se existe algum recurso anterior');
+
+        // Se ja existir no log um recurso anterior verifica se o novo recurso e 'superior' ao já registrado
+        if ($tipoManifestacaoAtual) {
+
+            $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Existe log, validando o tipo de manifestação: ' . $tipoManifestacaoAtual . ' para o anteior existente: ' . $ultimoTipoRecursoImportado);
+
+            /**
+             * [CUIDADO] Nâo é possível utilizar o 'switch > case' aqui - não sei o por quê, mas não funciona....  @study (??)
+             */
+
+            /**
+             * Para criar um R1 (Recurso de Primeira Instância) pode existir somente PR (Pedido de Revisão),
+             * R (Pedido Inicial do e-Sic)
+             */
+            if ($tipoManifestacaoAtual == 'R1' && in_array($ultimoTipoRecursoImportado, ['R2', 'RC', 'R3'])) {
+                $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criação deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
+                return 'bloquear';
+            }
+
+            /**
+             * Para criar um R2 (Recurso de Segunda Instância) pode existir somente R1 (Recurso de Primeira Instância),
+             * PR (Pedido de Revisão), R (Pedido Inicial do e-Sic)
+             */
+            if ($tipoManifestacaoAtual == 'R2' && in_array($ultimoTipoRecursoImportado, ['RC', 'R3'])) {
+                $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criação deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
+                return 'bloquear';
+            }
+
+            /**
+             * Se for tipo 4 - Reclamação - não importar
+             */
+            if ($tipoManifestacaoAtual == 'RE') {
+                $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criação deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
+                return 'bloquear';
+            }
+
+            /**
+             * Para criar um RC ainda não existe regra interna definida
+             */
+//            if ($tipoManifestacaoAtual == 'RC') {}
+
+            /**
+             * Para criar um RC ainda não existe regra interna definida
+             */
+//            if ($tipoManifestacaoAtual == 'R3') {}
+
+            /**
+             * Para criar um PR (Pedido de Revisão) pode existir somente R (Pedido Inicial do e-Sic)
+             */
+            if ($tipoManifestacaoAtual == 'PR' && in_array($ultimoTipoRecursoImportado, ['R1', 'R2', 'RC', 'R3'])) {
+                $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criação deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
+                return 'bloquear';
+            }
+        }
+
+        /**
+         * Se existir algo na tabela, porém, não estiver definido na regra acima ou se não existir nenhum registro na
+         * tabela, a importação será permitida
+         * [CUIDADO] Caso haja duplicidade na importação, pode haver algum tipo de recurso não mapeado no campo
+         * "instancia": { "IdInstanciaRecurso": ## > na API do FalaBR
+         */
+        $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Vai permitir a criação desse recurso!');
+        return 'permitir';
+    }
+
+    /**
+     * Verifica o tipo de Recuso com base na API do FalaBR
+     *
+     * - IdInstanciaRecurso
+     * - 1 = primeira instância
+     * - 2 = segunda instância
+     *
+     * @param null $recursos
+     * @return string
+     *
+     * - 'P' - Padrão, não possui recursos de primeira ou segunda instância
+     * - 'R1' - Recurso de primeira instância
+     * - 'R2' - Recurso de segunda instância
+     */
+    public function verificaTipo($recursos = null, $default_response = 'P')
+    {
+        $response = $default_response;
+        if (isset($recursos)) {
+            if (isset($recursos['instancia'])) {
+                $response = $this->checkTipoRecurso($recursos);
+            } else {
+                foreach ($recursos as $recurso) {
+                    if ($this->checkTipoRecurso($recurso)) {
+                        $response = $this->checkTipoRecurso($recurso);
+                        break;
+                    }
+                }
+
+            }
+        }
+
+        return $response;
+    }
+
+    public function limparErrosParaNup($numProtocoloComErro){
+        $objEouvRelatorioImportacaoDetalheDTO = new MdCguEouvRelatorioImportacaoDetalheDTO();
+        $objEouvRelatorioImportacaoDetalheDTO->retTodos(true);
+        $objEouvRelatorioImportacaoDetalheDTO->setStrProtocoloFormatado($numProtocoloComErro);
+        $objEouvRelatorioImportacaoDetalheDTO->setStrSinSucesso('N');
+
+        $objEouvRelatorioImportacaoDetalheRN = new MdCguEouvRelatorioImportacaoDetalheRN();
+        $objListaErros = $objEouvRelatorioImportacaoDetalheRN->listar($objEouvRelatorioImportacaoDetalheDTO);
+        foreach($objListaErros as $erro){
+            $erro->setStrSinSucesso('C');
+            $objEouvRelatorioImportacaoDetalheRN->alterar($erro);
+        }
+
+    }
+
+    public function gerarAnexosProtocolo($arrAnexosManifestacao, $numProtocoloFormatado, $tipoManifestacao = 'P', $IdProtocolo = false)
+    {
+        /**********************************************************************************************************************************************
+         * Início da importação de anexos de cada protocolo
+         * Desativado momentaneamente
+         */
+
+        $objInfraParametro = new InfraParametro(BancoSEI::getInstance());
+        $arrAnexosAdicionados = array();
+
+        $intTotAnexos = count($arrAnexosManifestacao);
+
+        if($intTotAnexos == 0){
+            //Não encontrou anexos..
+            return $arrAnexosAdicionados;
+        }
+
+        //Trata as extensÃµes permitidas
+        $objArquivoExtensaoDTO = new ArquivoExtensaoDTO();
+        $objArquivoExtensaoDTO->retNumIdArquivoExtensao();
+        $objArquivoExtensaoDTO->retStrExtensao();
+        $objArquivoExtensaoDTO->retStrDescricao();
+        $objArquivoExtensaoDTO->retNumTamanhoMaximo();
+        $objArquivoExtensaoRN = new ArquivoExtensaoRN();
+        $arrObjArquivoExtensaoDTO = $objArquivoExtensaoRN->listar($objArquivoExtensaoDTO);
+        $arrExtensoesPermitidas = array();
+
+        foreach($arrObjArquivoExtensaoDTO as $extensao){
+            array_push($arrExtensoesPermitidas, strtoupper ($extensao->getStrExtensao()));
+        }
+
+        foreach ($arrAnexosManifestacao as $retornoWsAnexoLista) {
+
+            foreach ($this->verificaRetornoWS($retornoWsAnexoLista) as $retornoWsAnexoLinha) {
+                try {
+
+                    $strNomeArquivoOriginal = $retornoWsAnexoLinha['NomeArquivo'];
+                    if ($strNomeArquivoOriginal == null) {
+                        $strNomeArquivoOriginal = $retornoWsAnexoLinha['nomeArquivo'];
+                    }
+
+                    // Ajustamos aqui o nome do arquivo limitado a 50 caracteres
+                    $strNomeArquivoOriginal = substr($strNomeArquivoOriginal, -50, 50);
+
+                    $ext = strtoupper(pathinfo($strNomeArquivoOriginal, PATHINFO_EXTENSION));
+                    $intIndexExtensao = array_search($ext, $arrExtensoesPermitidas);
+
+                    if (is_numeric($intIndexExtensao)) {
+                        $objAnexoRN = new AnexoRN();
+                        $strNomeArquivoUpload = $objAnexoRN->gerarNomeArquivoTemporario();
+
+                        $fp = fopen(DIR_SEI_TEMP . '/' . $strNomeArquivoUpload, 'w');
+
+                        //Busca o conteúdo do Anexo
+                        $arrDetalheAnexoManifestacao = MdCguEouvWS::apiRestRequest($retornoWsAnexoLinha['Links'][0]['href'], $this->token, 3);
+
+                        $strConteudoCodificado = $arrDetalheAnexoManifestacao['ConteudoZipadoEBase64'];
+
+                        $binConteudoDecodificado = '';
+                        for ($i = 0; $i < ceil(strlen($strConteudoCodificado) / 256); $i++) {
+                            $binConteudoDecodificado = $binConteudoDecodificado . base64_decode(substr($strConteudoCodificado, $i * 256, 256));
+                        }
+
+                        $binConteudoUnzip = $this->gzdecode($binConteudoDecodificado);
+
+                        fwrite($fp, $binConteudoUnzip);
+                        fclose($fp);
+
+                        $objAnexoManifestacao = new DocumentoAPI();
+
+                        if ($IdProtocolo && $IdProtocolo <> '') {
+                            $objAnexoManifestacao->setIdProcedimento($IdProtocolo);
+                        }
+                        $objAnexoManifestacao->setTipo('R');
+                        $objAnexoManifestacao->setIdSerie($this->idTipoDocumentoAnexoDadosManifestacao);
+                        $objAnexoManifestacao->setData(InfraData::getStrDataHoraAtual());
+                        $objAnexoManifestacao->setNomeArquivo($strNomeArquivoOriginal);
+                        $objAnexoManifestacao->setNumero($strNomeArquivoOriginal);
+                        $objAnexoManifestacao->setConteudo(base64_encode(file_get_contents(DIR_SEI_TEMP . '/' . $strNomeArquivoUpload)));
+
+                        if ($this->hashDuplicado(DIR_SEI_TEMP . '/' . $strNomeArquivoUpload, $numProtocoloFormatado)) {
+
+                        } else {
+                            if ($IdProtocolo && $IdProtocolo <> '') {
+                                $objSEIRN = new SeiRN();
+                                $objSEIRN->incluirDocumento($objAnexoManifestacao);
+                            }
+
+                            array_push($arrAnexosAdicionados, $objAnexoManifestacao);
+                        }
+                    } else {
+                        $ocorreuErroAdicionarAnexo = true;
+                        LogSEI::getInstance()->gravar('Importação de Manifestação ' . $numProtocoloFormatado . ': Arquivo ' . $strNomeArquivoOriginal . ' possui extensão inválida.', InfraLog::$INFORMACAO);
+                        continue;
+                    }
+                }
+                catch(Exception $e){
+                    $ocorreuErroAdicionarAnexo = true;
+                    $strMensagemErroAnexos = $strMensagemErroAnexos . " " . $e;
+                }
+            }
+
+            if($ocorreuErroAdicionarAnexo==true){
+                $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Um ou mais documentos anexos não foram importados corretamente: ' . $strMensagemErroAnexos, 'S', $tipoManifestacao);
+            }
+        }
+
+        return $arrAnexosAdicionados;
+    }
+
+
+    /**
+     * Verifica se já existe o hash do arquivo na tabela anexo coluna hash
+     *
+     * @param $strArquivo
+     * @return bool
+     * @throws InfraException
+     */
+    public function hashDuplicado($strArquivo, $numProtocoloFormatado)
+    {
+        // Verifica hash do arquivo
+        $hash = md5_file($strArquivo);
+
+        // Select na tabela Anexe com o hash Criado
+        $consulta = new MdCguEouvConsultarHashBD($this->getObjInfraIBanco());
+        $res = $consulta->consultarHash($hash, $numProtocoloFormatado);
+
+        return count($res) > 0;
+    }
+
+    /**
+     * Função para simular login
+     *
+     * @param $siglaSistema
+     * @param $idServico
+     * @param $idUnidade
+     */
+    public function simulaLogin($siglaSistema, $idServico, $idUnidade)
+    {
+        try {
+
+            InfraDebug::getInstance()->gravar(__METHOD__);
+            InfraDebug::getInstance()->gravar('SIGLA SISTEMA:'.$siglaSistema);
+            InfraDebug::getInstance()->gravar('IDENTIFICACAO SERVICO:'.$idServico);
+            InfraDebug::getInstance()->gravar('ID UNIDADE:'.$idUnidade);
+
+            SessaoSEI::getInstance(false);
+
+            $objServicoDTO = $this->obterServico($siglaSistema, $idServico);
+
+            if ($idUnidade!=null) {
+                $objUnidadeDTO = $this->obterUnidade($idUnidade,null);
+            } else {
+                $objUnidadeDTO = null;
+            }
+
+            SessaoSEI::getInstance()->simularLogin(null, null, $objServicoDTO->getNumIdUsuario(), $objUnidadeDTO->getNumIdUnidade());
+
+        } catch(Exception $e) {
+            LogSEI::getInstance()->gravar('Ocorreu erro simular Login.'.$e);
+            PaginaSEI::getInstance()->processarExcecao($e);
+        }
+    }
+
+    public function checkTipoRecurso($recurso)
+    {
+        if ($recurso['instancia']['IdInstanciaRecurso'] == 6) {
+            return 'PR'; // Pedido Revisão
+        }
+        if ($recurso['instancia']['IdInstanciaRecurso'] == 7) {
+            return 'R3'; // Recurso 3 instância
+        }
+        if ($recurso['instancia']['IdInstanciaRecurso'] == 4) {
+            return 'RE'; // Reclamação
+        }
+        if ($recurso['instancia']['IdInstanciaRecurso'] == 3) {
+            return 'RC'; // Recurso CGU
+        }
+        if ($recurso['instancia']['IdInstanciaRecurso'] == 2) {
+            return 'R2'; // Recurso 2 instância
+        }
+        if ($recurso['instancia']['IdInstanciaRecurso'] == 1) {
+            return 'R1'; // Recurso 1 instância
+        }
+
+        return 'R';
+    }
+    // GZIP DECODE
+    function gzdecode($data)
+    {
+        return gzinflate(substr($data, 10, -8));
     }
 
 }
