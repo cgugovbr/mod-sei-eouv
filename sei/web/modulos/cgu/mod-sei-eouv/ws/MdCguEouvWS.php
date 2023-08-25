@@ -818,7 +818,7 @@ class MdCguEouvWS extends InfraWS {
                             $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinha] Importando o recurso do protocolo: ' . $numProtocoloFormatado);
 
                             // Carregar documento recurso
-                            $mdCguEouvGerarPdfEsic = new MdCguEouvGerarPdfEsic();
+                            $mdCguEouvGerarPdfEsic = new MdCguEouvGerarPdfEsicWS();
                             $mdCguEouvGerarPdfEsic->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacao, $objProtocoloDTOExistente->getDblIdProtocolo(), $tipo_recurso);
                             LogSEI::getInstance()->gravar('Módulo Integração FalaBR - Importação de Recurso ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . $anexoCount, InfraLog::$INFORMACAO);
                             $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Recurso com protocolo ' . $numProtocoloFormatado . ' importado com sucesso com ' . $anexoCount . ' anexos incluidos no protocolo.', 'S', $tipoManifestacao, $dataPrazoAtendimento);
@@ -946,10 +946,10 @@ class MdCguEouvWS extends InfraWS {
              * Verificar o tipo de documento a ser importado para gerar o PDF conforme tipo de documento
              */
             if ($manifestacaoESic) {
-                $mdCguEouvGerarPdfEsic = new MdCguEouvGerarPdfEsic();
+                $mdCguEouvGerarPdfEsic = new MdCguEouvGerarPdfEsicWS();
                 $documentoManifestacao = $mdCguEouvGerarPdfEsic->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacao);
             } else {
-                $mdCguEouvGerarPdfInicial = new MdCguEouvGerarPdfInicial($arrDetalheManifestacao);
+                $mdCguEouvGerarPdfInicial = new MdCguEouvGerarPdfInicialWS($arrDetalheManifestacao);
                 $documentoManifestacao = $mdCguEouvGerarPdfInicial->gerarPDFPedidoInicial($this->idTipoDocumentoAnexoDadosManifestacao);
             }
 
@@ -1067,10 +1067,10 @@ class MdCguEouvWS extends InfraWS {
                              */
                             if ($tipo_recurso <> 'R1') {
                                 $arrRecursosManifestacaoComAnteriores = $this->executarServicoConsultaRecursos($this->urlWebServiceESicRecursos, $this->token, null, null, $numProtocoloSemFormatacao);
-                                $mdCguEouvGerarPdfEsic = new MdCguEouvGerarPdfEsic();
+                                $mdCguEouvGerarPdfEsic = new MdCguEouvGerarPdfEsicWS();
                                 $mdCguEouvGerarPdfEsic->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacaoComAnteriores, $objProtocoloDTOExistente->getDblIdProtocolo(), $tipo_recurso);
                             } else {
-                                $mdCguEouvGerarPdfEsic = new MdCguEouvGerarPdfEsic();
+                                $mdCguEouvGerarPdfEsic = new MdCguEouvGerarPdfEsicWS();
                                 $mdCguEouvGerarPdfEsic->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacao, $objProtocoloDTOExistente->getDblIdProtocolo(), $tipo_recurso);
                             }
 
