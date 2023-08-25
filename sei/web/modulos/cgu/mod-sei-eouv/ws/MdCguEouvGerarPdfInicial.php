@@ -44,6 +44,10 @@ class MdCguEouvGerarPdfInicial
      protected $campos_adicionais;
      protected $ocorreuErroAdicionarAnexo;
 
+    public function getObjInfraLog(){
+        return LogSEI::getInstance();
+    }
+
     public function __construct($retornoWsLinha)
     {
         $this->nup = $retornoWsLinha['NumerosProtocolo'][0];

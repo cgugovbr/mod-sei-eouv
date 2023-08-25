@@ -13,6 +13,9 @@ require_once dirname(__FILE__) . '/../../../../SEI.php';
 
 class MdCguEouvGerarPdfEsic
 {
+    public function getObjInfraLog(){
+        return LogSEI::getInstance();
+    }
     public function gerarPdf($retornoWsLinha, $retornoWsRecursos, $ocorreuErroAdicionarAnexo)
     {
         $pdf = new InfraPDF("P", "pt", "A4");
