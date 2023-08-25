@@ -694,7 +694,7 @@ class MdCguEouvWS extends InfraWS {
         return $arrResult;
     }
 
-    public function executarImportacaoLinha($retornoWsLinha, $tipoManifestacao = 'P')
+    public function executarImportacaoLinha($retornoWsLinha, $tipoManifestacao = 'P', $idRelatorioImportacao)
     {
         $debugLocal = false;
 
@@ -728,7 +728,7 @@ class MdCguEouvWS extends InfraWS {
         $numIdTipoManifestacao = $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'];
         if ($numIdTipoManifestacao > 8) {
             // Se não for marca como sucesso para evitar reimportação na próxima execução.
-            $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao,
+            $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao,
                 'Tipo de manifestação não suportado (ID = '.$numIdTipoManifestacao.'). Não será importada.', 'S');
             return;
         }

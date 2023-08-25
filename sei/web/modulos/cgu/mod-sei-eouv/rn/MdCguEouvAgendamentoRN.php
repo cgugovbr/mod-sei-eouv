@@ -309,7 +309,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 if (count($arrManifestacoes) > 0) {
                     $semManifestacoesEncontradas = false;
                     foreach ($arrManifestacoes as $retornoWsLinha) {
-                        $mdCguEouvWS->executarImportacaoLinha($retornoWsLinha);
+                        $mdCguEouvWS->executarImportacaoLinha($retornoWsLinha, 'P', $idRelatorioImportacao);
                     }
                 }
 
@@ -500,7 +500,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     $semManifestacoesEncontradas = false;
                     foreach ($arrManifestacoes as $retornoWsLinha) {
                         $debugLocal && LogSEI::getInstance()->gravar('Inicia importação por Linha');
-                        $mdCguEouvWS->executarImportacaoLinha($retornoWsLinha, 'R');
+                        $mdCguEouvWS->executarImportacaoLinha($retornoWsLinha, 'R',$idRelatorioImportacao);
                     }
                 }
 
