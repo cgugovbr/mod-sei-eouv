@@ -879,11 +879,11 @@ class MdCguEouvWS extends InfraWS {
                 }
             }
         } else {
-            $this->criarNovoProcesso($idTipoManifestacaoSei, $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'], $manifestacaoESic, $arrDetalheManifestacao, $idUnidadeDestino, $numProtocoloFormatado, $tipoManifestacao, $arrRecursosManifestacao);
+            $this->criarNovoProcesso($idTipoManifestacaoSei, $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'], $manifestacaoESic, $arrDetalheManifestacao, $idUnidadeDestino, $numProtocoloFormatado, $tipoManifestacao, $arrRecursosManifestacao, $idRelatorioImportacao);
         }
     }
 
-    public function criarNovoProcesso($idTipoManifestacaoSei, $idTipoManifestacao, bool $manifestacaoESic, $arrDetalheManifestacao, $idUnidadeDestino, $numProtocoloFormatado, $tipoManifestacao, $arrRecursosManifestacao)
+    public function criarNovoProcesso($idTipoManifestacaoSei, $idTipoManifestacao, bool $manifestacaoESic, $arrDetalheManifestacao, $idUnidadeDestino, $numProtocoloFormatado, $tipoManifestacao, $arrRecursosManifestacao, $idRelatorioImportacao)
     {
         /**
          * Inicia criação do Procedimento de criação de novo Processo
@@ -958,14 +958,15 @@ class MdCguEouvWS extends InfraWS {
             array_unshift($arrDocumentos, $documentoManifestacao);
             $objEntradaGerarProcedimentoAPI->setDocumentos($arrDocumentos);
             $objSaidaGerarProcedimentoAPI = $objSeiRN->gerarProcedimento($objEntradaGerarProcedimentoAPI);
-            $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Protocolo ' . $arrDetalheManifestacao['numProtocolo'] . ' gravado com sucesso.', 'S', $tipoManifestacao);
+            $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Protocolo ' . $arrDetalheManifestacao['numProtocolo'] . ' gravado com sucesso.', 'S', $tipoManifestacao);
 
         } catch (Exception $e) {
 
             if ($objSaidaGerarProcedimentoAPI != null and $objSaidaGerarProcedimentoAPI->getIdProcedimento() > 0) {
                 $this->excluirProcessoComErro($objSaidaGerarProcedimentoAPI->getIdProcedimento());
             }
-            $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Erro na gravação: ' . $e, 'N', $tipoManifestacao);
+            var_dump();
+            $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Erro na gravação: ' . $e, 'N', $tipoManifestacao);
         }
     }
 
