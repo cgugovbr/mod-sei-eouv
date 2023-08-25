@@ -18,7 +18,32 @@ require_once dirname(__FILE__) . '/../../../../SEI.php';
 error_reporting(E_ALL); ini_set('display_errors', '1');
 
 class MdCguEouvWS extends InfraWS {
+    protected $urlWebServiceEOuv;
+    protected $urlWebServiceESicRecursos;
+    protected $idTipoDocumentoAnexoDadosManifestacao;
+    protected $idUnidadeOuvidoria;
+    protected $idUnidadeEsicPrincipal;
+    protected $idUnidadeRecursoPrimeiraInstancia;
+    protected $idUnidadeRecursoSegundaInstancia;
+    protected $idUnidadeRecursoTerceiraInstancia;
+    protected $idUnidadeRecursoPedidoRevisao;
+    protected $token;
 
+    public function __construct($urlWebServiceEOuv, $urlWebServiceESicRecursos, $idTipoDocumentoAnexoDadosManifestacao,
+            $idUnidadeOuvidoria, $idUnidadeEsicPrincipal, $idUnidadeRecursoPrimeiraInstancia, $idUnidadeRecursoSegundaInstancia,
+            $idUnidadeRecursoTerceiraInstancia, $idUnidadeRecursoPedidoRevisao, $token)
+    {
+        $this->urlWebServiceEOuv = $urlWebServiceEOuv;
+        $this->urlWebServiceESicRecursos =$urlWebServiceESicRecursos;
+        $this->idTipoDocumentoAnexoDadosManifestacao = $idTipoDocumentoAnexoDadosManifestacao;
+        $this->idUnidadeOuvidoria = $idUnidadeOuvidoria;
+        $this->idUnidadeEsicPrincipal = $idUnidadeEsicPrincipal;
+        $this->idUnidadeRecursoPrimeiraInstancia = $idUnidadeRecursoPrimeiraInstancia;
+        $this->idUnidadeRecursoSegundaInstancia = $idUnidadeRecursoSegundaInstancia;
+        $this->idUnidadeRecursoTerceiraInstancia = $idUnidadeRecursoTerceiraInstancia;
+        $this->idUnidadeRecursoPedidoRevisao = $idUnidadeRecursoPedidoRevisao;
+        $this->token = $token;
+    }
     public function getObjInfraLog(){
         return LogSEI::getInstance();
     }
@@ -677,7 +702,7 @@ class MdCguEouvWS extends InfraWS {
         $objProcedimentoDTO->setDblIdProcedimento(null);
 
         $linkDetalheManifestacao = $retornoWsLinha['Links'][0]['href'];
-        $arrDetalheManifestacao = MdCguEouvWS::apiRestRequest($linkDetalheManifestacao, $this->token, 2);
+        $arrDetalheManifestacao = self::apiRestRequest($linkDetalheManifestacao, $this->token, 2);
 
         /**
          * Verifica Tipo de Manifestação e-Ouv ou e-Sic
@@ -694,7 +719,7 @@ class MdCguEouvWS extends InfraWS {
             /**
              * Importar Recursos caso seja manifestação e-Sic (Tipo 8)
              */
-            $arrRecursosManifestacao = MdCguEouvWS::apiRestRequest($this->urlWebServiceESicRecursos . '?NumProtocolo=' . $arrDetalheManifestacao['NumerosProtocolo'][0], $this->token, 2);
+            $arrRecursosManifestacao = self::apiRestRequest($this->urlWebServiceESicRecursos . '?NumProtocolo=' . $arrDetalheManifestacao['NumerosProtocolo'][0], $this->token, 2);
         }
 
         $numProtocoloFormatado =  $this->formatarProcesso($arrDetalheManifestacao['NumerosProtocolo'][0]);
@@ -1033,7 +1058,7 @@ class MdCguEouvWS extends InfraWS {
                             $numProtocoloSemFormatacao = str_replace(['.', '/', '-'], ['', '', ''], $numProtocoloFormatado);
                             $retornoWsLinha = $this->executarServicoConsultaManifestacoes($this->urlWebServiceEOuv, $this->token, null, null, $numProtocoloSemFormatacao, $this->idRelatorioImportacao);
                             $linkDetalheManifestacao = $retornoWsLinha[0]['Links'][0]['href'];
-                            $arrDetalheManifestacao = MdCguEouvWS::apiRestRequest($linkDetalheManifestacao, $this->token, 2);
+                            $arrDetalheManifestacao = self::apiRestRequest($linkDetalheManifestacao, $this->token, 2);
 
                             $debugLocal && LogSEI::getInstance()->gravar('Importando Recurso processo: ' . $numProtocoloFormatado . ' | tipo: ' . $tipo_recurso);
 
@@ -1305,7 +1330,7 @@ class MdCguEouvWS extends InfraWS {
                         $fp = fopen(DIR_SEI_TEMP . '/' . $strNomeArquivoUpload, 'w');
 
                         //Busca o conteúdo do Anexo
-                        $arrDetalheAnexoManifestacao = MdCguEouvWS::apiRestRequest($retornoWsAnexoLinha['Links'][0]['href'], $this->token, 3);
+                        $arrDetalheAnexoManifestacao = self::apiRestRequest($retornoWsAnexoLinha['Links'][0]['href'], $this->token, 3);
 
                         $strConteudoCodificado = $arrDetalheAnexoManifestacao['ConteudoZipadoEBase64'];
 

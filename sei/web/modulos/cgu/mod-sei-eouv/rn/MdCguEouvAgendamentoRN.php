@@ -240,7 +240,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $isBolHabilitada = SessaoSEI::getInstance(false)->isBolHabilitada();
         SessaoSEI::getInstance()->setBolHabilitada(false);
 
-        $mdCguEouvWS = new MdCguEouvWS();
+        $mdCguEouvWS = new MdCguEouvWS($this->urlWebServiceEOuv, $this->urlWebServiceESicRecursos, $this->idTipoDocumentoAnexoDadosManifestacao,
+            $this->idUnidadeOuvidoria, $this->idUnidadeEsicPrincipal, $this->idUnidadeRecursoPrimeiraInstancia, $this->idUnidadeRecursoSegundaInstancia,
+            $this->idUnidadeRecursoTerceiraInstancia, $this->idUnidadeRecursoPedidoRevisao, $this->token);
         // Simula login inicial
         $mdCguEouvWS->simulaLogin($this->siglaSistema, $this->identificacaoServico, $this->idUnidadeOuvidoria);
 
@@ -251,7 +253,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
             if ($objUltimaExecucao != null) {
                 $ultimaDataExecucao = $objUltimaExecucao->getDthDthPeriodoFinal();
-                $idUltimaExecucao = $objUltimaExecucao->getNumIdRelatorioImportacao();
             } //Primeira execução ou nenhuma executada com sucesso
             else {
                 $ultimaDataExecucao = $this->dataInicialImportacaoManifestacoes;
