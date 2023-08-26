@@ -11,12 +11,10 @@ error_reporting(E_ALL); ini_set('display_errors', '1');
 
 require_once dirname(__FILE__) . '/../../../../SEI.php';
 
-class MdCguEouvGerarPdfEsicWS extends InfraWS
+class MdCguEouvGerarPdfEsic
 {
-    public function getObjInfraLog(){
-        return LogSEI::getInstance();
-    }
-    public function gerarPdf($retornoWsLinha, $retornoWsRecursos, $ocorreuErroAdicionarAnexo)
+
+    public static function gerarPdf($retornoWsLinha, $retornoWsRecursos, $ocorreuErroAdicionarAnexo)
     {
         $pdf = new InfraPDF("P", "pt", "A4");
 
@@ -557,65 +555,5 @@ class MdCguEouvGerarPdfEsicWS extends InfraWS
         }
         return $pdf;
     }
-
-    public function gerarPDFDocumentoESic($retornoWsLinha, $retornoWsRecursos = null, $IdProtocolo = false, $tipo_recurso = '')
-    {
-        /**
-         * Testa acessar dado da manifestação se não conseguir salva log
-         */
-        try {
-            $IdTipoManifestacao = $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'];
-        } catch (Exception $e) {
-            $this->gravarLogLinha($IdProtocolo ? $IdProtocolo : 'n/a', $idRelatorioImportacao, substr('ERRO-esic|' . $retornoWsLinha . '|' . $e, 0, 500), 'N');
-            return;
-        }
-
-        /***********************************************************************************************
-         * DADOS INICIAIS DA MANIFESTAÇÃO
-         * Primeiro é gerado o PDF com todas as informações referentes a Manifestação e mais abaixo
-         * é incluído como um anexo do novo Processo Gerado
-         * *********************************************************************************************/
-
-        $pdf = $this->gerarPdf($retornoWsLinha, $retornoWsRecursos, $this->ocorreuErroAdicionarAnexo);
-
-        $objAnexoRN = new AnexoRN();
-        $strNomeArquivoInicialUpload = $objAnexoRN->gerarNomeArquivoTemporario();
-
-        $pdf->Output(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", "F");
-
-        //Renomeuia tirando a extencaoo para o SEI trabalhar o Arquivo
-        rename(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload);
-
-        $objDocumentoManifestacao = new DocumentoAPI();
-        $objDocumentoManifestacao->setTipo('R');
-        if ($IdProtocolo && $IdProtocolo <> '') {
-            $objDocumentoManifestacao->setIdProcedimento($IdProtocolo);
-        }
-        if ($tipo_recurso == 'R1') {
-            $nomeDocumentoArvore = 'Primeira Instância';
-        } elseif ($tipo_recurso == 'R2') {
-            $nomeDocumentoArvore = 'Segunda Instância';
-        } elseif ($tipo_recurso == 'R3' || $tipo_recurso == 'RC') {
-            $nomeDocumentoArvore = 'Terceira Instância';
-        } elseif ($tipo_recurso == 'PR') {
-            $nomeDocumentoArvore = 'Pedido Revisão';
-        } else {
-            $nomeDocumentoArvore = 'Pedido Inicial';
-        }
-
-        $objDocumentoManifestacao->setNumero($nomeDocumentoArvore);
-        $objDocumentoManifestacao->setIdSerie($this->idTipoDocumentoAnexoDadosManifestacao);
-        $objDocumentoManifestacao->setData($retornoWsLinha['DataCadastro']);
-        $objDocumentoManifestacao->setNomeArquivo('RelatorioDadosManifestacao.pdf');
-        $objDocumentoManifestacao->setConteudo(base64_encode(file_get_contents(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload)));
-
-        if ($IdProtocolo && $IdProtocolo <> '') {
-            $objSEIRN = new SeiRN();
-            $objSEIRN->incluirDocumento($objDocumentoManifestacao);
-        }
-
-        return $objDocumentoManifestacao;
-    }
-
 
 }

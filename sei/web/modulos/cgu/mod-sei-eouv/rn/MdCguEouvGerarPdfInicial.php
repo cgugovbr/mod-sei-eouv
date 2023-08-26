@@ -11,7 +11,7 @@ error_reporting(E_ALL); ini_set('display_errors', '1');
 
 require_once dirname(__FILE__) . '/../../../../SEI.php';
 
-class MdCguEouvGerarPdfInicialWS extends InfraWS
+class MdCguEouvGerarPdfInicial
 {
      protected $nup;
      protected $dt_cadastro;
@@ -43,10 +43,6 @@ class MdCguEouvGerarPdfInicialWS extends InfraWS
      protected $envolvidos;
      protected $campos_adicionais;
      protected $ocorreuErroAdicionarAnexo;
-
-    public function getObjInfraLog(){
-        return LogSEI::getInstance();
-    }
 
     public function __construct($retornoWsLinha)
     {
@@ -363,31 +359,4 @@ class MdCguEouvGerarPdfInicialWS extends InfraWS
         return $pdf;
     }
 
-    public function gerarPDFPedidoInicial($idTipoDocumentoAnexoDadosManifestacao){
-
-        /***********************************************************************************************
-         * // DADOS INICIAIS DA MANIFESTAÇÃO
-         * Primeiro é gerado o PDF com todas as informações referentes a Manifestação, e mais abaixo
-         * é incluindo como um anexo do novo Processo Gerado
-         * **********************************************************************************************/
-
-        $pdf = $this->gerarPdfInicial();
-
-        $objAnexoRN = new AnexoRN();
-        $strNomeArquivoInicialUpload = $objAnexoRN->gerarNomeArquivoTemporario();
-
-        $pdf->Output(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", "F");
-
-        //Renomeia tirando a extensao para o SEI trabalhar o Arquivo
-        rename(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload);
-
-        $objDocumentoManifestacao = new DocumentoAPI();
-        $objDocumentoManifestacao->setTipo('R');
-        $objDocumentoManifestacao->setIdSerie($idTipoDocumentoAnexoDadosManifestacao);
-        $objDocumentoManifestacao->setData($this->dtCadastro);
-        $objDocumentoManifestacao->setNomeArquivo('RelatórioDadosManifestação.pdf');
-        $objDocumentoManifestacao->setConteudo(base64_encode(file_get_contents(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload)));
-
-        return $objDocumentoManifestacao;
-    }
 }
