@@ -42,6 +42,41 @@ class MdCguEouvAgendamentoRN extends InfraRN
         //ini_set('memory_limit', '1024M');
     }
 
+    /**
+     * @param MdCguEouvRelatorioImportacaoDTO $objEouvRelatorioImportacaoDTO
+     * @param string $SinSucessoExecucao
+     * @param string $textoMensagemFinal
+     * @param MdCguEouvRelatorioImportacaoRN $objEouvRelatorioImportacaoRN
+     * @return void
+     */
+    public function gravarRelatorioImportacaoSucesso(MdCguEouvRelatorioImportacaoDTO $objEouvRelatorioImportacaoDTO, string $SinSucessoExecucao, string $textoMensagemFinal, MdCguEouvRelatorioImportacaoRN $objEouvRelatorioImportacaoRN)
+    {
+        $objEouvRelatorioImportacaoDTO2 = new MdCguEouvRelatorioImportacaoDTO();
+
+        $objEouvRelatorioImportacaoDTO2->setNumIdRelatorioImportacao($objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao());
+        $objEouvRelatorioImportacaoDTO2->setStrSinSucesso($SinSucessoExecucao);
+        $objEouvRelatorioImportacaoDTO2->setStrDeLogProcessamento($textoMensagemFinal);
+        $objEouvRelatorioImportacaoDTO2->setStrTipManifestacao('R');
+        $objEouvRelatorioImportacaoRN->alterar($objEouvRelatorioImportacaoDTO2);
+    }
+
+    /**
+     * @param MdCguEouvRelatorioImportacaoDTO $objEouvRelatorioImportacaoDTO
+     * @param Exception $e
+     * @param MdCguEouvRelatorioImportacaoRN $objEouvRelatorioImportacaoRN
+     * @return void
+     */
+    public function gravarRelatorioImportacaoErro(MdCguEouvRelatorioImportacaoDTO $objEouvRelatorioImportacaoDTO, Exception $e, MdCguEouvRelatorioImportacaoRN $objEouvRelatorioImportacaoRN)
+    {
+        $objEouvRelatorioImportacaoDTO3 = new MdCguEouvRelatorioImportacaoDTO();
+        $objEouvRelatorioImportacaoDTO3->setNumIdRelatorioImportacao($objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao());
+        $strMensagem = 'Ocorreu um erro no processamento:' . $e;
+        $strMensagem = substr($strMensagem, 0, 500);
+        $objEouvRelatorioImportacaoDTO3->setStrDeLogProcessamento($strMensagem);
+
+        $objEouvRelatorioImportacaoRN->alterar($objEouvRelatorioImportacaoDTO3);
+    }
+
     protected function inicializarObjInfraIBanco()
     {
         return BancoSEI::getInstance();
@@ -168,24 +203,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
             }
 
             //Grava a execução com sucesso se tiver corrido tudo bem
-            $objEouvRelatorioImportacaoDTO2 = new MdCguEouvRelatorioImportacaoDTO();
-
-            $objEouvRelatorioImportacaoDTO2->setNumIdRelatorioImportacao($objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao());
-            $objEouvRelatorioImportacaoDTO2->setStrSinSucesso($SinSucessoExecucao);
-            $objEouvRelatorioImportacaoDTO2->setStrDeLogProcessamento($textoMensagemFinal);
-            $objEouvRelatorioImportacaoRN->alterar($objEouvRelatorioImportacaoDTO2);
-
-
+            $this->gravarRelatorioImportacaoSucesso($objEouvRelatorioImportacaoDTO, $SinSucessoExecucao, $textoMensagemFinal, $objEouvRelatorioImportacaoRN);
 
         } catch(Exception $e) {
-
-            $objEouvRelatorioImportacaoDTO3 = new MdCguEouvRelatorioImportacaoDTO();
-            $objEouvRelatorioImportacaoDTO3->setNumIdRelatorioImportacao($objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao());
-            $strMensagem = 'Ocorreu um erro no processamento:' . $e;
-            $strMensagem = substr($strMensagem, 0, 500);
-            $objEouvRelatorioImportacaoDTO3->setStrDeLogProcessamento($strMensagem);
-
-            $objEouvRelatorioImportacaoRN->alterar($objEouvRelatorioImportacaoDTO3);
+            $this->gravarRelatorioImportacaoErro($objEouvRelatorioImportacaoDTO, $e, $objEouvRelatorioImportacaoRN);
 
             PaginaSEI::getInstance()->processarExcecao($e);
         } finally {
@@ -257,7 +278,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $qtdManifestacoesAntigas = 0;
             $semRecursosEncontrados = true;
             $qtdRecursosNovos = 0;
-            $qtdRecursosAntigos = 0;
 
             /**
              * A função abaixo gravarLogImportacao recebe o tipo de manifestação 'R' (Recursos) para as manifestações do e-Sic
@@ -379,24 +399,12 @@ class MdCguEouvAgendamentoRN extends InfraRN
             }
 
             //Grava a execução com sucesso se tiver corrido tudo bem
-            $objEouvRelatorioImportacaoDTO2 = new MdCguEouvRelatorioImportacaoDTO();
-
-            $objEouvRelatorioImportacaoDTO2->setNumIdRelatorioImportacao($objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao());
-            $objEouvRelatorioImportacaoDTO2->setStrSinSucesso($SinSucessoExecucao);
-            $objEouvRelatorioImportacaoDTO2->setStrDeLogProcessamento($textoMensagemFinal);
-            $objEouvRelatorioImportacaoDTO2->setStrTipManifestacao('R');
-            $objEouvRelatorioImportacaoRN->alterar($objEouvRelatorioImportacaoDTO2);
+            $this->gravarRelatorioImportacaoSucesso($objEouvRelatorioImportacaoDTO, $SinSucessoExecucao, $textoMensagemFinal, $objEouvRelatorioImportacaoRN);
 
             LogSEI::getInstance()->gravar('Finalizado a importção dos processos e-Sic - FalaBR');
 
         } catch(Exception $e) {
-
-            $objEouvRelatorioImportacaoDTO3 = new MdCguEouvRelatorioImportacaoDTO();
-            $objEouvRelatorioImportacaoDTO3->setNumIdRelatorioImportacao($objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao());
-            $strMensagem = 'Ocorreu um erro no processamento:' . $e;
-            $strMensagem = substr($strMensagem, 0, 500);
-            $objEouvRelatorioImportacaoDTO3->setStrDeLogProcessamento($strMensagem);
-            $objEouvRelatorioImportacaoRN->alterar($objEouvRelatorioImportacaoDTO3);
+            $this->gravarRelatorioImportacaoErro($objEouvRelatorioImportacaoDTO, $e, $objEouvRelatorioImportacaoRN);
 
             PaginaSEI::getInstance()->processarExcecao($e);
 
