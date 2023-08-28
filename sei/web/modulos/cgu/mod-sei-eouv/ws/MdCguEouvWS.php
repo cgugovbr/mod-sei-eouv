@@ -130,6 +130,20 @@ class MdCguEouvWS extends InfraWS {
         return $response;
 
     }
+    public static function verificaRetornoWS($retornoWsLista)
+    {
+        /*
+        função criada para tratar o retorno de dados do WS, pois quando existe apenas um unico resultado retorna um objeto e
+        quando tem mais de um resultado retorna um array ocasionando falhas na exibição dos dados.
+        */
+        if (isset($retornoWsLista) and key_exists(0, $retornoWsLista)) {
+            $resultado = $retornoWsLista;
+        } else {
+            $resultado = array ( $retornoWsLista );
+        }
+        return $resultado;
+    }
+
 }
 
 ?>

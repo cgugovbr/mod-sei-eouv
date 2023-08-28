@@ -61,13 +61,13 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
     $objInfraMetaBD->criarIndice('md_eouv_depara_importacao', 'i01_md_eouv_depara_importacao', array('id_tipo_procedimento'));
 
     $this->logar('CRIANDO REGISTROS PARA A TABELA md_eouv_depara_importacao');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'1\', \'Denúncia\', NULL);');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'2\', \'Reclamação\', NULL);');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'3\', \'Elogio\', NULL);');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'4\', \'Sugestão\', NULL);');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'5\', \'Solicitação\', NULL);');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'6\', \'Simplifique\', NULL);');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'7\', \'Comunicado\', NULL);');
+    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'1\', \'Denúncia\', NULL)');
+    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'2\', \'Reclamação\', NULL)');
+    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'3\', \'Elogio\', NULL)');
+    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'4\', \'Sugestão\', NULL)');
+    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'5\', \'Solicitação\', NULL)');
+    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'6\', \'Simplifique\', NULL)');
+    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_depara_importacao (id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento) VALUES (\'7\', \'Comunicado\', NULL)');
 
     $this->logar('CRIANDO A TABELA md_eouv_rel_import');
     BancoSEI::getInstance()->executarSql('CREATE TABLE md_eouv_rel_import(id_md_eouv_rel_import ' . $objInfraMetaBD->tipoNumero() . ' NOT NULL ,
@@ -203,17 +203,17 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
     $objInfraMetaBD->adicionarChavePrimaria('md_eouv_parametros', 'pk_md_eouv_parametro', array('id_parametro'));
 
     $this->logar('CRIANDO REGISTROS PARA A TABELA md_eouv_parametro');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'1\', \'EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES\', \''.date('d/m/Y').'\');');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'2\', \'EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO\', \'63\');');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'3\', \'ID_SERIE_EXTERNO_OUVIDORIA\', \'92\');');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'4\', \'EOUV_USUARIO_ACESSO_WEBSERVICE\', \'nomeUsuarioWebService\');');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'5\', \'EOUV_SENHA_ACESSO_WEBSERVICE\', \'senhaUsuarioWebService\');');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'6\', \'CLIENT_ID\', \'XXX\');');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'7\', \'CLIENT_SECRET\', \'XXX\');');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'8\', \'EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO\', \'https://falabr.cgu.gov.br/api/manifestacoes\');');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'9\', \'ID_UNIDADE_OUVIDORIA\', \'110000001\');');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'10\', \'TOKEN\', \'XXX\');');
-    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'11\', \'IMPORTAR_DADOS_MANIFESTANTE\', \'1\');');
+    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'1\', \'EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES\', \''.date('d/m/Y').'\')');
+    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'2\', \'EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO\', \'63\')');
+    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'3\', \'ID_SERIE_EXTERNO_OUVIDORIA\', \'92\')');
+    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'4\', \'EOUV_USUARIO_ACESSO_WEBSERVICE\', \'nomeUsuarioWebService\')');
+    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'5\', \'EOUV_SENHA_ACESSO_WEBSERVICE\', \'senhaUsuarioWebService\')');
+    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'6\', \'CLIENT_ID\', \'XXX\')');
+    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'7\', \'CLIENT_SECRET\', \'XXX\')');
+    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'8\', \'EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO\', \'https://falabr.cgu.gov.br/api/manifestacoes\')');
+    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'9\', \'ID_UNIDADE_OUVIDORIA\', \'110000001\')');
+    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'10\', \'TOKEN\', \'XXX\')');
+    BancoSEI::getInstance()->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) VALUES (\'11\', \'IMPORTAR_DADOS_MANIFESTANTE\', \'1\')');
 
     $this->logar('APAGANDO OS REGISTROS DA TABELA INFRA_PARAMETROS USADOS NA VERSÃO 2.0.5 E QUE AGORA NÃO SÃO MAIS NECESSÁRIOS');
 

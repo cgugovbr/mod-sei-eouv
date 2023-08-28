@@ -33,6 +33,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
     protected $token;
     protected $importar_dados_manifestante;
     protected $dataInicialImportacaoManifestacoes;
+    protected $idRelatorioImportacao;
     protected $identificacaoServico = 'CadastrarManifestacao';
     protected $siglaSistema = 'EOUV';
     
@@ -110,7 +111,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $this->token = $this->token . $tokenPart2;
 
         $objInfraParametro = new InfraParametro(BancoSEI::getInstance());
-        $idUsuarioSei = $objInfraParametro->getValor('ID_USUARIO_SEI');
         $dataAtual = InfraData::getStrDataHoraAtual();
 
         $isBolHabilitada = SessaoSEI::getInstance(false)->isBolHabilitada();
@@ -135,12 +135,12 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $qtdManifestacoesNovas = 0;
             $qtdManifestacoesAntigas = 0;
             $objEouvRelatorioImportacaoDTO = $this->gravarLogImportacao($ultimaDataExecucao, $dataAtual);
-            $idRelatorioImportacao = $objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao();
+            $this->idRelatorioImportacao = $objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao();
             $objEouvRelatorioImportacaoRN = new MdCguEouvRelatorioImportacaoRN();
             $SinSucessoExecucao = 'N';
             $textoMensagemErroToken = '';
 
-            $retornoWs = $this->executarServicoConsultaManifestacoes($this->urlWebServiceEOuv, $this->token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
+            $retornoWs = $this->executarServicoConsultaManifestacoes($this->urlWebServiceEOuv, $this->token, $ultimaDataExecucao, $dataAtual, null, $this->idRelatorioImportacao);
 
             //Caso retornado algum erro
             if (is_string($retornoWs)) {
@@ -153,16 +153,16 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                     } elseif (isset($tokenValido['access_token'])) {
                         $this->gravarParametroToken($tokenValido['access_token']);
-                        $token = $tokenValido['access_token'];
+                        $this->token = $tokenValido['access_token'];
 
                         //Chama novamente a execução da ConsultaManifestacao que deu errado por causa do Token
-                        $retornoWs = $this->executarServicoConsultaManifestacoes($this->urlWebServiceEOuv, $token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
+                        $retornoWs = $this->executarServicoConsultaManifestacoes($this->urlWebServiceEOuv, $this->token, $ultimaDataExecucao, $dataAtual, null, $this->idRelatorioImportacao);
                     }
                 }
             }
 
             if ($textoMensagemErroToken == '') {
-                $arrComErro = $this->obterManifestacoesComErro($this->urlWebServiceEOuv, $token, $ultimaDataExecucao, $dataAtual, $idRelatorioImportacao);
+                $arrComErro = $this->obterManifestacoesComErro($this->urlWebServiceEOuv, $this->token, $ultimaDataExecucao, $dataAtual, $this->idRelatorioImportacao);
 
                 $arrManifestacoes = array();
 
@@ -284,7 +284,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
              */
 
             $objEouvRelatorioImportacaoDTO = $this->gravarLogImportacao($ultimaDataExecucao, $dataAtual, 'R');
-            $idRelatorioImportacao = $objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao();
+            $this->idRelatorioImportacao = $objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao();
             $objEouvRelatorioImportacaoRN = new MdCguEouvRelatorioImportacaoRN();
             $SinSucessoExecucao = 'N';
             $textoMensagemErroToken = '';
@@ -294,8 +294,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
              * As funções abaixo fazem a busca no webservice dos dados a serem trabalhados na rotina de importação
              */
             $debugLocal && LogSEI::getInstance()->gravar('Iniciando a consulta inicial');
-            $retornoWs = $this->executarServicoConsultaManifestacoes($this->urlWebServiceEOuv, $this->token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
-            $retornoWsRecursos = $this->executarServicoConsultaRecursos($this->urlWebServiceESicRecursos, $this->token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
+            $retornoWs = $this->executarServicoConsultaManifestacoes($this->urlWebServiceEOuv, $this->token, $ultimaDataExecucao, $dataAtual, null, $this->idRelatorioImportacao);
+            $retornoWsRecursos = $this->executarServicoConsultaRecursos($this->urlWebServiceESicRecursos, $this->token, $ultimaDataExecucao, $dataAtual, null, $this->idRelatorioImportacao);
 
             //Caso retornado algum erro - Manifestações e-Sic
             if (is_string($retornoWs)) {
@@ -310,11 +310,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                     } elseif (isset($tokenValido['access_token'])) {
                         $this->gravarParametroToken($tokenValido['access_token']);
-                        $token = $tokenValido['access_token'];
+                        $this->token = $tokenValido['access_token'];
 
                         //Chama novamente a execução da ConsultaManifestacao que deu errado por causa do Token
-                        $retornoWs = $this->executarServicoConsultaManifestacoes($this->urlWebServiceEOuv, $token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
-                        $retornoWsRecursos = $this->executarServicoConsultaRecursos($this->urlWebServiceESicRecursos, $token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
+                        $retornoWs = $this->executarServicoConsultaManifestacoes($this->urlWebServiceEOuv, $this->token, $ultimaDataExecucao, $dataAtual, null, $this->idRelatorioImportacao);
+                        $retornoWsRecursos = $this->executarServicoConsultaRecursos($this->urlWebServiceESicRecursos, $this->token, $ultimaDataExecucao, $dataAtual, null, $this->idRelatorioImportacao);
                     }
                 }
             }
@@ -330,7 +330,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                  * Comentar a linha abaixo para debugar um retorno manual
                  */
                 $debugLocal && LogSEI::getInstance()->gravar('Inicia busca manifestação com erros');
-                $arrComErro = $this->obterManifestacoesComErro($this->urlWebServiceEOuv, $token, $ultimaDataExecucao, $dataAtual, $idRelatorioImportacao, 'R');
+                $arrComErro = $this->obterManifestacoesComErro($this->urlWebServiceEOuv, $this->token, $ultimaDataExecucao, $dataAtual, $this->idRelatorioImportacao, 'R');
 
                 $arrManifestacoes = array();
 
@@ -766,20 +766,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
         return gzinflate(substr($data, 10, -8));
     }
 
-    public function verificaRetornoWS($retornoWsLista)
-    {
-        /*
-        função criada para tratar o retorno de dados do WS, pois quando existe apenas um unico resultado retorna um objeto e
-        quando tem mais de um resultado retorna um array ocasionando falhas na exibição dos dados.
-        */
-        if (isset($retornoWsLista) and key_exists(0, $retornoWsLista)) {
-            $resultado = $retornoWsLista;
-        } else {
-            $resultado = array ( $retornoWsLista );
-        }
-        return $resultado;
-    }
-
     public function gravarLogImportacao($ultimaDataExecucao, $dataAtual, $tipoManifestacao = 'P'){
 
         try {
@@ -1207,7 +1193,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                             $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Recurso tipo ' . $tipo_recurso . ' com protocolo ' . $numProtocoloFormatado . ' importado com sucesso com ' . $anexoCount . ' anexos incluidos no protocolo.', 'S', $tipo_recurso, $dataPrazoAtendimento);
                             $debugLocal && LogSEI::getInstance()->gravar('Importando Recurso processo: ' . $numProtocoloFormatado . ' | tipo: ' . $tipo_recurso . 'depois de gravar log ?!');
-                            // $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Recurso com protocolo ' . $numProtocoloFormatado . ' importado com sucesso com ' . $anexoCount . ' anexos incluidos no protocolo.', 'S', $tipoManifestacao, $dataPrazoAtendimento);
                             LogSEI::getInstance()->gravar('Módulo Integração FalaBR - Importação de Recurso ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . $anexoCount, InfraLog::$INFORMACAO);
 
                             // Carregar anexos
@@ -1265,7 +1250,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
     public function gerarPDFPedidoInicial($retornoWsLinha)
     {
-        $mdCguEouvGerarPdfInicial = new MdCguEouvGerarPdfInicial($retornoWsLinha);
+        $mdCguEouvGerarPdfInicial = new MdCguEouvGerarPdfInicialRN($retornoWsLinha);
         $pdf = $mdCguEouvGerarPdfInicial->gerarPdfInicial();
 
         $objAnexoRN = new AnexoRN();
@@ -1294,11 +1279,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
         try {
             $IdTipoManifestacao = $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'];
         } catch (Exception $e) {
-            $this->gravarLogLinha($IdProtocolo ? $IdProtocolo : 'n/a', $idRelatorioImportacao, substr('ERRO-esic|' . $retornoWsLinha . '|' . $e, 0, 500), 'N');
+            $this->gravarLogLinha($IdProtocolo ? $IdProtocolo : 'n/a', $this->idRelatorioImportacao, substr('ERRO-esic|' . $retornoWsLinha . '|' . $e, 0, 500), 'N');
             return;
         }
 
-        $pdf = MdCguEouvGerarPdfEsic::gerarPdf($retornoWsLinha, $retornoWsRecursos, $this->ocorreuErroAdicionarAnexo);
+        $pdf = MdCguEouvGerarPdfEsicRN::gerarPdf($retornoWsLinha, $retornoWsRecursos, $this->ocorreuErroAdicionarAnexo);
         $objAnexoRN = new AnexoRN();
         $strNomeArquivoInicialUpload = $objAnexoRN->gerarNomeArquivoTemporario();
 
@@ -1370,7 +1355,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         foreach ($arrAnexosManifestacao as $retornoWsAnexoLista) {
 
-            foreach ($this->verificaRetornoWS($retornoWsAnexoLista) as $retornoWsAnexoLinha) {
+            foreach (MdCguEouvWS::verificaRetornoWS($retornoWsAnexoLista) as $retornoWsAnexoLinha) {
                 try {
 
                     $strNomeArquivoOriginal = $retornoWsAnexoLinha['NomeArquivo'];
@@ -1606,10 +1591,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
      * - Posterior está entre aspas pq o recurso deve seguir uma órdem cronológica para se adequar à importação dos
      * dados no SEI
      *
-     * @param $idRelatorioImportacao
-     * @param $numProtocolo
-     * @param $tipoManifestacao
-     * @return bool|void
      */
     public function permiteImportacaoRecursoAtual($tipoManifestacaoAtual, $ultimoTipoRecursoImportado)
     {
