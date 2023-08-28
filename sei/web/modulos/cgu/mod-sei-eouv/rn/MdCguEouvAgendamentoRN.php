@@ -787,7 +787,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         }catch (Exception $e) {
             PaginaInfra::getInstance()->processarExcecao($e);
-            die;
         }
 
     }
