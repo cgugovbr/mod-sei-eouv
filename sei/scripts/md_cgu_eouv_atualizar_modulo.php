@@ -368,6 +368,27 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
   protected function instalarv401(){
 
   }
+
+  protected function instalarv402(){
+      SessaoInfra::setObjInfraSessao(SessaoSEI::getInstance());
+      BancoInfra::setObjInfraIBanco(BancoSEI::getInstance());
+
+      $objInfraMetaBD = new InfraMetaBD(BancoSEI::getInstance());
+
+      $this->logar('CRIANDO coluna PARA A TABELA md_eouv_depara_importacao');
+      $objInfraMetaBD->adicionarColuna('md_eouv_depara_importacao', 'sin_ativo', $objInfraMetaBD->tipoTextoFixo(1), 'not null');
+
+      // Atualiza descrição do depara_importacao
+      $this->logar('ATUALIZANDO SIN_ATIVO para a tabela md_eouv_depara_importacao');
+      $objDeParaDTO = new MdCguEouvDeparaImportacaoDTO();
+      $objDeParaDTO->retTodos();
+      $objDeParaRN = new MdCguEouvDeparaImportacaoRN();
+      $arrObjDeParaDTO = $objDeParaRN->consultar($objDeParaDTO);
+      foreach ($arrObjDeParaDTO as $obj){
+          $obj->setStrSinAtivo('S');
+          $objDeParaRN->alterar($obj);
+      }
+  }
 }
 
 try {
