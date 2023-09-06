@@ -11,7 +11,7 @@ error_reporting(E_ALL); ini_set('display_errors', '1');
 
 require_once dirname(__FILE__) . '/../../../../SEI.php';
 
-class MdCguEouvGerarPdfInicialRN extends InfraRN
+class MdCguEouvGerarPdfInicial extends InfraPDF
 {
      protected $nup;
      protected $dt_cadastro;
@@ -43,11 +43,6 @@ class MdCguEouvGerarPdfInicialRN extends InfraRN
      protected $envolvidos;
      protected $campos_adicionais;
      protected $ocorreuErroAdicionarAnexo;
-
-    protected function inicializarObjInfraIBanco()
-    {
-        return BancoSEI::getInstance();
-    }
 
     public function __construct($retornoWsLinha)
     {
@@ -144,7 +139,7 @@ class MdCguEouvGerarPdfInicialRN extends InfraRN
             }
         }
         $this->campos_adicionais = $campos_adicionais;
-        
+
     }
 
     public function gerarPdfInicial()
