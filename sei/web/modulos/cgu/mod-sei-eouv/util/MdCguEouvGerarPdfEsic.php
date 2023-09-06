@@ -11,7 +11,7 @@ error_reporting(E_ALL); ini_set('display_errors', '1');
 
 require_once dirname(__FILE__) . '/../../../../SEI.php';
 
-class MdCguEouvGerarPdfEsicRN extends InfraRN
+class MdCguEouvGerarPdfEsic extends InfraPDF
 {
     protected function inicializarObjInfraIBanco()
     {

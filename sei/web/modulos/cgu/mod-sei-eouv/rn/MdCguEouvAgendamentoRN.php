@@ -1249,7 +1249,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
     public function gerarPDFPedidoInicial($retornoWsLinha)
     {
-        $mdCguEouvGerarPdfInicial = new MdCguEouvGerarPdfInicialRN($retornoWsLinha);
+        $mdCguEouvGerarPdfInicial = new MdCguEouvGerarPdfInicial($retornoWsLinha);
         $pdf = $mdCguEouvGerarPdfInicial->gerarPdfInicial();
 
         $objAnexoRN = new AnexoRN();
@@ -1282,7 +1282,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
             return;
         }
 
-        $pdf = MdCguEouvGerarPdfEsicRN::gerarPdf($retornoWsLinha, $retornoWsRecursos, $this->ocorreuErroAdicionarAnexo);
+        $pdf = MdCguEouvGerarPdfEsic::gerarPdf($retornoWsLinha, $retornoWsRecursos, $this->ocorreuErroAdicionarAnexo);
         $objAnexoRN = new AnexoRN();
         $strNomeArquivoInicialUpload = $objAnexoRN->gerarNomeArquivoTemporario();
 
