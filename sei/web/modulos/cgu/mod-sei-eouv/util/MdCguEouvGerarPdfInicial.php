@@ -44,11 +44,6 @@ class MdCguEouvGerarPdfInicial extends InfraPDF
      protected $campos_adicionais;
      protected $ocorreuErroAdicionarAnexo;
 
-    protected function inicializarObjInfraIBanco()
-    {
-        return BancoSEI::getInstance();
-    }
-
     public function __construct($retornoWsLinha)
     {
         $this->nup = $retornoWsLinha['NumerosProtocolo'][0];
@@ -144,7 +139,7 @@ class MdCguEouvGerarPdfInicial extends InfraPDF
             }
         }
         $this->campos_adicionais = $campos_adicionais;
-        
+
     }
 
     public function gerarPdfInicial()

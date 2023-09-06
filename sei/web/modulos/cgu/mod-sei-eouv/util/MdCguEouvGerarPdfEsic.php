@@ -13,10 +13,6 @@ require_once dirname(__FILE__) . '/../../../../SEI.php';
 
 class MdCguEouvGerarPdfEsic extends InfraPDF
 {
-    protected function inicializarObjInfraIBanco()
-    {
-        return BancoSEI::getInstance();
-    }
 
     public static function gerarPdf($retornoWsLinha, $retornoWsRecursos, $ocorreuErroAdicionarAnexo)
     {
