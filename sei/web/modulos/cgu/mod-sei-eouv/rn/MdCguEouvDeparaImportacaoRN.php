@@ -95,11 +95,6 @@ class MdCguEouvDeparaImportacaoRN extends InfraRN
       //Valida Permissao
       SessaoSEI::getInstance()->validarPermissao('md_cgu_eouv_depara_importacao_consultar');
 
-      //Regras de Negocio
-      //$objInfraException = new InfraException();
-
-      //$objInfraException->lancarValidacoes();
-
       $objEouvDeparaImportacaoBD = new MdEouvDeparaImportacaoBD($this->getObjInfraIBanco());
       $ret = $objEouvDeparaImportacaoBD->consultar($objEouvDeparaImportacaoDTO);
 

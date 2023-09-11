@@ -199,7 +199,6 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
     $objPerfilRN = new PerfilRN();
     $objMenuRN = new MenuRN();
     $objItemMenuRN = new ItemMenuRN();
-    $objRecursoRN = new RecursoRN();
 
     $objSistemaDTO = new SistemaDTO();
     $objSistemaDTO->retNumIdSistema();

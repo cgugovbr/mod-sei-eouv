@@ -9,8 +9,6 @@
 * Versão no CVS: $Id$
 */
 
-//try {
-
   require_once dirname(__FILE__).'/../../../SEI.php';
   
   session_start();
@@ -169,10 +167,6 @@
   }else{
     $arrComandos[] = '<button type="button" accesskey="F" id="btnFechar" value="Fechar" onclick="location.href=\''.PaginaSEI::getInstance()->formatarXHTML(SessaoSEI::getInstance()->assinarLink('controlador.php?acao='.PaginaSEI::getInstance()->getAcaoRetorno().'&acao_origem='.$_GET['acao'])).'\'" class="infraButton"><span class="infraTeclaAtalho">F</span>echar</button>';
   }
-
-/*}catch(Exception $e){
-  PaginaSEI::getInstance()->processarExcecao($e);
-} */
 
 PaginaSEI::getInstance()->montarDocType();
 PaginaSEI::getInstance()->abrirHtml();

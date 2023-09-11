@@ -83,12 +83,10 @@ try {
   $objMdCguEouvParametroDTO->retStrDeValorParametro();
 
   PaginaSEI::getInstance()->prepararOrdenacao($objMdCguEouvParametroDTO, 'IdParametro', InfraDTO::$TIPO_ORDENACAO_ASC);
-  //PaginaSEI::getInstance()->prepararPaginacao($objMdCguEouvParametroDTO);
 
   $objMdCguEouvParametroRN = new MdCguEouvParametroRN();
   $arrObjMdCguEouvParametroDTO = $objMdCguEouvParametroRN->listarParametroESic($objMdCguEouvParametroDTO);
 
-  //PaginaSEI::getInstance()->processarPaginacao($objMdCguEouvParametroDTO);
   $numRegistros = count($arrObjMdCguEouvParametroDTO);
 
   if ($numRegistros > 0){
@@ -296,10 +294,7 @@ PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
 ?>
 <form id="frmMdCguEouvParametroLista" method="post" action="<?=SessaoSEI::getInstance()->assinarLink('controlador.php?acao='.$_GET['acao'].'&acao_origem='.$_GET['acao'])?>">
   <?
-  //PaginaSEI::getInstance()->montarBarraLocalizacao($strTitulo);
   PaginaSEI::getInstance()->montarBarraComandosSuperior($arrComandos);
-  //PaginaSEI::getInstance()->abrirAreaDados('5em');
-  //PaginaSEI::getInstance()->fecharAreaDados();
   PaginaSEI::getInstance()->montarAreaTabela($strResultado,$numRegistros);
   //PaginaSEI::getInstance()->montarAreaDebug();
   PaginaSEI::getInstance()->montarBarraComandosInferior($arrComandos);
