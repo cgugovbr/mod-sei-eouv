@@ -17,7 +17,7 @@ try {
 
   SessaoSEI::getInstance()->validarLink();
 
-  PaginaInfra::getInstance()->prepararSelecao('md_cgu_eouv_depara_importacao_selecionar');
+  PaginaSEI::getInstance()->prepararSelecao('md_cgu_eouv_depara_importacao_selecionar');
 
   SessaoSEI::getInstance()->validarPermissao($_GET['acao']);
 
@@ -28,7 +28,7 @@ try {
 
       case 'md_cgu_eouv_depara_importacao_excluir':
           try{
-              $arrStrIds = PaginaInfra::getInstance()->getArrStrItensSelecionados();
+              $arrStrIds = PaginaSEI::getInstance()->getArrStrItensSelecionados();
               $arrObjDeParaDTO = array();
               for ($i=0, $iMax = count($arrStrIds); $i<$iMax; $i++){
                   $objMdCguEouvDeparaImportacaoDTO = new MdCguEouvDeparaImportacaoDTO();
@@ -37,16 +37,16 @@ try {
               }
               $objMdCguEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
               $objMdCguEouvDeparaImportacaoRN->excluir($arrObjDeParaDTO);
-              PaginaInfra::getInstance()->adicionarMensagem('Operação realizada com sucesso.');
+              PaginaSEI::getInstance()->adicionarMensagem('Operação realizada com sucesso.');
           }catch(Exception $e){
-              PaginaInfra::getInstance()->processarExcecao($e);
+              PaginaSEI::getInstance()->processarExcecao($e);
           }
-          header('Location: '.SessaoInfra::getInstance()->assinarLink('controlador.php?acao='.$_GET['acao_origem'].'&acao_origem='.$_GET['acao']));
+          header('Location: '.SessaoSei::getInstance()->assinarLink('controlador.php?acao='.$_GET['acao_origem'].'&acao_origem='.$_GET['acao']));
           die;
 
       case 'md_cgu_eouv_depara_importacao_desativar':
           try{
-              $arrStrIds = PaginaInfra::getInstance()->getArrStrItensSelecionados();
+              $arrStrIds = PaginaSEI::getInstance()->getArrStrItensSelecionados();
               $arrObjDeParaDTO = array();
               for ($i=0, $iMax = count($arrStrIds); $i<$iMax; $i++){
                   $objMdCguEouvDeparaImportacaoDTO = new MdCguEouvDeparaImportacaoDTO();
@@ -55,11 +55,11 @@ try {
               }
               $objMdCguEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
               $objMdCguEouvDeparaImportacaoRN->desativar($arrObjDeParaDTO);
-              PaginaInfra::getInstance()->adicionarMensagem('Operação realizada com sucesso.');
+              PaginaSEI::getInstance()->adicionarMensagem('Operação realizada com sucesso.');
           }catch(Exception $e){
-              PaginaInfra::getInstance()->processarExcecao($e);
+              PaginaSEI::getInstance()->processarExcecao($e);
           }
-          header('Location: '.SessaoInfra::getInstance()->assinarLink('controlador.php?acao='.$_GET['acao_origem'].'&acao_origem='.$_GET['acao']));
+          header('Location: '.SessaoSei::getInstance()->assinarLink('controlador.php?acao='.$_GET['acao_origem'].'&acao_origem='.$_GET['acao']));
           die;
 
       case 'md_cgu_eouv_depara_importacao_reativar':
@@ -67,7 +67,7 @@ try {
 
           if ($_GET['acao_confirmada']==='sim'){
               try{
-                  $arrStrIds = PaginaInfra::getInstance()->getArrStrItensSelecionados();
+                  $arrStrIds = PaginaSEI::getInstance()->getArrStrItensSelecionados();
                   $arrObjDeParaDTO = array();
                   for ($i=0, $iMax = count($arrStrIds); $i<$iMax; $i++){
                       $objMdCguEouvDeparaImportacaoDTO = new MdCguEouvDeparaImportacaoDTO();
@@ -76,22 +76,22 @@ try {
                   }
                   $objMdCguEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
                   $objMdCguEouvDeparaImportacaoRN->reativar($arrObjDeParaDTO);
-                  PaginaInfra::getInstance()->adicionarMensagem('Operação realizada com sucesso.');
+                  PaginaSEI::getInstance()->adicionarMensagem('Operação realizada com sucesso.');
               }catch(Exception $e){
-                  PaginaInfra::getInstance()->processarExcecao($e);
+                  PaginaSEI::getInstance()->processarExcecao($e);
               }
-              header('Location: '.SessaoInfra::getInstance()->assinarLink('controlador.php?acao='.$_GET['acao_origem'].'&acao_origem='.$_GET['acao']));
+              header('Location: '.SessaoSei::getInstance()->assinarLink('controlador.php?acao='.$_GET['acao_origem'].'&acao_origem='.$_GET['acao']));
               die;
           }
           break;
 
       case 'md_cgu_eouv_depara_importacao_selecionar':
-          $strTitulo = PaginaInfra::getInstance()->getTituloSelecao('Selecionar Agendamento de Tarefa','Selecionar Agendamentos de Tarefas');
+          $strTitulo = PaginaSEI::getInstance()->getTituloSelecao('Selecionar Agendamento de Tarefa','Selecionar Agendamentos de Tarefas');
 
           //Se cadastrou alguem
           if ($_GET['acao_origem']==='md_cgu_eouv_depara_importacao_cadastrar'){
               if (isset($_GET['id_md_cgu_eouv_depara_importacao'])){
-                  PaginaInfra::getInstance()->adicionarSelecionado($_GET['id_md_cgu_eouv_depara_importacao']);
+                  PaginaSEI::getInstance()->adicionarSelecionado($_GET['id_md_cgu_eouv_depara_importacao']);
               }
           }
           break;
@@ -102,9 +102,9 @@ try {
 
   $arrComandos = array();
   if ($_GET['acao'] === 'md_cgu_eouv_depara_importacao_listar' || $_GET['acao'] === 'md_cgu_eouv_depara_importacao_selecionar'){
-        $bolAcaoCadastrar = SessaoInfra::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_cadastrar');
+        $bolAcaoCadastrar = SessaoSei::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_cadastrar');
         if ($bolAcaoCadastrar){
-            $arrComandos[] = '<button type="button" accesskey="N" id="btnNovo" value="Novo" onclick="location.href=\''.SessaoInfra::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_depara_importacao_cadastrar&acao_origem='.$_GET['acao'].'&acao_retorno='.$_GET['acao']).'\'" class="infraButton"><span class="infraTeclaAtalho">N</span>ovo</button>';
+            $arrComandos[] = '<button type="button" accesskey="N" id="btnNovo" value="Novo" onclick="location.href=\''.SessaoSei::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_depara_importacao_cadastrar&acao_origem='.$_GET['acao'].'&acao_retorno='.$_GET['acao']).'\'" class="infraButton"><span class="infraTeclaAtalho">N</span>ovo</button>';
         }
   }
   $objDeParaDTO = new MdCguEouvDeparaImportacaoDTO();
@@ -125,31 +125,31 @@ try {
 
       if ($_GET['acao']==='md_cgu_eouv_depara_importacao_selecionar'){
           $bolAcaoReativar = false;
-          $bolAcaoAlterar = SessaoInfra::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_alterar');
+          $bolAcaoAlterar = SessaoSei::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_alterar');
           $bolAcaoExcluir = false;
           $bolAcaoDesativar = false;
           $bolCheck = true;
       }else{
-          $bolAcaoReativar = SessaoInfra::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_reativar');
-          $bolAcaoAlterar = SessaoInfra::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_alterar');
-          $bolAcaoExcluir = SessaoInfra::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_excluir');
-          $bolAcaoDesativar = SessaoInfra::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_desativar');
+          $bolAcaoReativar = SessaoSei::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_reativar');
+          $bolAcaoAlterar = SessaoSei::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_alterar');
+          $bolAcaoExcluir = SessaoSei::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_excluir');
+          $bolAcaoDesativar = SessaoSei::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_desativar');
       }
 
       if ($bolAcaoDesativar){
           $arrComandos[] = '<button type="button" accesskey="t" id="btnDesativar" value="Desativar" onclick="acaoDesativacaoMultipla();" class="infraButton">Desa<span class="infraTeclaAtalho">t</span>ivar</button>';
-          $strLinkDesativar = SessaoInfra::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_depara_importacao_desativar&acao_origem='.$_GET['acao']);
+          $strLinkDesativar = SessaoSei::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_depara_importacao_desativar&acao_origem='.$_GET['acao']);
       }
 
       if ($bolAcaoReativar){
           $arrComandos[] = '<button type="button" accesskey="R" id="btnReativar" value="Reativar" onclick="acaoReativacaoMultipla();" class="infraButton"><span class="infraTeclaAtalho">R</span>eativar</button>';
-          $strLinkReativar = SessaoInfra::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_depara_importacao_reativar&acao_origem='.$_GET['acao'].'&acao_confirmada=sim');
+          $strLinkReativar = SessaoSei::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_depara_importacao_reativar&acao_origem='.$_GET['acao'].'&acao_confirmada=sim');
       }
 
       if ($bolAcaoExcluir){
           $bolCheck = true;
           $arrComandos[] = '<button type="button" accesskey="E" id="btnExcluir" value="Excluir" onclick="acaoExclusaoMultipla();" class="infraButton"><span class="infraTeclaAtalho">E</span>xcluir</button>';
-          $strLinkExcluir = SessaoInfra::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_depara_importacao_excluir&acao_origem='.$_GET['acao']);
+          $strLinkExcluir = SessaoSei::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_depara_importacao_excluir&acao_origem='.$_GET['acao']);
       }
 
     $strResultado = '';
@@ -181,8 +181,8 @@ try {
         $strResultado .= '<td align="center">'.PaginaSEI::tratarHTML($arrObjDeParaDTO[$i]->getStrTipoProcedimento()).'</td>';
         $strResultado .= '<td width="15%" align="center">';
 
-        $strId = $arrObjDeParaDTO[$i]->getNumIdInfraAgendamentoTarefa();
-        $strDescricao = PaginaInfra::getInstance()->formatarParametrosJavaScript($arrObjDeParaDTO[$i]->getStrNome());
+        $strId = $arrObjDeParaDTO[$i]->getNumIdTipoManifestacaoEouv();
+        $strDescricao = PaginaSEI::getInstance()->formatarParametrosJavaScript($arrObjDeParaDTO[$i]->getStrDeTipoManifestacaoEouv());
 
         if ($bolAcaoAlterar) {
             $strLinkAlterar = SessaoSEI::getInstance()->assinarLink('controlador.php?'.
@@ -196,17 +196,17 @@ try {
             $strResultado .= '</a>&nbsp;';
           }
         if ($bolAcaoDesativar && $arrObjDeParaDTO[$i]->getStrSinAtivo()=='S'){
-            $strResultado .= '<a href="'.PaginaInfra::getInstance()->montarAncora($strId).'" onclick="acaoDesativar(\''.$strId.'\',\''.$strDescricao.
-                '\');" tabindex="'.PaginaInfra::getInstance()->getProxTabTabela().
-                '"><img src="'.PaginaInfra::getInstance()->getIconeDesativar().'" title="Desativar" alt="Desativar" class="infraImg" /></a>&nbsp;';
+            $strResultado .= '<a href="'.PaginaSEI::getInstance()->montarAncora($strId).'" onclick="acaoDesativar(\''.$strId.'\',\''.$strDescricao.
+                '\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().
+                '"><img src="'.PaginaSEI::getInstance()->getIconeDesativar().'" title="Desativar" alt="Desativar" class="infraImg" /></a>&nbsp;';
         }
 
         if ($bolAcaoReativar && $arrObjDeParaDTO[$i]->getStrSinAtivo()=='N'){
-            $strResultado .= '<a href="'.PaginaInfra::getInstance()->montarAncora($strId).'" onclick="acaoReativar(\''.$strId.'\',\''.$strDescricao.'\');" tabindex="'.PaginaInfra::getInstance()->getProxTabTabela().'"><img src="'.PaginaInfra::getInstance()->getIconeReativar().'" title="Reativar" alt="Reativar" class="infraImg" /></a>&nbsp;';
+            $strResultado .= '<a href="'.PaginaSEI::getInstance()->montarAncora($strId).'" onclick="acaoReativar(\''.$strId.'\',\''.$strDescricao.'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeReativar().'" title="Reativar" alt="Reativar" class="infraImg" /></a>&nbsp;';
         }
 
         if ($bolAcaoExcluir){
-            $strResultado .= '<a href="'.PaginaInfra::getInstance()->montarAncora($strId).'" onclick="acaoExcluir(\''.$strId.'\',\''.$strDescricao.'\');" tabindex="'.PaginaInfra::getInstance()->getProxTabTabela().'"><img src="'.PaginaInfra::getInstance()->getIconeExcluir().'" title="Excluir" alt="Excluir" class="infraImg" /></a>&nbsp;';
+            $strResultado .= '<a href="'.PaginaSEI::getInstance()->montarAncora($strId).'" onclick="acaoExcluir(\''.$strId.'\',\''.$strDescricao.'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeExcluir().'" title="Excluir" alt="Excluir" class="infraImg" /></a>&nbsp;';
         }
 
         $strResultado .= '</td></tr>'."\n";
@@ -231,7 +231,7 @@ PaginaSEI::getInstance()->montarTitle(PaginaSEI::getInstance()->getStrNomeSistem
 PaginaSEI::getInstance()->montarStyle();
 PaginaSEI::getInstance()->abrirStyle();
 ?>
-<style>
+<?if(0){?><style><?}?>
 #lblComandoListar {position:absolute;left:0%;top:0%;width:31%;}
 #txtComandoListar {position:absolute;left:0%;top:40%;width:31%;}
 
@@ -250,12 +250,13 @@ PaginaSEI::getInstance()->abrirStyle();
 tr.trVermelha{
     background-color:#f59f9f;
 }
-</style>
+<?if(0){?></style><?}?>
 <?
 PaginaSEI::getInstance()->fecharStyle();
 PaginaSEI::getInstance()->montarJavaScript();
 PaginaSEI::getInstance()->abrirJavaScript();
 ?>
+<?if(0){?><script type="text/javascript"><?}?>
 
     function inicializar() {
         if ('<?=$_GET['acao']?>'=='md_cgu_eouv_depara_importacao_selecionar') {
@@ -332,6 +333,8 @@ PaginaSEI::getInstance()->abrirJavaScript();
         }
     }
 <? } ?>
+<?if(0){?></script><?}?>
+
 <?
 PaginaSEI::getInstance()->fecharJavaScript();
 PaginaSEI::getInstance()->fecharHead();

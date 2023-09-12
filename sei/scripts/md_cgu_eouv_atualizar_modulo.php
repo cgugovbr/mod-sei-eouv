@@ -5,13 +5,14 @@ require_once dirname(__FILE__) . '/../web/SEI.php';
 class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
 {
   private $nomeModulo = 'EOUV - Integração com sistema FalaBR (E-ouv)';
-  private $versaoAtual = '4.0.1';
+  private $versaoAtual = '4.0.2';
   private $parametroVersao = 'VERSAO_MODULO_CGU_EOUV';
   private $arrayVersoes = array(
     '2.0.5' => 'instalarv205',
     '3.0.*' => 'instalarv300',
     '4.0.0' => 'instalarv400',
-    '4.0.1' => 'instalarv401'
+    '4.0.1' => 'instalarv401',
+    '4.0.2' => 'instalarv402'
   );
   /**
    * 1. Começamos a contralar a partir da versão 2.0.5 que é a última estável para o SEI 3.0
@@ -376,18 +377,10 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
       $objInfraMetaBD = new InfraMetaBD(BancoSEI::getInstance());
 
       $this->logar('CRIANDO coluna PARA A TABELA md_eouv_depara_importacao');
-      $objInfraMetaBD->adicionarColuna('md_eouv_depara_importacao', 'sin_ativo', $objInfraMetaBD->tipoTextoFixo(1), 'not null');
+      $objInfraMetaBD->adicionarColuna('md_eouv_depara_importacao', 'sin_ativo', $objInfraMetaBD->tipoTextoFixo(1), 'null');
+      BancoSEI::getInstance()->executarSql('UPDATE md_eouv_depara_importacao SET sin_ativo = \'S\'');
+      $objInfraMetaBD->alterarColuna('md_eouv_depara_importacao', 'sin_ativo', $objInfraMetaBD->tipoTextoFixo(1), 'not null');
 
-      // Atualiza descrição do depara_importacao
-      $this->logar('ATUALIZANDO SIN_ATIVO para a tabela md_eouv_depara_importacao');
-      $objDeParaDTO = new MdCguEouvDeparaImportacaoDTO();
-      $objDeParaDTO->retTodos();
-      $objDeParaRN = new MdCguEouvDeparaImportacaoRN();
-      $arrObjDeParaDTO = $objDeParaRN->consultar($objDeParaDTO);
-      foreach ($arrObjDeParaDTO as $obj){
-          $obj->setStrSinAtivo('S');
-          $objDeParaRN->alterar($obj);
-      }
   }
 }
 
