@@ -587,10 +587,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 if (strpos($retornoWs, 'Invalidado') !== false) {
                     return "Token Invalidado";
                 }
-                // Outro erro
-                if (strpos($retornoWs, 'Erro') !== false) {
-                    return "Erro:" . $retornoWs;
-                }
             }
         } else {
             // Faz tratamento diferenciado para consulta por Protocolo específico
@@ -633,13 +629,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     //Token expirado, necessÃ¡rio gerar novo Token
                     return "Token Invalidado";
                 }
-
-                //Outro erro
-                if (strpos($retornoWs, 'Erro') !== false) {
-                    //Token expirado, necessÃ¡rio gerar novo Token
-                    return "Erro:" . $retornoWs;
-                }
-
             }
         } else {
             //Faz tratamento diferenciado para consulta por Protocolo específico
