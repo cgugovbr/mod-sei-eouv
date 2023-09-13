@@ -71,7 +71,12 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         $response = curl_exec($curl);
         $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        $err = curl_error($curl);
+        // Verifica erro ao fazer requisição
+        if ($response === false) {
+            $err = curl_error($curl);
+            throw new Exception($err);
+        }
+
         curl_close($curl);
 
         /**
@@ -91,6 +96,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
         switch ($httpcode) {
             case 200:
                 $response = json_decode($response, true);
+
+                // Verifica erro na decodificação JSON
+                if ($response === null) {
+                    throw new Exception('Erro ao decodificar resposta JSON da API ('. json_last_error_msg(). ')');
+                }
                 $response = $this->decode_result($response);
                 break;
             case 401:
@@ -101,6 +111,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 break;
             default:
                 $response = "Erro: Ocorreu algum erro não tratado. HTTP Status: " . $httpcode;
+                throw new Exception($response);
                 break;
         }
 
@@ -223,9 +234,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 if (strpos($retornoWs, 'Invalidado') !== false) {
                     return "Token Invalidado";
                 }
-                // Outro erro
-                if (strpos($retornoWs, 'Erro') !== false) {
-                    return "Erro:" . $retornoWs;
+                // Erro 404
+                if (strpos($retornoWs, '404') !== false) {
+                    throw new Exception($retornoWs);
                 }
             }
         } else {
@@ -272,12 +283,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     return "Token Invalidado";
                 }
 
-                //Outro erro
-                if (strpos($retornoWs, 'Erro') !== false) {
-                    //Token expirado, necessÃ¡rio gerar novo Token
-                    return "Erro:" . $retornoWs;
+                // Erro 404
+                if (strpos($retornoWs, '404') !== false) {
+                    throw new Exception($retornoWs);
                 }
-
             }
         } else {
             //Faz tratamento diferenciado para consulta por Protocolo específico
