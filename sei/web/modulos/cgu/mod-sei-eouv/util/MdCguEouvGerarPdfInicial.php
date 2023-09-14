@@ -19,8 +19,10 @@ class MdCguEouvGerarPdfInicial extends InfraPDF
      protected $desc_sub_assunto;
      protected $id_tipo_manifestacao;
      protected $desc_tipo_manifestacao;
+     protected $desc_tipo_formulario;
      protected $envolve_das4_superior;
      protected $dt_prazo_atendimento;
+     protected $esfera_orgao;
      protected $nome_orgao;
      protected $canal_entrada;
      protected $registrado_por;
@@ -47,7 +49,7 @@ class MdCguEouvGerarPdfInicial extends InfraPDF
     public function __construct($retornoWsLinha)
     {
         $this->nup = $retornoWsLinha['NumerosProtocolo'][0];
-        $this->dtCadastro = $retornoWsLinha['DataCadastro'];
+        $this->dt_cadastro = $retornoWsLinha['DataCadastro'];
 
         if (is_array($retornoWsLinha['Assunto'])) {
             $this->desc_assunto = $retornoWsLinha['Assunto']['DescAssunto'];
@@ -59,8 +61,10 @@ class MdCguEouvGerarPdfInicial extends InfraPDF
 
         $this->id_tipo_manifestacao = $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'];
         $this->desc_tipo_manifestacao = $retornoWsLinha['TipoManifestacao']['DescTipoManifestacao'];
+        $this->desc_tipo_formulario = $retornoWsLinha['TipoFormulario']['DescTipoFormulario'];
         $this->envolve_das4_superior = $retornoWsLinha['InformacoesAdicionais']['EnvolveCargoComissionadoDAS4OuSuperior'];
         $this->dt_prazo_atendimento = $retornoWsLinha['PrazoAtendimento'];
+        $this->esfera_orgao = $retornoWsLinha['OuvidoriaDestino']['Esfera']['DescEsfera'];
         $this->nome_orgao = $retornoWsLinha['OuvidoriaDestino']['NomOuvidoria'];
 
         if (is_array($retornoWsLinha['CanalEntrada'])) {
@@ -185,6 +189,12 @@ class MdCguEouvGerarPdfInicial extends InfraPDF
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(0, 20, $this->id_tipo_manifestacao . " - " . $this->desc_tipo_manifestacao, 0, 1, 'L');
 
+        // Tipo de formulário
+        $pdf->SetFont('arial', 'B', 12);
+        $pdf->Cell(150, 20, "Tipo de Formulário:", 0, 0, 'L');
+        $pdf->setFont('arial', '', 12);
+        $pdf->Cell(0, 20, $this->desc_tipo_formulario, 0, 1, 'L');
+
         //EnvolveDas4OuSuperior
         $pdf->SetFont('arial', 'B', 12);
         $pdf->Cell(450, 20, "Denúncia Envolvendo Ocupante de Cargo Comissionado DAS4 ou Superior?:", 0, 0, 'L');
@@ -197,11 +207,17 @@ class MdCguEouvGerarPdfInicial extends InfraPDF
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(70, 20, $this->dt_prazo_atendimento, 0, 1, 'L');
 
+        // Esfera do Órgão
+        $pdf->SetFont('arial', 'B', 12);
+        $pdf->Cell(150, 20, "Esfera:", 0, 0, 'L');
+        $pdf->setFont('arial', '', 12);
+        $pdf->Cell(0, 20, $this->esfera_orgao, 0, 1, 'L');
+
         //Nome do Órgão
         $pdf->SetFont('arial', 'B', 12);
         $pdf->Cell(150, 20, "Nome do Órgão:", 0, 0, 'L');
         $pdf->setFont('arial', '', 12);
-        $pdf->Cell(70, 20, $this->nome_orgao, 0, 1, 'L');
+        $pdf->MultiCell(0, 20, $this->nome_orgao, 0, 'L');
 
         //Canal Entrada
         $pdf->SetFont('arial', 'B', 12);
