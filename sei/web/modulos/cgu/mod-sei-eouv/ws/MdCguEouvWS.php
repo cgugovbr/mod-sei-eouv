@@ -58,12 +58,20 @@ class MdCguEouvWS extends InfraWS {
 
         $response = curl_exec($curl);
         $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        $err = curl_error($curl);
+        // Verifica erro ao fazer requisição
+        if ($response === false) {
+            $err = curl_error($curl);
+            throw new Exception($err);
+        }
         curl_close($curl);
 
         switch ($httpcode) {
             case 200:
                 $response = json_decode($response, true);
+                // Verifica erro na decodificação JSON
+                if ($response === null) {
+                    throw new Exception('Erro ao decodificar resposta JSON da API ('. json_last_error_msg(). ')');
+                }
                 $response = self::decode_result($response);
                 break;
             case 401:
@@ -74,6 +82,7 @@ class MdCguEouvWS extends InfraWS {
                 break;
             default:
                 $response = "Erro: Ocorreu algum erro não tratado. HTTP Status: " . $httpcode;
+                throw new Exception($response);
                 break;
         }
 
