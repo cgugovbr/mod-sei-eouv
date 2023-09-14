@@ -106,26 +106,10 @@ class MdCguEouvDeparaImportacaoRN extends InfraRN
     }
   }
 
-  protected function excluirControlado($arrObjEouvDeparaImportacaoDTO){
-        try {
-
-            //Valida Permissao
-            SessaoInfra::getInstance()->validarPermissao('md_cgu_eouv_depara_importacao_excluir');
-
-            $objEouvDeparaImportacaoBD = new MdEouvDeparaImportacaoBD($this->getObjInfraIBanco());
-            for($i=0;$i<count($arrObjEouvDeparaImportacaoDTO);$i++){
-                $objEouvDeparaImportacaoBD->excluir($arrObjEouvDeparaImportacaoDTO[$i]);
-            }
-        }catch(Exception $e){
-            throw new InfraException('Erro excluindo DePara Eouv Importação.',$e);
-        }
-  }
-
     protected function desativarControlado($arrObjEouvDeparaImportacaoDTO){
         try {
-
             //Valida Permissao
-            SessaoInfra::getInstance()->validarPermissao('md_cgu_eouv_depara_importacao_desativar');
+            SessaoSEI::getInstance()->validarPermissao('md_cgu_eouv_depara_importacao_desativar');
 
             $objEouvDeparaImportacaoBD = new MdEouvDeparaImportacaoBD($this->getObjInfraIBanco());
             for($i=0;$i<count($arrObjEouvDeparaImportacaoDTO);$i++){
@@ -143,7 +127,7 @@ class MdCguEouvDeparaImportacaoRN extends InfraRN
         try {
 
             //Valida Permissao
-            SessaoInfra::getInstance()->validarPermissao('md_cgu_eouv_depara_importacao_reativar');
+            SessaoSEI::getInstance()->validarPermissao('md_cgu_eouv_depara_importacao_reativar');
 
             $objEouvDeparaImportacaoBD = new MdEouvDeparaImportacaoBD($this->getObjInfraIBanco());
             for($i=0;$i<count($arrObjEouvDeparaImportacaoDTO);$i++){

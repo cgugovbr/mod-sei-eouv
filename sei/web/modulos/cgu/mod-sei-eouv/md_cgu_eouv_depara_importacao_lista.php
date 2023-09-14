@@ -26,31 +26,13 @@ try {
         $strTitulo = 'Tipos de Manifestação do FalaBR e Tipos de Processo Associados';
       break;
 
-      case 'md_cgu_eouv_depara_importacao_excluir':
-          try{
-              $arrStrIds = PaginaSEI::getInstance()->getArrStrItensSelecionados();
-              $arrObjDeParaDTO = array();
-              for ($i=0, $iMax = count($arrStrIds); $i<$iMax; $i++){
-                  $objMdCguEouvDeparaImportacaoDTO = new MdCguEouvDeparaImportacaoDTO();
-                  $objMdCguEouvDeparaImportacaoDTO->setIdTipoManifestacaoEouv($arrStrIds[$i]);
-                  $arrObjDeParaDTO[] = $objMdCguEouvDeparaImportacaoDTO;
-              }
-              $objMdCguEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
-              $objMdCguEouvDeparaImportacaoRN->excluir($arrObjDeParaDTO);
-              PaginaSEI::getInstance()->adicionarMensagem('Operação realizada com sucesso.');
-          }catch(Exception $e){
-              PaginaSEI::getInstance()->processarExcecao($e);
-          }
-          header('Location: '.SessaoSei::getInstance()->assinarLink('controlador.php?acao='.$_GET['acao_origem'].'&acao_origem='.$_GET['acao']));
-          die;
-
       case 'md_cgu_eouv_depara_importacao_desativar':
           try{
               $arrStrIds = PaginaSEI::getInstance()->getArrStrItensSelecionados();
               $arrObjDeParaDTO = array();
               for ($i=0, $iMax = count($arrStrIds); $i<$iMax; $i++){
                   $objMdCguEouvDeparaImportacaoDTO = new MdCguEouvDeparaImportacaoDTO();
-                  $objMdCguEouvDeparaImportacaoDTO->setIdTipoManifestacaoEouv($arrStrIds[$i]);
+                  $objMdCguEouvDeparaImportacaoDTO->setNumIdTipoManifestacaoEouv($arrStrIds[$i]);
                   $arrObjDeParaDTO[] = $objMdCguEouvDeparaImportacaoDTO;
               }
               $objMdCguEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
@@ -63,7 +45,7 @@ try {
           die;
 
       case 'md_cgu_eouv_depara_importacao_reativar':
-          $strTitulo = 'Reativar Agendamentos de Tarefas';
+          $strTitulo = 'Reativar Tipo de manifestação';
 
           if ($_GET['acao_confirmada']==='sim'){
               try{
@@ -71,7 +53,7 @@ try {
                   $arrObjDeParaDTO = array();
                   for ($i=0, $iMax = count($arrStrIds); $i<$iMax; $i++){
                       $objMdCguEouvDeparaImportacaoDTO = new MdCguEouvDeparaImportacaoDTO();
-                      $objMdCguEouvDeparaImportacaoDTO->setIdTipoManifestacaoEouv($arrStrIds[$i]);
+                      $objMdCguEouvDeparaImportacaoDTO->setNumIdTipoManifestacaoEouv($arrStrIds[$i]);
                       $arrObjDeParaDTO[] = $objMdCguEouvDeparaImportacaoDTO;
                   }
                   $objMdCguEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
@@ -86,7 +68,7 @@ try {
           break;
 
       case 'md_cgu_eouv_depara_importacao_selecionar':
-          $strTitulo = PaginaSEI::getInstance()->getTituloSelecao('Selecionar Agendamento de Tarefa','Selecionar Agendamentos de Tarefas');
+          $strTitulo = PaginaSEI::getInstance()->getTituloSelecao('Selecionar Tipo de manifestação','Selecionar Tipos de manifestações');
 
           //Se cadastrou alguem
           if ($_GET['acao_origem']==='md_cgu_eouv_depara_importacao_cadastrar'){
@@ -101,12 +83,7 @@ try {
   }
 
   $arrComandos = array();
-  if ($_GET['acao'] === 'md_cgu_eouv_depara_importacao_listar' || $_GET['acao'] === 'md_cgu_eouv_depara_importacao_selecionar'){
-        $bolAcaoCadastrar = SessaoSei::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_cadastrar');
-        if ($bolAcaoCadastrar){
-            $arrComandos[] = '<button type="button" accesskey="N" id="btnNovo" value="Novo" onclick="location.href=\''.SessaoSei::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_depara_importacao_cadastrar&acao_origem='.$_GET['acao'].'&acao_retorno='.$_GET['acao']).'\'" class="infraButton"><span class="infraTeclaAtalho">N</span>ovo</button>';
-        }
-  }
+
   $objDeParaDTO = new MdCguEouvDeparaImportacaoDTO();
   $objDeParaDTO->retTodos();
   $objDeParaDTO->retStrTipoProcedimento();
@@ -126,17 +103,16 @@ try {
       if ($_GET['acao']==='md_cgu_eouv_depara_importacao_selecionar'){
           $bolAcaoReativar = false;
           $bolAcaoAlterar = SessaoSei::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_alterar');
-          $bolAcaoExcluir = false;
           $bolAcaoDesativar = false;
           $bolCheck = true;
       }else{
           $bolAcaoReativar = SessaoSei::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_reativar');
           $bolAcaoAlterar = SessaoSei::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_alterar');
-          $bolAcaoExcluir = SessaoSei::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_excluir');
           $bolAcaoDesativar = SessaoSei::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_desativar');
       }
 
       if ($bolAcaoDesativar){
+          $bolCheck = true;
           $arrComandos[] = '<button type="button" accesskey="t" id="btnDesativar" value="Desativar" onclick="acaoDesativacaoMultipla();" class="infraButton">Desa<span class="infraTeclaAtalho">t</span>ivar</button>';
           $strLinkDesativar = SessaoSei::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_depara_importacao_desativar&acao_origem='.$_GET['acao']);
       }
@@ -146,13 +122,7 @@ try {
           $strLinkReativar = SessaoSei::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_depara_importacao_reativar&acao_origem='.$_GET['acao'].'&acao_confirmada=sim');
       }
 
-      if ($bolAcaoExcluir){
-          $bolCheck = true;
-          $arrComandos[] = '<button type="button" accesskey="E" id="btnExcluir" value="Excluir" onclick="acaoExclusaoMultipla();" class="infraButton"><span class="infraTeclaAtalho">E</span>xcluir</button>';
-          $strLinkExcluir = SessaoSei::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_depara_importacao_excluir&acao_origem='.$_GET['acao']);
-      }
-
-    $strResultado = '';
+      $strResultado = '';
 
     $strSumarioTabela = 'Tabela de Tipos de Manifestação.';
     $strCaptionTabela = 'Tipos de Manifestação';
@@ -160,6 +130,9 @@ try {
     $strResultado .= '<table width="99%" class="infraTable" summary="'.$strSumarioTabela.'">'."\n";
     $strResultado .= '<caption class="infraCaption">'.PaginaSEI::getInstance()->gerarCaptionTabela($strCaptionTabela,$numRegistros).'</caption>';
     $strResultado .= '<tr>';
+    if ($bolCheck) {
+          $strResultado .= '<th class="infraTh" width="1%">'.PaginaSEI::getInstance()->getThCheck().'</th>'."\n";
+    }
     $strResultado .= '<th class="infraTh">'.PaginaSEI::getInstance()->getThOrdenacao($objDeParaDTO,'ID da Manifestação','IdTipoManifestacaoEouv',$arrObjDeParaDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh">Tipo de Manifestação</th>'."\n";
     $strResultado .= '<th class="infraTh">Tipo de Processo Associado</th>'."\n";
@@ -174,8 +147,9 @@ try {
                 $strCssTr = '<tr class="trVermelha">';
                 $strResultado .= $strCssTr;
         }
-
-
+        if ($bolCheck){
+            $strResultado .= '<td valign="top">'.PaginaSEI::getInstance()->getTrCheck($i,$arrObjDeParaDTO[$i]->getNumIdTipoManifestacaoEouv(),$arrObjDeParaDTO[$i]->getStrDeTipoManifestacaoEouv()).'</td>';
+        }
         $strResultado .= '<td width="15%" align="center">'.$arrObjDeParaDTO[$i]->getNumIdTipoManifestacaoEouv().'</td>';
         $strResultado .= '<td width="20%" align="center">'.PaginaSEI::tratarHTML($arrObjDeParaDTO[$i]->getStrDeTipoManifestacaoEouv()).'</td>';
         $strResultado .= '<td align="center">'.PaginaSEI::tratarHTML($arrObjDeParaDTO[$i]->getStrTipoProcedimento()).'</td>';
@@ -203,10 +177,6 @@ try {
 
         if ($bolAcaoReativar && $arrObjDeParaDTO[$i]->getStrSinAtivo()=='N'){
             $strResultado .= '<a href="'.PaginaSEI::getInstance()->montarAncora($strId).'" onclick="acaoReativar(\''.$strId.'\',\''.$strDescricao.'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeReativar().'" title="Reativar" alt="Reativar" class="infraImg" /></a>&nbsp;';
-        }
-
-        if ($bolAcaoExcluir){
-            $strResultado .= '<a href="'.PaginaSEI::getInstance()->montarAncora($strId).'" onclick="acaoExcluir(\''.$strId.'\',\''.$strDescricao.'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeExcluir().'" title="Excluir" alt="Excluir" class="infraImg" /></a>&nbsp;';
         }
 
         $strResultado .= '</td></tr>'."\n";
@@ -270,10 +240,10 @@ PaginaSEI::getInstance()->abrirJavaScript();
 
 <? if ($bolAcaoDesativar){ ?>
     function acaoDesativar(id, desc) {
-        if (confirm("Confirma desativação do Agendamento de Tarefa \"" + desc + "\"?")) {
+        if (confirm("Confirma desativação do Tipo de manifestação \"" + desc + "\"?")) {
             document.getElementById('hdnInfraItemId').value = id;
-            document.getElementById('frmInfraAgendamentoTarefaLista').action = '<?=$strLinkDesativar?>';
-            document.getElementById('frmInfraAgendamentoTarefaLista').submit();
+            document.getElementById('frmMdCguEouvDeparaImportacaoLista').action = '<?=$strLinkDesativar?>';
+            document.getElementById('frmMdCguEouvDeparaImportacaoLista').submit();
         }
     }
 
@@ -282,57 +252,36 @@ PaginaSEI::getInstance()->abrirJavaScript();
         alert('Nenhuma  selecionada.');
         return;
         }
-        if (confirm("Confirma desativação dos Agendamentos de Tarefas selecionados?")) {
+        if (confirm("Confirma desativação dos tipos de manifestação selecionados?")) {
             document.getElementById('hdnInfraItemId').value = '';
-            document.getElementById('frmInfraAgendamentoTarefaLista').action = '<?=$strLinkDesativar?>';
-            document.getElementById('frmInfraAgendamentoTarefaLista').submit();
+            document.getElementById('frmMdCguEouvDeparaImportacaoLista').action = '<?=$strLinkDesativar?>';
+            document.getElementById('frmMdCguEouvDeparaImportacaoLista').submit();
         }
     }
 <? } ?>
 
 <? if ($bolAcaoReativar){ ?>
     function acaoReativar(id, desc) {
-        if (confirm("Confirma reativação do Agendamento de Tarefa  \"" + desc + "\"?")) {
+        if (confirm("Confirma reativação do Tipo de manifestação  \"" + desc + "\"?")) {
             document.getElementById('hdnInfraItemId').value = id;
-            document.getElementById('frmInfraAgendamentoTarefaLista').action = '<?=$strLinkReativar?>';
-            document.getElementById('frmInfraAgendamentoTarefaLista').submit();
+            document.getElementById('frmMdCguEouvDeparaImportacaoLista').action = '<?=$strLinkReativar?>';
+            document.getElementById('frmMdCguEouvDeparaImportacaoLista').submit();
         }
     }
 
     function acaoReativacaoMultipla() {
         if (document.getElementById('hdnInfraItensSelecionados').value=='') {
-            alert('Nenhum Agendamento de Tarefa selecionado.');
+            alert('Nenhum Tipo de manifestação selecionado.');
             return;
         }
-        if (confirm("Confirma reativação dos Agendamentos de Tarefas selecionados?")) {
+        if (confirm("Confirma reativação dos Tipos de manifestação selecionados?")) {
             document.getElementById('hdnInfraItemId').value = '';
-            document.getElementById('frmInfraAgendamentoTarefaLista').action = '<?=$strLinkReativar?>';
-            document.getElementById('frmInfraAgendamentoTarefaLista').submit();
+            document.getElementById('frmMdCguEouvDeparaImportacaoLista').action = '<?=$strLinkReativar?>';
+            document.getElementById('frmMdCguEouvDeparaImportacaoLista').submit();
         }
     }
 <? } ?>
 
-<? if ($bolAcaoExcluir){ ?>
-    function acaoExcluir(id, desc) {
-        if (confirm("Confirma exclusão de \"" + desc + "\"?")) {
-            document.getElementById('hdnInfraItemId').value = id;
-            document.getElementById('frmInfraAgendamentoTarefaLista').action = '<?=$strLinkExcluir?>';
-            document.getElementById('frmInfraAgendamentoTarefaLista').submit();
-        }
-    }
-
-    function acaoExclusaoMultipla() {
-        if (document.getElementById('hdnInfraItensSelecionados').value=='') {
-            alert('Nenhuma  selecionada.');
-            return;
-        }
-        if (confirm("Confirma exclusão dos itens selecionados?")) {
-            document.getElementById('hdnInfraItemId').value = '';
-            document.getElementById('frmInfraAgendamentoTarefaLista').action = '<?=$strLinkExcluir?>';
-            document.getElementById('frmInfraAgendamentoTarefaLista').submit();
-        }
-    }
-<? } ?>
 <?if(0){?></script><?}?>
 
 <?

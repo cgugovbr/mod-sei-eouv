@@ -43,6 +43,8 @@ class MdCguEouvDeparaImportacaoDTO extends InfraDTO {
 
       $this->configurarFK('IdTipoProcedimento', 'tipo_procedimento', 'id_tipo_procedimento', InfraDTO::$TIPO_FK_OPCIONAL);
 
+      $this->configurarExclusaoLogica('SinAtivo', 'N');
+
   }
 }
 ?>
