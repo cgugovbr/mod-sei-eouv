@@ -106,7 +106,7 @@ class MdCguEouvDeparaImportacaoRN extends InfraRN
     }
   }
 
-    protected function desativarControlado($arrObjEouvDeparaImportacaoDTO){
+  protected function desativarControlado($arrObjEouvDeparaImportacaoDTO){
         try {
             //Valida Permissao
             SessaoSEI::getInstance()->validarPermissao('md_cgu_eouv_depara_importacao_desativar');
@@ -123,7 +123,7 @@ class MdCguEouvDeparaImportacaoRN extends InfraRN
         }
     }
 
-    protected function reativarControlado($arrObjEouvDeparaImportacaoDTO){
+  protected function reativarControlado($arrObjEouvDeparaImportacaoDTO){
         try {
 
             //Valida Permissao
@@ -141,7 +141,7 @@ class MdCguEouvDeparaImportacaoRN extends InfraRN
         }
     }
 
-    private function validarNumIdTipoManifestacaoEouv(MdCguEouvDeparaImportacaoDTO $objEouvDeparaImportacaoDTO, InfraException $objInfraException){
+  private function validarNumIdTipoManifestacaoEouv(MdCguEouvDeparaImportacaoDTO $objEouvDeparaImportacaoDTO, InfraException $objInfraException){
     if (InfraString::isBolVazia($objEouvDeparaImportacaoDTO->getNumIdTipoManifestacaoEouv())){
       $objInfraException->adicionarValidacao('ID do Tipo da Manifestação não informado.');
     }
