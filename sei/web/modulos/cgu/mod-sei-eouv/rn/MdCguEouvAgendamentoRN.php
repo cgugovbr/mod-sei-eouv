@@ -307,12 +307,13 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                 switch ($strParametroNome) {
 
-                    case "ESIC_DATA_INICIAL_IMPORTACAO_MANIFESTACOES":
+                    case "EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES":
                         $this->dataInicialImportacaoManifestacoes = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
                         break;
 
-                    case "ESIC_URL_WEBSERVICE_IMPORTACAO_RECURSOS":
-                        $this->urlWebServiceESicRecursos = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
+                    case "EOUV_URL_WEBSERVICE_IMPORTACAO":
+                        $this->urlWebServiceAnexosEOuv = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro() + '/api/recursos';
+                        $this->urlWebServiceESicRecursos = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro() + '/api/recursos';
                         break;
 
                     case "EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO":
@@ -333,14 +334,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                     case "CLIENT_SECRET":
                         $this->client_secret = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
-                        break;
-
-                    case "EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO":
-                        $this->urlWebServiceEOuv = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
-                        break;
-
-                    case "EOUV_URL_WEBSERVICE_IMPORTACAO_ANEXO_MANIFESTACAO":
-                        $this->urlWebServiceAnexosEOuv = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
                         break;
 
                     case "ESIC_ID_UNIDADE_PRINCIPAL":
