@@ -384,9 +384,6 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
       $this->logar('EXCLUINDO COLUNA tip_manifestacao DA TABELA md_eouv_rel_import');
       $objInfraMetaBD->excluirColuna('md_eouv_rel_import', 'tip_manifestacao');
 
-      $this->logar('EXCLUINDO COLUNA tip_manifestacao DA TABELA md_eouv_rel_import_det');
-      $objInfraMetaBD->excluirColuna('md_eouv_rel_import', 'tip_manifestacao');
-
       $this->logar('Criando nova tarefa no agendamento');
       $infraAgendamentoTarefaRN = new InfraAgendamentoTarefaRN();
 
