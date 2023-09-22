@@ -22,7 +22,6 @@ class MdCguEouvAgendamentoINT extends InfraINT
         $objEouvRelatorioImportacaoDTO->retDthDthPeriodoFinal();
         $objEouvRelatorioImportacaoDTO->retNumIdRelatorioImportacao();
         $objEouvRelatorioImportacaoDTO->setStrSinSucesso('S');
-        $objEouvRelatorioImportacaoDTO->setStrTipManifestacao($tipManifestacao);
         $objEouvRelatorioImportacaoDTO->setOrdDthDthImportacao(InfraDTO::$TIPO_ORDENACAO_DESC);
         $objEouvRelatorioImportacaoDTO->setNumMaxRegistrosRetorno(1);
 
