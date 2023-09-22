@@ -271,6 +271,49 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
   }
 
   protected function instalarv402(){
+      SessaoInfra::setObjInfraSessao(SessaoSEI::getInstance());
+      BancoInfra::setObjInfraIBanco(BancoSEI::getInstance());
+
+      $objInfraMetaBD = new InfraMetaBD(BancoSEI::getInstance());
+
+      $this->logar('EXCLUINDO COLUNA id_md_eouv_rel_import DA TABELA md_eouv_rel_import');
+      $objInfraMetaBD->excluirColuna('md_eouv_rel_import', 'tip_manifestacao');
+
+      $infraAgendamentoTarefaRN = new InfraAgendamentoTarefaRN();
+
+      $infraAgendamentoTarefaDTO = new InfraAgendamentoTarefaDTO();
+      $infraAgendamentoTarefaDTO->retTodos();
+      $infraAgendamentoTarefaDTO->setStrComando('MdCguEouvAgendamentoRN::executarImportacaoManifestacaoEOuv');
+
+      $tarefa = $infraAgendamentoTarefaRN->consultar();
+      $numRegistros = count($tarefa);
+      if($numRegistros == 0) {
+          $infraAgendamentoTarefaDTO->setStrComando('MdCguEouvAgendamentoRN::executarImportacaoManifestacaoESic');
+          $tarefa = $infraAgendamentoTarefaRN->consultar($infraAgendamentoTarefaDTO);
+      }
+      $numRegistros = count($tarefa);
+      if($numRegistros == 0) {
+          $infraAgendamentoNovaTarefaDTO = new InfraAgendamentoTarefaDTO();
+          $infraAgendamentoNovaTarefaDTO->setStrDescricao('Rotina responsável pela execução da importação de manifestações cadastradas no FalaBR que serão importadas para o SEI/SUPER como um novo processo. Se baseia na data da última execução com sucesso até a data atual.');
+          $infraAgendamentoNovaTarefaDTO->setStrComando('MdCguEouvAgendamentoRN::executarImportacaoManifestacaoFalaBr');
+          $infraAgendamentoNovaTarefaDTO->setStrSinAtivo('S');
+          $infraAgendamentoNovaTarefaDTO->setStrStaPeriodicidadeExecucao('N');
+          $infraAgendamentoNovaTarefaDTO->setStrPeriodicidadeComplemento('0,10,20,30,40,50');
+          $infraAgendamentoNovaTarefaDTO->setStrSinSucesso('S');
+
+          $infraAgendamentoTarefaRN->cadastrar($infraAgendamentoNovaTarefaDTO);
+      }else{
+          $infraAgendamentoNovaTarefaDTO = new InfraAgendamentoTarefaDTO();
+          $infraAgendamentoNovaTarefaDTO->setStrDescricao('Rotina responsável pela execução da importação de manifestações cadastradas no FalaBR que serão importadas para o SEI/SUPER como um novo processo. Se baseia na data da última execução com sucesso até a data atual.');
+          $infraAgendamentoNovaTarefaDTO->setStrComando('MdCguEouvAgendamentoRN::executarImportacaoManifestacaoFalaBr');
+          $infraAgendamentoNovaTarefaDTO->setStrSinAtivo('S');
+          $infraAgendamentoNovaTarefaDTO->setStrStaPeriodicidadeExecucao($tarefa[0]->getStrStaPeriodicidadeExecucao());
+          $infraAgendamentoNovaTarefaDTO->setStrPeriodicidadeComplemento($tarefa[0]->getStrPeriodicidadeComplemento());
+          $infraAgendamentoNovaTarefaDTO->setStrSinSucesso('S');
+
+          $infraAgendamentoTarefaRN->cadastrar($infraAgendamentoNovaTarefaDTO);
+      }
+      //TODO preciso apagar os agendamentos anteriores?
 
   }
 

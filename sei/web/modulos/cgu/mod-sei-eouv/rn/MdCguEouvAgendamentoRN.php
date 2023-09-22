@@ -86,6 +86,21 @@ class MdCguEouvAgendamentoRN extends InfraRN
         return BancoSEI::getInstance();
     }
 
+    public static function tiposValidos(){
+        $objMdCguEouvDeparaImportacaoDTO = new MdCguEouvDeparaImportacaoDTO();
+        $objMdCguEouvDeparaImportacaoDTO->retTodos();
+        $objMdCguEouvDeparaImportacaoDTO->setStrSinAtivo('S');
+
+        $objMdCguEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
+        $arrObjMdCguEouvDeparaImportacaoDTO = $objMdCguEouvDeparaImportacaoRN->listar($objMdCguEouvDeparaImportacaoDTO);
+        $numRegistrosMdCguEouvDeparaImportacaoDTO = count($arrObjMdCguEouvDeparaImportacaoDTO);
+        $tiposValidos = array();
+        for ($i = 0; $i < $numRegistrosMdCguEouvDeparaImportacaoDTO; $i++) {
+            $idTipoManifestacaoEouv = $arrObjMdCguEouvDeparaImportacaoDTO[$i]->getNumIdTipoManifestacaoEouv();
+            $tiposValidos[] = $idTipoManifestacaoEouv;
+        }
+        return $tiposValidos;
+    }
 
     /**
      * Função para importar as manifestações do FalaBr
@@ -108,6 +123,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $numRegistros = count($arrObjEouvParametroDTO);
 
         $this->preencheVariaveis($numRegistros, $arrObjEouvParametroDTO);
+        $tiposValidos = self::tiposValidos();
 
         /**
          * Função para buscar o 'restante' do token sem o limite de 255 caracteres do SEI
@@ -207,20 +223,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                 if (is_array($retornoWs)) {
                     // Filtra as manifestações e-Sic
-                    $arrManifestacoes = array_filter($retornoWs, function($manifestacao) {
-                        $objMdCguEouvDeparaImportacaoDTO = new MdCguEouvDeparaImportacaoDTO();
-                        $objMdCguEouvDeparaImportacaoDTO->retTodos();
-                        $objMdCguEouvDeparaImportacaoDTO->setStrSinAtivo('S');
-
-                        $objMdCguEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
-                        $arrObjMdCguEouvDeparaImportacaoDTO = $objMdCguEouvDeparaImportacaoRN->listar($objMdCguEouvDeparaImportacaoDTO);
-                        $numRegistrosMdCguEouvDeparaImportacaoDTO = count($arrObjMdCguEouvDeparaImportacaoDTO);
-                        $tiposValidos = array();
-                        for ($i = 0; $i < $numRegistrosMdCguEouvDeparaImportacaoDTO; $i++) {
-                            $idTipoManifestacaoEouv = $arrObjMdCguEouvDeparaImportacaoDTO[$i]->getNumIdTipoManifestacaoEouv();
-                            $tiposValidos[] = $idTipoManifestacaoEouv;
-                        }
-
+                    $arrManifestacoes = array_filter($retornoWs, function($manifestacao, $tiposValidos) {
                         return in_array($manifestacao['TipoManifestacao']['IdTipoManifestacao'], $tiposValidos);
                     });
                     $qtdManifestacoesNovas = count($arrManifestacoes);
