@@ -60,7 +60,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $objEouvRelatorioImportacaoDTO2->setNumIdRelatorioImportacao($objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao());
         $objEouvRelatorioImportacaoDTO2->setStrSinSucesso($SinSucessoExecucao);
         $objEouvRelatorioImportacaoDTO2->setStrDeLogProcessamento($textoMensagemFinal);
-        $objEouvRelatorioImportacaoDTO2->setStrTipManifestacao('R');
         $objEouvRelatorioImportacaoRN->alterar($objEouvRelatorioImportacaoDTO2);
     }
 
@@ -86,142 +85,26 @@ class MdCguEouvAgendamentoRN extends InfraRN
         return BancoSEI::getInstance();
     }
 
-    /**
-     * Função para importar as manifestações e-Ouv do FalaBR
-     *
-     * Tipos: 1, 2, 3, 4, 5, 6 e 7
-     */
-    public function executarImportacaoManifestacaoEOuv()
-    {
-        // Log
-        LogSEI::getInstance()->gravar('Rotina de Importação de Manifestações do E-Ouv', InfraLog::$INFORMACAO);
+    public static function tiposValidos(){
+        $objMdCguEouvDeparaImportacaoDTO = new MdCguEouvDeparaImportacaoDTO();
+        $objMdCguEouvDeparaImportacaoDTO->retTodos();
+        $objMdCguEouvDeparaImportacaoDTO->setStrSinAtivo('S');
 
-        $objEouvParametroDTO = new MdCguEouvParametroDTO();
-        $objEouvParametroDTO -> retTodos();
-
-        // Busca parâmetros do banco de dados
-        $objEouvParametroRN = new MdCguEouvParametroRN();
-        $arrObjEouvParametroDTO = $objEouvParametroRN->listarParametro($objEouvParametroDTO);
-
-        $numRegistros = count($arrObjEouvParametroDTO);
-
-        $this->preencheVariaveisEouv($numRegistros, $arrObjEouvParametroDTO);
-
-        /**
-         * Função para buscar o 'restante' do token sem o limite de 255 caracteres do SEI
-         */
-        $tokenPart2 = BancoSEI::getInstance()->consultarSql('select substring(de_valor_parametro, 256, 455) from md_eouv_parametros where id_parametro=10;')[0]['computed'];
-        $this->token = $this->token . $tokenPart2;
-
-        $objInfraParametro = new InfraParametro(BancoSEI::getInstance());
-        $dataAtual = InfraData::getStrDataHoraAtual();
-
-        $isBolHabilitada = SessaoSEI::getInstance(false)->isBolHabilitada();
-        SessaoSEI::getInstance()->setBolHabilitada(false);
-
-        // Simula login inicial
-        self::simulaLogin($this->siglaSistema, $this->identificacaoServico, $this->idUnidadeOuvidoria);
-
-        try {
-
-            //Retorna dados da Última execução com Sucesso
-            $objUltimaExecucao = MdCguEouvAgendamentoINT::retornarUltimaExecucaoSucesso();
-
-            if ($objUltimaExecucao != null) {
-                $ultimaDataExecucao = $objUltimaExecucao->getDthDthPeriodoFinal();
-            } //Primeira execução ou nenhuma executada com sucesso
-            else {
-                $ultimaDataExecucao = $this->dataInicialImportacaoManifestacoes;
-            }
-
-            $semManifestacoesEncontradas = true;
-            $qtdManifestacoesNovas = 0;
-            $qtdManifestacoesAntigas = 0;
-            $objEouvRelatorioImportacaoDTO = $this->gravarLogImportacao($ultimaDataExecucao, $dataAtual);
-            $this->idRelatorioImportacao = $objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao();
-            $objEouvRelatorioImportacaoRN = new MdCguEouvRelatorioImportacaoRN();
-            $SinSucessoExecucao = 'N';
-            $textoMensagemErroToken = '';
-
-            $retornoWs = $this->executarServicoConsultaManifestacoes($this->urlWebServiceEOuv, $this->token, $ultimaDataExecucao, $dataAtual, null, $this->idRelatorioImportacao);
-
-            //Caso retornado algum erro
-            if (is_string($retornoWs)) {
-                if (strpos($retornoWs, 'Invalidado') !== false) {
-                    //Tenta gerar novo token
-                    $tokenValido = MdCguEouvWS::apiValidarToken($this->urlWebServiceEOuv, $this->usuarioWebService, $this->senhaUsuarioWebService, $this->client_id, $this->client_secret);
-
-                    if (isset($tokenValido['error'])) {
-                        $textoMensagemErroToken = 'Não foi possível validar o Token de acesso aos WebServices do E-ouv. <br>Verifique as informações de Usuário, Senha, Client_Id e Client_Secret nas configurações de Parâmetros do Módulo';
-
-                    } elseif (isset($tokenValido['access_token'])) {
-                        $this->gravarParametroToken($tokenValido['access_token']);
-                        $this->token = $tokenValido['access_token'];
-
-                        //Chama novamente a execução da ConsultaManifestacao que deu errado por causa do Token
-                        $retornoWs = $this->executarServicoConsultaManifestacoes($this->urlWebServiceEOuv, $this->token, $ultimaDataExecucao, $dataAtual, null, $this->idRelatorioImportacao);
-                    }
-                }
-            }
-
-            if ($textoMensagemErroToken == '') {
-                $arrComErro = $this->obterManifestacoesComErro($this->urlWebServiceEOuv, $this->token, $ultimaDataExecucao, $dataAtual, $this->idRelatorioImportacao);
-
-                $arrManifestacoes = array();
-
-                if (is_array($retornoWs)) {
-                    // Filtra as manifestações e-Ouv
-                    $arrManifestacoes = array_filter($retornoWs, function($manifestacao) {
-                        return $manifestacao['TipoManifestacao']['IdTipoManifestacao'] <> 8;
-                    });
-                    $qtdManifestacoesNovas = count($arrManifestacoes);
-                }
-
-                if (is_array($arrComErro)) {
-                    $qtdManifestacoesAntigas = count($arrComErro);
-                    $arrManifestacoes = array_merge($arrManifestacoes, $arrComErro);
-                }
-
-                if (count($arrManifestacoes) > 0) {
-                    $semManifestacoesEncontradas = false;
-                    foreach ($arrManifestacoes as $retornoWsLinha) {
-                        $this->executarImportacaoLinha($retornoWsLinha);
-                    }
-                }
-
-                $textoMensagemFinal = 'Execução Finalizada com Sucesso!';
-                $SinSucessoExecucao = 'S';
-
-                if ($semManifestacoesEncontradas) {
-                    $textoMensagemFinal = $textoMensagemFinal . ' Não foram encontradas manifestações para o período.';
-                } else {
-                    $textoMensagemFinal = $textoMensagemFinal . '<br>Quantidade de Manifestações novas encontradas (e-Ouv): ' . $qtdManifestacoesNovas . '<br>Quantidade de Manifestações encontadas que ocorreram erro em outras importações: ' . $qtdManifestacoesAntigas;
-                }
-
-                if ($this->ocorreuErroEmProtocolo) {
-                    $textoMensagemFinal = $textoMensagemFinal . '<br> Ocorreram erros em 1 ou mais protocolos.';
-                }
-            } else {
-                $textoMensagemFinal = $textoMensagemErroToken;
-            }
-
-            //Grava a execução com sucesso se tiver corrido tudo bem
-            $this->gravarRelatorioImportacaoSucesso($objEouvRelatorioImportacaoDTO, $SinSucessoExecucao, $textoMensagemFinal, $objEouvRelatorioImportacaoRN);
-
-        } catch(Exception $e) {
-            $this->gravarRelatorioImportacaoErro($objEouvRelatorioImportacaoDTO, $e, $objEouvRelatorioImportacaoRN);
-
-            PaginaSEI::getInstance()->processarExcecao($e);
-        } finally {
-            //Restaura a sessão
-            SessaoSEI::getInstance()->setBolHabilitada($isBolHabilitada);
+        $objMdCguEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
+        $arrObjMdCguEouvDeparaImportacaoDTO = $objMdCguEouvDeparaImportacaoRN->listar($objMdCguEouvDeparaImportacaoDTO);
+        $numRegistrosMdCguEouvDeparaImportacaoDTO = count($arrObjMdCguEouvDeparaImportacaoDTO);
+        $tiposValidos = array();
+        for ($i = 0; $i < $numRegistrosMdCguEouvDeparaImportacaoDTO; $i++) {
+            $idTipoManifestacaoEouv = $arrObjMdCguEouvDeparaImportacaoDTO[$i]->getNumIdTipoManifestacaoEouv();
+            $tiposValidos[] = $idTipoManifestacaoEouv;
         }
+        return $tiposValidos;
     }
 
     /**
-     * Função para importar as manifestações e-Sic do FalaBR (tipo 8)
+     * Função para importar as manifestações do FalaBr
      */
-    public function executarImportacaoManifestacaoESic()
+    public function executarImportacaoManifestacaoFalaBr()
     {
 
         $debugLocal = false;
@@ -239,6 +122,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $numRegistros = count($arrObjEouvParametroDTO);
 
         $this->preencheVariaveis($numRegistros, $arrObjEouvParametroDTO);
+        $tiposValidos = self::tiposValidos();
 
         /**
          * Função para buscar o 'restante' do token sem o limite de 255 caracteres do SEI
@@ -248,7 +132,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         // Busca parâmetros do banco de dados da tabela infra_parametros
         $objInfraParametro = new InfraParametro(BancoSEI::getInstance());
-        $idUsuarioSei = $objInfraParametro->getValor('ID_USUARIO_SEI');
         $dataAtual = InfraData::getStrDataHoraAtual();
 
         $isBolHabilitada = SessaoSEI::getInstance(false)->isBolHabilitada();
@@ -261,7 +144,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         try {
 
             //Retorna dados da Última execução com Sucesso
-            $objUltimaExecucao = MdCguEouvAgendamentoINT::retornarUltimaExecucaoSucesso('R');
+            $objUltimaExecucao = MdCguEouvAgendamentoINT::retornarUltimaExecucaoSucesso();
 
             if ($objUltimaExecucao != null) {
                 // Debug Logs
@@ -286,7 +169,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
              * A função abaixo gravarLogImportacao recebe o tipo de manifestação 'R' (Recursos) para as manifestações do e-Sic
              */
 
-            $objEouvRelatorioImportacaoDTO = $this->gravarLogImportacao($ultimaDataExecucao, $dataAtual, 'R');
+            $objEouvRelatorioImportacaoDTO = $this->gravarLogImportacao($ultimaDataExecucao, $dataAtual);
             $this->idRelatorioImportacao = $objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao();
             $objEouvRelatorioImportacaoRN = new MdCguEouvRelatorioImportacaoRN();
             $SinSucessoExecucao = 'N';
@@ -339,8 +222,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                 if (is_array($retornoWs)) {
                     // Filtra as manifestações e-Sic
-                    $arrManifestacoes = array_filter($retornoWs, function($manifestacao) {
-                        return $manifestacao['TipoManifestacao']['IdTipoManifestacao'] == 8;
+                    $arrManifestacoes = array_filter($retornoWs, function($manifestacao) use ($tiposValidos ) {
+                        return in_array($manifestacao['TipoManifestacao']['IdTipoManifestacao'], $tiposValidos);
                     });
                     $qtdManifestacoesNovas = count($arrManifestacoes);
                     $debugLocal && LogSEI::getInstance()->gravar('Possui novas manifestações qtd: ' . $qtdManifestacoesNovas);
@@ -362,12 +245,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                 }
 
-                // Importa manifestações e-Sic
                 if (count($arrManifestacoes) > 0) {
                     $semManifestacoesEncontradas = false;
                     foreach ($arrManifestacoes as $retornoWsLinha) {
                         $debugLocal && LogSEI::getInstance()->gravar('Inicia importação por Linha');
-                        $this->executarImportacaoLinha($retornoWsLinha, 'R');
+                        $this->executarImportacaoLinha($retornoWsLinha);
                     }
                 }
                 // Importa recursos e-Sic
@@ -385,7 +267,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 if ($semManifestacoesEncontradas) {
                     $textoMensagemFinal = $textoMensagemFinal . ' Não foram encontradas manifestações para o período.';
                 } else {
-                    $textoMensagemFinal = $textoMensagemFinal . '<br>Quantidade de Manifestações novas encontradas (e-Sic): ' . $qtdManifestacoesNovas . '<br>Quantidade de Manifestações encontadas que ocorreram erro em outras importações: ' . $qtdManifestacoesAntigas;
+                    $textoMensagemFinal = $textoMensagemFinal . '<br>Quantidade de Manifestações novas encontradas (FalaBr): ' . $qtdManifestacoesNovas . '<br>Quantidade de Manifestações encontadas que ocorreram erro em outras importações: ' . $qtdManifestacoesAntigas;
                 }
 
                 if ($semRecursosEncontrados) {
@@ -404,7 +286,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
             //Grava a execução com sucesso se tiver corrido tudo bem
             $this->gravarRelatorioImportacaoSucesso($objEouvRelatorioImportacaoDTO, $SinSucessoExecucao, $textoMensagemFinal, $objEouvRelatorioImportacaoRN);
 
-            LogSEI::getInstance()->gravar('Finalizado a importção dos processos e-Sic - FalaBR');
+            LogSEI::getInstance()->gravar('Finalizado a importção dos processos - FalaBR');
 
         } catch(Exception $e) {
             $this->gravarRelatorioImportacaoErro($objEouvRelatorioImportacaoDTO, $e, $objEouvRelatorioImportacaoRN);
@@ -490,64 +372,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     case "IMPORTAR_DADOS_MANIFESTANTE":
                         $this->importar_dados_manifestante = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
                         break;
-                }
-            }
-        }
-    }
-
-    public function preencheVariaveisEouv(int $numRegistros, $arrObjEouvParametroDTO)
-    {
-        if ($numRegistros > 0) {
-            for ($i = 0; $i < $numRegistros; $i++) {
-
-                $strParametroNome = $arrObjEouvParametroDTO[$i]->getStrNoParametro();
-
-                switch ($strParametroNome) {
-
-                    case "EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES":
-                        $this->dataInicialImportacaoManifestacoes = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
-                        break;
-
-                    case "EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO":
-                        $this->idTipoDocumentoAnexoDadosManifestacao = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
-                        break;
-
-                    case "EOUV_USUARIO_ACESSO_WEBSERVICE":
-                        $this->usuarioWebService = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
-                        break;
-
-                    case "EOUV_SENHA_ACESSO_WEBSERVICE":
-                        $this->senhaUsuarioWebService = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
-                        break;
-
-                    case "CLIENT_ID":
-                        $this->client_id = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
-                        break;
-
-                    case "CLIENT_SECRET":
-                        $this->client_secret = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
-                        break;
-
-                    case "EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO":
-                        $this->urlWebServiceEOuv = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
-                        break;
-
-                    case "EOUV_URL_WEBSERVICE_IMPORTACAO_ANEXO_MANIFESTACAO":
-                        $this->urlWebServiceAnexosEOuv = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
-                        break;
 
                     case "ID_UNIDADE_OUVIDORIA":
                         $this->idUnidadeOuvidoria = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
                         break;
-
-                    case "TOKEN":
-                        $this->token = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
-                        break;
-
-                    case "IMPORTAR_DADOS_MANIFESTANTE":
-                        $this->importar_dados_manifestante = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
-                        break;
-
 
                 }
             }
@@ -758,7 +586,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         return gzinflate(substr($data, 10, -8));
     }
 
-    public function gravarLogImportacao($ultimaDataExecucao, $dataAtual, $tipoManifestacao = 'P'){
+    public function gravarLogImportacao($ultimaDataExecucao, $dataAtual){
 
         try {
             $objEouvRelatorioImportacaoDTO = new MdCguEouvRelatorioImportacaoDTO();
@@ -770,7 +598,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $objEouvRelatorioImportacaoDTO->setDthDthPeriodoFinal($dataAtual);
             $objEouvRelatorioImportacaoDTO->setStrDeLogProcessamento('Passo 1 - Iniciando processamento.');
             $objEouvRelatorioImportacaoDTO->setStrSinSucesso('N');
-            $objEouvRelatorioImportacaoDTO->setStrTipManifestacao($tipoManifestacao);
 
             $objEouvRelatorioImportacaoRN = new MdCguEouvRelatorioImportacaoRN();
             $objEouvRelatorioImportacaoRN->cadastrar($objEouvRelatorioImportacaoDTO);
@@ -902,7 +729,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         return $objUnidadeDTO;
     }
 
-    public function executarImportacaoLinha($retornoWsLinha, $tipoManifestacao = 'P')
+    public function executarImportacaoLinha($retornoWsLinha)
     {
         $debugLocal = false;
 
@@ -915,12 +742,14 @@ class MdCguEouvAgendamentoRN extends InfraRN
         /**
          * Verifica Tipo de Manifestação e-Ouv ou e-Sic
          */
-        if ($tipoManifestacao == 'P' && $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'] <> 8) {
+        if ($retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'] <> 8) {
             $debugLocal && LogSEI::getInstance()->gravar('Importação tipo "P" - tipoManifestação <> "8"');
+            $tipoManifestacao = 'P';
             $manifestacaoESic = false;
             $idUnidadeDestino = $this->idUnidadeOuvidoria;
-        } elseif ($tipoManifestacao == 'R' && $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'] == 8) {
+        } elseif ($retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'] == 8) {
             $debugLocal && LogSEI::getInstance()->gravar('Importação tipo "R" - tipoManifestação == "8"');
+            $tipoManifestacao = 'R';
             $manifestacaoESic = true;
             $idUnidadeDestino = $this->idUnidadeEsicPrincipal;
 

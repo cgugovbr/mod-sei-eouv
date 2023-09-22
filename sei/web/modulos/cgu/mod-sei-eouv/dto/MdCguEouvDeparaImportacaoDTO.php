@@ -35,10 +35,15 @@ class MdCguEouvDeparaImportacaoDTO extends InfraDTO {
                                               'TipoProcedimento',
                                               'nome',
                                               'tipo_procedimento');
+      $this->adicionarAtributoTabela(InfraDTO::$PREFIXO_STR,
+          'SinAtivo',
+          'sin_ativo');
 
-    $this->configurarPK('IdTipoManifestacaoEouv',InfraDTO::$TIPO_PK_INFORMADO);
+      $this->configurarPK('IdTipoManifestacaoEouv',InfraDTO::$TIPO_PK_INFORMADO);
 
-    $this->configurarFK('IdTipoProcedimento', 'tipo_procedimento', 'id_tipo_procedimento', InfraDTO::$TIPO_FK_OPCIONAL);
+      $this->configurarFK('IdTipoProcedimento', 'tipo_procedimento', 'id_tipo_procedimento', InfraDTO::$TIPO_FK_OPCIONAL);
+
+      $this->configurarExclusaoLogica('SinAtivo', 'N');
 
   }
 }

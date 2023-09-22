@@ -5,13 +5,14 @@ require_once dirname(__FILE__) . '/../web/SEI.php';
 class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
 {
   private $nomeModulo = 'EOUV - Integração com sistema FalaBR (E-ouv)';
-  private $versaoAtual = '4.0.1';
+  private $versaoAtual = '4.0.2';
   private $parametroVersao = 'VERSAO_MODULO_CGU_EOUV';
   private $arrayVersoes = array(
     '2.0.5' => 'instalarv205',
     '3.0.*' => 'instalarv300',
     '4.0.0' => 'instalarv400',
-    '4.0.1' => 'instalarv401'
+    '4.0.1' => 'instalarv401',
+    '4.0.2' => 'instalarv402'
   );
   /**
    * 1. Começamos a contralar a partir da versão 2.0.5 que é a última estável para o SEI 3.0
@@ -367,6 +368,61 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
 
   protected function instalarv401(){
 
+  }
+
+  protected function instalarv402(){
+      SessaoInfra::setObjInfraSessao(SessaoSEI::getInstance());
+      BancoInfra::setObjInfraIBanco(BancoSEI::getInstance());
+
+      $objInfraMetaBD = new InfraMetaBD(BancoSEI::getInstance());
+
+      $this->logar('CRIANDO coluna PARA A TABELA md_eouv_depara_importacao');
+      $objInfraMetaBD->adicionarColuna('md_eouv_depara_importacao', 'sin_ativo', $objInfraMetaBD->tipoTextoFixo(1), 'null');
+      BancoSEI::getInstance()->executarSql('UPDATE md_eouv_depara_importacao SET sin_ativo = \'S\'');
+      $objInfraMetaBD->alterarColuna('md_eouv_depara_importacao', 'sin_ativo', $objInfraMetaBD->tipoTextoFixo(1), 'not null');
+
+      $this->logar('EXCLUINDO COLUNA tip_manifestacao DA TABELA md_eouv_rel_import');
+      $objInfraMetaBD->excluirColuna('md_eouv_rel_import', 'tip_manifestacao');
+
+      $infraAgendamentoTarefaRN = new InfraAgendamentoTarefaRN();
+
+      $this->logar('removendo tarefas antidas do agendamento');
+
+      $infraAgendamentoTarefaDTO = new InfraAgendamentoTarefaDTO();
+      $infraAgendamentoTarefaDTO->retTodos();
+      $infraAgendamentoTarefaDTO->setStrComando('MdCguEouvAgendamentoRN::executarImportacaoManifestacaoEOuv');
+      $infraAgendamentoTarefaDTO->setBolExclusaoLogica(false);
+      $tarefaEouv = $infraAgendamentoTarefaRN->consultar($infraAgendamentoTarefaDTO);
+      if ($tarefaEouv != null){
+          $arrTarefaEouv = [$tarefaEouv];
+          $infraAgendamentoTarefaRN->excluir($arrTarefaEouv);
+      }
+
+      $infraAgendamentoTarefaDTO = new InfraAgendamentoTarefaDTO();
+      $infraAgendamentoTarefaDTO->retTodos();
+      $infraAgendamentoTarefaDTO->setStrComando('MdCguEouvAgendamentoRN::executarImportacaoManifestacaoESic');
+      $infraAgendamentoTarefaDTO->setBolExclusaoLogica(false);
+      $tarefaEsic = $infraAgendamentoTarefaRN->consultar($infraAgendamentoTarefaDTO);
+      if ($tarefaEsic != null){
+          $arrTarefaEsic = [$tarefaEsic];
+          $infraAgendamentoTarefaRN->excluir($arrTarefaEsic);
+      }
+
+      $this->logar('Criando nova tarefa no agendamento');
+
+      $infraAgendamentoNovaTarefaDTO = new InfraAgendamentoTarefaDTO();
+      $infraAgendamentoNovaTarefaDTO->setStrDescricao('Rotina responsável pela execução da importação de manifestações cadastradas no FalaBR que serão importadas para o SEI/SUPER como um novo processo. Se baseia na data da última execução com sucesso até a data atual.');
+      $infraAgendamentoNovaTarefaDTO->setStrComando('MdCguEouvAgendamentoRN::executarImportacaoManifestacaoFalaBr');
+      $infraAgendamentoNovaTarefaDTO->setStrSinAtivo('S');
+      $infraAgendamentoNovaTarefaDTO->setStrStaPeriodicidadeExecucao('D');
+      $infraAgendamentoNovaTarefaDTO->setStrPeriodicidadeComplemento('1');
+      $infraAgendamentoNovaTarefaDTO->setStrSinSucesso('S');
+      $infraAgendamentoNovaTarefaDTO->setDthUltimaExecucao(null);
+      $infraAgendamentoNovaTarefaDTO->setDthUltimaConclusao(null);
+      $infraAgendamentoNovaTarefaDTO->setStrParametro(null);
+      $infraAgendamentoNovaTarefaDTO->setStrEmailErro('');
+
+      $infraAgendamentoTarefaRN->cadastrar($infraAgendamentoNovaTarefaDTO);
   }
 }
 

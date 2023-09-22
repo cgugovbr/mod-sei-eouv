@@ -43,10 +43,6 @@ class MdCguEouvRelatorioImportacaoDTO extends InfraDTO {
                                   'DeLogProcessamento',
                                   'des_log_processamento');
 
-    $this->adicionarAtributoTabela(InfraDTO::$PREFIXO_STR,
-                                  'TipManifestacao',
-                                  'tip_manifestacao');
-
     $this->configurarPK('IdRelatorioImportacao', InfraDTO::$TIPO_PK_NATIVA);
     
   }

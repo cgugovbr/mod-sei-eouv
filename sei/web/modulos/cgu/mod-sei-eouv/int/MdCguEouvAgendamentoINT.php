@@ -13,7 +13,7 @@ require_once dirname(__FILE__).'/../../../../SEI.php';
 
 class MdCguEouvAgendamentoINT extends InfraINT
 {
-    public static function retornarUltimaExecucaoSucesso($tipManifestacao = 'P')
+    public static function retornarUltimaExecucaoSucesso()
     {
 
         $objEouvRelatorioImportacaoDTO=new MdCguEouvRelatorioImportacaoDTO();
@@ -22,7 +22,6 @@ class MdCguEouvAgendamentoINT extends InfraINT
         $objEouvRelatorioImportacaoDTO->retDthDthPeriodoFinal();
         $objEouvRelatorioImportacaoDTO->retNumIdRelatorioImportacao();
         $objEouvRelatorioImportacaoDTO->setStrSinSucesso('S');
-        $objEouvRelatorioImportacaoDTO->setStrTipManifestacao($tipManifestacao);
         $objEouvRelatorioImportacaoDTO->setOrdDthDthImportacao(InfraDTO::$TIPO_ORDENACAO_DESC);
         $objEouvRelatorioImportacaoDTO->setNumMaxRegistrosRetorno(1);
 

@@ -106,6 +106,41 @@ class MdCguEouvDeparaImportacaoRN extends InfraRN
     }
   }
 
+  protected function desativarControlado($arrObjEouvDeparaImportacaoDTO){
+        try {
+            //Valida Permissao
+            SessaoSEI::getInstance()->validarPermissao('md_cgu_eouv_depara_importacao_desativar');
+
+            $objEouvDeparaImportacaoBD = new MdEouvDeparaImportacaoBD($this->getObjInfraIBanco());
+            for($i=0;$i<count($arrObjEouvDeparaImportacaoDTO);$i++){
+                $objEouvDeparaImportacaoBD->desativar($arrObjEouvDeparaImportacaoDTO[$i]);
+            }
+
+            //Auditoria
+
+        }catch(Exception $e){
+            throw new InfraException('Erro desativando DePara Eouv Importação.',$e);
+        }
+    }
+
+  protected function reativarControlado($arrObjEouvDeparaImportacaoDTO){
+        try {
+
+            //Valida Permissao
+            SessaoSEI::getInstance()->validarPermissao('md_cgu_eouv_depara_importacao_reativar');
+
+            $objEouvDeparaImportacaoBD = new MdEouvDeparaImportacaoBD($this->getObjInfraIBanco());
+            for($i=0;$i<count($arrObjEouvDeparaImportacaoDTO);$i++){
+                $objEouvDeparaImportacaoBD->reativar($arrObjEouvDeparaImportacaoDTO[$i]);
+            }
+
+            //Auditoria
+
+        }catch(Exception $e){
+            throw new InfraException('Erro reativando DePara Eouv Importação.',$e);
+        }
+    }
+
   private function validarNumIdTipoManifestacaoEouv(MdCguEouvDeparaImportacaoDTO $objEouvDeparaImportacaoDTO, InfraException $objInfraException){
     if (InfraString::isBolVazia($objEouvDeparaImportacaoDTO->getNumIdTipoManifestacaoEouv())){
       $objInfraException->adicionarValidacao('ID do Tipo da Manifestação não informado.');

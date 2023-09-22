@@ -72,7 +72,6 @@ class MdCguEouvParametroRN extends InfraRN {
         }
     }
 
-    
     protected function consultarParametroConectado(MdCguEouvParametroDTO $objEouvParametroDTO){
       try {
 
@@ -87,7 +86,6 @@ class MdCguEouvParametroRN extends InfraRN {
         throw new InfraException('Erro consultando Parâmetro do módulo de integração SEI x E-ouv.',$e);
       }
     }
-
 
     protected function listarParametroConectado(MdCguEouvParametroDTO $objEouvParametroDTO) {
         try {
@@ -120,8 +118,6 @@ class MdCguEouvParametroRN extends InfraRN {
             throw new InfraException('Erro listando associações entre Protocolo e Assunto.',$e);
         }
     }
-
-
 
 }
 ?>
