@@ -300,10 +300,10 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
       $numIdPerfilSeiAdministrador = $objPerfilDTO->getNumIdPerfil();
 
       $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
-          'md_cgu_eouv_depara_importacao_desativar', 'Desativar de Parâmetros módulo SEI x E-ouv',
+          'md_cgu_eouv_depara_importacao_desativar', 'Desativar Tipo de Manifestação FalaBR',
           'controlador.php?acao=md_cgu_eouv_depara_importacao_desativar');
       $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
-          'md_cgu_eouv_depara_importacao_reativar', 'Reativar de Parâmetros módulo SEI x E-ouv',
+          'md_cgu_eouv_depara_importacao_reativar', 'Reativar Tipo de Manifestação FalaBR',
           'controlador.php?acao=md_cgu_eouv_depara_importacao_reativar');
 
 
