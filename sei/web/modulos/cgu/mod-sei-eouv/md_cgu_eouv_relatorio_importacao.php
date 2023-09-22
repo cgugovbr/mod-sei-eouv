@@ -39,7 +39,6 @@
   $objEouvRelatorioImportacaoDTO->retNumIdRelatorioImportacao();
   $objEouvRelatorioImportacaoDTO->retDthDthImportacao();
   $objEouvRelatorioImportacaoDTO->retStrSinSucesso();
-  $objEouvRelatorioImportacaoDTO->retStrTipManifestacao();
   $objEouvRelatorioImportacaoDTO->retDthDthPeriodoInicial();
   $objEouvRelatorioImportacaoDTO->retDthDthPeriodoFinal();
   $objEouvRelatorioImportacaoDTO->retStrDeLogProcessamento();

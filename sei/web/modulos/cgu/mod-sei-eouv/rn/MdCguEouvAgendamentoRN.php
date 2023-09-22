@@ -144,7 +144,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         try {
 
             //Retorna dados da Última execução com Sucesso
-            $objUltimaExecucao = MdCguEouvAgendamentoINT::retornarUltimaExecucaoSucesso('R');
+            $objUltimaExecucao = MdCguEouvAgendamentoINT::retornarUltimaExecucaoSucesso();
 
             if ($objUltimaExecucao != null) {
                 // Debug Logs
@@ -222,7 +222,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                 if (is_array($retornoWs)) {
                     // Filtra as manifestações e-Sic
-                    $arrManifestacoes = array_filter($retornoWs, function($manifestacao, $tiposValidos) {
+                    $arrManifestacoes = array_filter($retornoWs, function($manifestacao) use ($tiposValidos ) {
                         return in_array($manifestacao['TipoManifestacao']['IdTipoManifestacao'], $tiposValidos);
                     });
                     $qtdManifestacoesNovas = count($arrManifestacoes);

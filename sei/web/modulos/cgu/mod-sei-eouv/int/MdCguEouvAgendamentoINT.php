@@ -13,7 +13,7 @@ require_once dirname(__FILE__).'/../../../../SEI.php';
 
 class MdCguEouvAgendamentoINT extends InfraINT
 {
-    public static function retornarUltimaExecucaoSucesso($tipManifestacao = 'P')
+    public static function retornarUltimaExecucaoSucesso()
     {
 
         $objEouvRelatorioImportacaoDTO=new MdCguEouvRelatorioImportacaoDTO();
