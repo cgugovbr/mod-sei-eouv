@@ -423,7 +423,6 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
       $infraAgendamentoNovaTarefaDTO->setStrEmailErro('');
 
       $infraAgendamentoTarefaRN->cadastrar($infraAgendamentoNovaTarefaDTO);
-
   }
 }
 
