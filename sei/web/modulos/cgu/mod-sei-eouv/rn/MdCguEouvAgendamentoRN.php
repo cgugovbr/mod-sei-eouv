@@ -60,7 +60,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $objEouvRelatorioImportacaoDTO2->setNumIdRelatorioImportacao($objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao());
         $objEouvRelatorioImportacaoDTO2->setStrSinSucesso($SinSucessoExecucao);
         $objEouvRelatorioImportacaoDTO2->setStrDeLogProcessamento($textoMensagemFinal);
-        $objEouvRelatorioImportacaoDTO2->setStrTipManifestacao('R');
         $objEouvRelatorioImportacaoRN->alterar($objEouvRelatorioImportacaoDTO2);
     }
 
@@ -170,7 +169,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
              * A função abaixo gravarLogImportacao recebe o tipo de manifestação 'R' (Recursos) para as manifestações do e-Sic
              */
 
-            $objEouvRelatorioImportacaoDTO = $this->gravarLogImportacao($ultimaDataExecucao, $dataAtual, 'R');
+            $objEouvRelatorioImportacaoDTO = $this->gravarLogImportacao($ultimaDataExecucao, $dataAtual);
             $this->idRelatorioImportacao = $objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao();
             $objEouvRelatorioImportacaoRN = new MdCguEouvRelatorioImportacaoRN();
             $SinSucessoExecucao = 'N';
@@ -587,7 +586,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         return gzinflate(substr($data, 10, -8));
     }
 
-    public function gravarLogImportacao($ultimaDataExecucao, $dataAtual, $tipoManifestacao = 'P'){
+    public function gravarLogImportacao($ultimaDataExecucao, $dataAtual){
 
         try {
             $objEouvRelatorioImportacaoDTO = new MdCguEouvRelatorioImportacaoDTO();
@@ -599,7 +598,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $objEouvRelatorioImportacaoDTO->setDthDthPeriodoFinal($dataAtual);
             $objEouvRelatorioImportacaoDTO->setStrDeLogProcessamento('Passo 1 - Iniciando processamento.');
             $objEouvRelatorioImportacaoDTO->setStrSinSucesso('N');
-            $objEouvRelatorioImportacaoDTO->setStrTipManifestacao($tipoManifestacao);
 
             $objEouvRelatorioImportacaoRN = new MdCguEouvRelatorioImportacaoRN();
             $objEouvRelatorioImportacaoRN->cadastrar($objEouvRelatorioImportacaoDTO);
