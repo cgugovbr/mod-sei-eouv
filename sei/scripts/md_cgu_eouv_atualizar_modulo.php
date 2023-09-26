@@ -381,6 +381,48 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
       BancoSEI::getInstance()->executarSql('UPDATE md_eouv_depara_importacao SET sin_ativo = \'S\'');
       $objInfraMetaBD->alterarColuna('md_eouv_depara_importacao', 'sin_ativo', $objInfraMetaBD->tipoTextoFixo(1), 'not null');
 
+      $this->logar('EXCLUINDO COLUNA tip_manifestacao DA TABELA md_eouv_rel_import');
+      $objInfraMetaBD->excluirColuna('md_eouv_rel_import', 'tip_manifestacao');
+
+      $infraAgendamentoTarefaRN = new InfraAgendamentoTarefaRN();
+
+      $this->logar('removendo tarefas antidas do agendamento');
+
+      $infraAgendamentoTarefaDTO = new InfraAgendamentoTarefaDTO();
+      $infraAgendamentoTarefaDTO->retTodos();
+      $infraAgendamentoTarefaDTO->setStrComando('MdCguEouvAgendamentoRN::executarImportacaoManifestacaoEOuv');
+      $infraAgendamentoTarefaDTO->setBolExclusaoLogica(false);
+      $tarefaEouv = $infraAgendamentoTarefaRN->consultar($infraAgendamentoTarefaDTO);
+      if ($tarefaEouv != null){
+          $arrTarefaEouv = [$tarefaEouv];
+          $infraAgendamentoTarefaRN->excluir($arrTarefaEouv);
+      }
+
+      $infraAgendamentoTarefaDTO = new InfraAgendamentoTarefaDTO();
+      $infraAgendamentoTarefaDTO->retTodos();
+      $infraAgendamentoTarefaDTO->setStrComando('MdCguEouvAgendamentoRN::executarImportacaoManifestacaoESic');
+      $infraAgendamentoTarefaDTO->setBolExclusaoLogica(false);
+      $tarefaEsic = $infraAgendamentoTarefaRN->consultar($infraAgendamentoTarefaDTO);
+      if ($tarefaEsic != null){
+          $arrTarefaEsic = [$tarefaEsic];
+          $infraAgendamentoTarefaRN->excluir($arrTarefaEsic);
+      }
+
+      $this->logar('Criando nova tarefa no agendamento');
+
+      $infraAgendamentoNovaTarefaDTO = new InfraAgendamentoTarefaDTO();
+      $infraAgendamentoNovaTarefaDTO->setStrDescricao('Rotina responsável pela execução da importação de manifestações cadastradas no FalaBR que serão importadas para o SEI/SUPER como um novo processo. Se baseia na data da última execução com sucesso até a data atual.');
+      $infraAgendamentoNovaTarefaDTO->setStrComando('MdCguEouvAgendamentoRN::executarImportacaoManifestacaoFalaBr');
+      $infraAgendamentoNovaTarefaDTO->setStrSinAtivo('S');
+      $infraAgendamentoNovaTarefaDTO->setStrStaPeriodicidadeExecucao('D');
+      $infraAgendamentoNovaTarefaDTO->setStrPeriodicidadeComplemento('1');
+      $infraAgendamentoNovaTarefaDTO->setStrSinSucesso('S');
+      $infraAgendamentoNovaTarefaDTO->setDthUltimaExecucao(null);
+      $infraAgendamentoNovaTarefaDTO->setDthUltimaConclusao(null);
+      $infraAgendamentoNovaTarefaDTO->setStrParametro(null);
+      $infraAgendamentoNovaTarefaDTO->setStrEmailErro('');
+
+      $infraAgendamentoTarefaRN->cadastrar($infraAgendamentoNovaTarefaDTO);
   }
 }
 

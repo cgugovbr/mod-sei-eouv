@@ -39,7 +39,6 @@
   $objEouvRelatorioImportacaoDTO->retNumIdRelatorioImportacao();
   $objEouvRelatorioImportacaoDTO->retDthDthImportacao();
   $objEouvRelatorioImportacaoDTO->retStrSinSucesso();
-  $objEouvRelatorioImportacaoDTO->retStrTipManifestacao();
   $objEouvRelatorioImportacaoDTO->retDthDthPeriodoInicial();
   $objEouvRelatorioImportacaoDTO->retDthDthPeriodoFinal();
   $objEouvRelatorioImportacaoDTO->retStrDeLogProcessamento();
@@ -98,7 +97,6 @@
 
     $strResultado .= '<th class="infraTh" width="5%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'ID','IdRelatorioImportacao',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh" width="10%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'Data da Execução','DthImportacao',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
-    $strResultado .= '<th class="infraTh" width="7%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'Tipo','TipManifestacao',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh" width="7%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'Sucesso','SinSucesso',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh" width="10%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'Período Inicial','DthPeriodoInicial',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh" width="10%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'Período Final','DthPeriodoFinal',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
@@ -118,7 +116,6 @@
 
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDTO[$i]->getNumIdRelatorioImportacao().'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDTO[$i]->getDthDthImportacao().'</td>';
-      $strResultado .= '<td align="center">'.(in_array(trim($arrObjEouvRelatorioImportacaoDTO[$i]->getStrTipManifestacao()), ['R', 'R1', 'R2', 'R3', 'RE', 'RC', 'PR']) ? 'e-Sic' : 'e-Ouv').'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDTO[$i]->getStrSinSucesso().'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDTO[$i]->getDthDthPeriodoInicial().'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDTO[$i]->getDthDthPeriodoFinal().'</td>';

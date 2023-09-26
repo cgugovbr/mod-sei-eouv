@@ -60,7 +60,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $objEouvRelatorioImportacaoDTO2->setNumIdRelatorioImportacao($objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao());
         $objEouvRelatorioImportacaoDTO2->setStrSinSucesso($SinSucessoExecucao);
         $objEouvRelatorioImportacaoDTO2->setStrDeLogProcessamento($textoMensagemFinal);
-        $objEouvRelatorioImportacaoDTO2->setStrTipManifestacao('R');
         $objEouvRelatorioImportacaoRN->alterar($objEouvRelatorioImportacaoDTO2);
     }
 
@@ -86,6 +85,21 @@ class MdCguEouvAgendamentoRN extends InfraRN
         return BancoSEI::getInstance();
     }
 
+    public static function tiposValidos(){
+        $objMdCguEouvDeparaImportacaoDTO = new MdCguEouvDeparaImportacaoDTO();
+        $objMdCguEouvDeparaImportacaoDTO->retTodos();
+        $objMdCguEouvDeparaImportacaoDTO->setStrSinAtivo('S');
+
+        $objMdCguEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
+        $arrObjMdCguEouvDeparaImportacaoDTO = $objMdCguEouvDeparaImportacaoRN->listar($objMdCguEouvDeparaImportacaoDTO);
+        $numRegistrosMdCguEouvDeparaImportacaoDTO = count($arrObjMdCguEouvDeparaImportacaoDTO);
+        $tiposValidos = array();
+        for ($i = 0; $i < $numRegistrosMdCguEouvDeparaImportacaoDTO; $i++) {
+            $idTipoManifestacaoEouv = $arrObjMdCguEouvDeparaImportacaoDTO[$i]->getNumIdTipoManifestacaoEouv();
+            $tiposValidos[] = $idTipoManifestacaoEouv;
+        }
+        return $tiposValidos;
+    }
 
     /**
      * Função para importar as manifestações do FalaBr
@@ -108,6 +122,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $numRegistros = count($arrObjEouvParametroDTO);
 
         $this->preencheVariaveis($numRegistros, $arrObjEouvParametroDTO);
+        $tiposValidos = self::tiposValidos();
 
         /**
          * Função para buscar o 'restante' do token sem o limite de 255 caracteres do SEI
@@ -129,7 +144,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         try {
 
             //Retorna dados da Última execução com Sucesso
-            $objUltimaExecucao = MdCguEouvAgendamentoINT::retornarUltimaExecucaoSucesso('R');
+            $objUltimaExecucao = MdCguEouvAgendamentoINT::retornarUltimaExecucaoSucesso();
 
             if ($objUltimaExecucao != null) {
                 // Debug Logs
@@ -154,7 +169,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
              * A função abaixo gravarLogImportacao recebe o tipo de manifestação 'R' (Recursos) para as manifestações do e-Sic
              */
 
-            $objEouvRelatorioImportacaoDTO = $this->gravarLogImportacao($ultimaDataExecucao, $dataAtual, 'R');
+            $objEouvRelatorioImportacaoDTO = $this->gravarLogImportacao($ultimaDataExecucao, $dataAtual);
             $this->idRelatorioImportacao = $objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao();
             $objEouvRelatorioImportacaoRN = new MdCguEouvRelatorioImportacaoRN();
             $SinSucessoExecucao = 'N';
@@ -207,20 +222,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                 if (is_array($retornoWs)) {
                     // Filtra as manifestações e-Sic
-                    $arrManifestacoes = array_filter($retornoWs, function($manifestacao) {
-                        $objMdCguEouvDeparaImportacaoDTO = new MdCguEouvDeparaImportacaoDTO();
-                        $objMdCguEouvDeparaImportacaoDTO->retTodos();
-                        $objMdCguEouvDeparaImportacaoDTO->setStrSinAtivo('S');
-
-                        $objMdCguEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
-                        $arrObjMdCguEouvDeparaImportacaoDTO = $objMdCguEouvDeparaImportacaoRN->listar($objMdCguEouvDeparaImportacaoDTO);
-                        $numRegistrosMdCguEouvDeparaImportacaoDTO = count($arrObjMdCguEouvDeparaImportacaoDTO);
-                        $tiposValidos = array();
-                        for ($i = 0; $i < $numRegistrosMdCguEouvDeparaImportacaoDTO; $i++) {
-                            $idTipoManifestacaoEouv = $arrObjMdCguEouvDeparaImportacaoDTO[$i]->getNumIdTipoManifestacaoEouv();
-                            $tiposValidos[] = $idTipoManifestacaoEouv;
-                        }
-
+                    $arrManifestacoes = array_filter($retornoWs, function($manifestacao) use ($tiposValidos ) {
                         return in_array($manifestacao['TipoManifestacao']['IdTipoManifestacao'], $tiposValidos);
                     });
                     $qtdManifestacoesNovas = count($arrManifestacoes);
@@ -577,7 +579,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         return gzinflate(substr($data, 10, -8));
     }
 
-    public function gravarLogImportacao($ultimaDataExecucao, $dataAtual, $tipoManifestacao = 'P'){
+    public function gravarLogImportacao($ultimaDataExecucao, $dataAtual){
 
         try {
             $objEouvRelatorioImportacaoDTO = new MdCguEouvRelatorioImportacaoDTO();
@@ -589,7 +591,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $objEouvRelatorioImportacaoDTO->setDthDthPeriodoFinal($dataAtual);
             $objEouvRelatorioImportacaoDTO->setStrDeLogProcessamento('Passo 1 - Iniciando processamento.');
             $objEouvRelatorioImportacaoDTO->setStrSinSucesso('N');
-            $objEouvRelatorioImportacaoDTO->setStrTipManifestacao($tipoManifestacao);
 
             $objEouvRelatorioImportacaoRN = new MdCguEouvRelatorioImportacaoRN();
             $objEouvRelatorioImportacaoRN->cadastrar($objEouvRelatorioImportacaoDTO);

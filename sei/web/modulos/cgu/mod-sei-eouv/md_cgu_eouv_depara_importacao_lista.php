@@ -17,8 +17,6 @@ try {
 
   SessaoSEI::getInstance()->validarLink();
 
-  PaginaSEI::getInstance()->prepararSelecao('md_cgu_eouv_depara_importacao_selecionar');
-
   SessaoSEI::getInstance()->validarPermissao($_GET['acao']);
 
   switch($_GET['acao']){
@@ -67,17 +65,6 @@ try {
           }
           break;
 
-      case 'md_cgu_eouv_depara_importacao_selecionar':
-          $strTitulo = PaginaSEI::getInstance()->getTituloSelecao('Selecionar Tipo de manifestação','Selecionar Tipos de manifestações');
-
-          //Se cadastrou alguem
-          if ($_GET['acao_origem']==='md_cgu_eouv_depara_importacao_cadastrar'){
-              if (isset($_GET['id_md_cgu_eouv_depara_importacao'])){
-                  PaginaSEI::getInstance()->adicionarSelecionado($_GET['id_md_cgu_eouv_depara_importacao']);
-              }
-          }
-          break;
-
     default:
       throw new InfraException("Ação '".$_GET['acao']."' não reconhecida.");
   }
@@ -99,17 +86,9 @@ try {
     $bolAcaoAlterar = SessaoSEI::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_alterar');
 
       $bolCheck = false;
-
-      if ($_GET['acao']==='md_cgu_eouv_depara_importacao_selecionar'){
-          $bolAcaoReativar = false;
-          $bolAcaoAlterar = SessaoSei::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_alterar');
-          $bolAcaoDesativar = false;
-          $bolCheck = true;
-      }else{
-          $bolAcaoReativar = SessaoSei::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_reativar');
-          $bolAcaoAlterar = SessaoSei::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_alterar');
-          $bolAcaoDesativar = SessaoSei::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_desativar');
-      }
+      $bolAcaoReativar = SessaoSei::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_reativar');
+      $bolAcaoAlterar = SessaoSei::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_alterar');
+      $bolAcaoDesativar = SessaoSei::getInstance()->verificarPermissao('md_cgu_eouv_depara_importacao_desativar');
 
       if ($bolAcaoDesativar){
           $bolCheck = true;
@@ -229,13 +208,8 @@ PaginaSEI::getInstance()->abrirJavaScript();
 <?if(0){?><script type="text/javascript"><?}?>
 
     function inicializar() {
-        if ('<?=$_GET['acao']?>'=='md_cgu_eouv_depara_importacao_selecionar') {
-            infraReceberSelecao();
-            document.getElementById('btnFecharSelecao').focus();
-        } else {
-            document.getElementById('btnFechar').focus();
-        }
-        infraEfeitoTabelas();
+       document.getElementById('btnFechar').focus();
+       infraEfeitoTabelas();
     }
 
 <? if ($bolAcaoDesativar){ ?>

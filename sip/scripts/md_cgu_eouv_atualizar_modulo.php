@@ -272,6 +272,41 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
 
   protected function instalarv402(){
 
+      $objSistemaRN = new SistemaRN();
+      $objPerfilRN = new PerfilRN();
+
+      $objSistemaDTO = new SistemaDTO();
+      $objSistemaDTO->retNumIdSistema();
+      $objSistemaDTO->setStrSigla('SEI');
+
+      $objSistemaDTO = $objSistemaRN->consultar($objSistemaDTO);
+
+      if ($objSistemaDTO == null) {
+          throw new InfraException('Sistema SEI não encontrado.');
+      }
+
+      $numIdSistemaSei = $objSistemaDTO->getNumIdSistema();
+
+      $objPerfilDTO = new PerfilDTO();
+      $objPerfilDTO->retNumIdPerfil();
+      $objPerfilDTO->setNumIdSistema($numIdSistemaSei);
+      $objPerfilDTO->setStrNome('Administrador');
+      $objPerfilDTO = $objPerfilRN->consultar($objPerfilDTO);
+
+      if ($objPerfilDTO == null) {
+          throw new InfraException('Perfil Administrador do sistema SEI não encontrado.');
+      }
+
+      $numIdPerfilSeiAdministrador = $objPerfilDTO->getNumIdPerfil();
+
+      $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
+          'md_cgu_eouv_depara_importacao_desativar', 'Desativar Tipo de Manifestação FalaBR',
+          'controlador.php?acao=md_cgu_eouv_depara_importacao_desativar');
+      $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
+          'md_cgu_eouv_depara_importacao_reativar', 'Reativar Tipo de Manifestação FalaBR',
+          'controlador.php?acao=md_cgu_eouv_depara_importacao_reativar');
+
+
   }
 
   private function adicionarItemMenu($numIdSistema, $numIdPerfil, $numIdMenu, $numIdItemMenuPai, $numIdRecurso, $strRotulo, $strDescricao, $numSequencia)
