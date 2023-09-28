@@ -14,8 +14,9 @@ function alterarParametro(MdCguEouvParametroDTO $objMdCguEouvParametroDTO)
     try {
         $objMdCguEouvAlterarParametroRN = new MdCguEouvParametroRN();
         $objMdCguEouvAlterarParametroRN->alterarParametro($objMdCguEouvParametroDTO);
+        PaginaSEI::getInstance()->setBolExibirMensagens(true);
         PaginaSEI::getInstance()->setStrMensagem('Parâmetro "' . $objMdCguEouvParametroDTO->getStrNoParametro() . '" alterado com sucesso.');
-        //header('Location: ' . SessaoSEI::getInstance()->assinarLink('controlador.php?acao=' . PaginaSEI::getInstance()->getAcaoRetorno() . '&acao_origem=' . $_GET['acao'] . '#ID-' . $objMdCguEouvParametroDTO->getNumIdParametro()));
+        header('Location: ' . SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_listar' ));
     } catch (Exception $e) {
         PaginaSEI::getInstance()->processarExcecao($e);
     }
