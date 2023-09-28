@@ -205,15 +205,89 @@ PaginaSEI::getInstance()->fecharStyle();
 PaginaSEI::getInstance()->montarJavaScript();
 PaginaSEI::getInstance()->abrirJavaScript();
 ?>
+    //<script>
     function inicializar(){
 
     }
+    function OnSubmitForm() {
+    return ValidarCadastroParametro();
+    }
+
+    function ValidarCadastroParametro() {
+        if (infraTrim(document.getElementById('EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES').value)=='') {
+            alert('Informe a Data Inicial de Importação.');
+            document.getElementById('EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO').value)=='null') {
+            alert('Informe o Tipo de Documento.');
+            document.getElementById('EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('EOUV_USUARIO_ACESSO_WEBSERVICE').value)=='') {
+            alert('Informe o Usuário.');
+            document.getElementById('EOUV_USUARIO_ACESSO_WEBSERVICE').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('EOUV_SENHA_ACESSO_WEBSERVICE').value)=='') {
+            alert('Informe a senha.');
+            document.getElementById('EOUV_SENHA_ACESSO_WEBSERVICE').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('CLIENT_ID').value)=='') {
+            alert('Informe o CLIENT_ID.');
+            document.getElementById('CLIENT_ID').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('CLIENT_SECRET').value)=='') {
+            alert('Informe o CLIENT_SECRET.');
+            document.getElementById('CLIENT_SECRET').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('EOUV_URL_WEBSERVICE_IMPORTACAO').value)=='') {
+            alert('Informe a url do Webservice.');
+            document.getElementById('EOUV_URL_WEBSERVICE_IMPORTACAO').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('ID_UNIDADE_OUVIDORIA').value)=='null') {
+            alert('Informe a Unidade de Ouvidoria');
+            document.getElementById('ID_UNIDADE_OUVIDORIA').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_PRINCIPAL').value)=='null') {
+            alert('Informe a Unidade de Acesso a Informação.');
+            document.getElementById('ESIC_ID_UNIDADE_PRINCIPAL').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA').value)=='null') {
+            alert('Informe a Unidade de Recurso em 1ª Instância.');
+            document.getElementById('ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA').value)=='null') {
+            alert('Informe a Unidade de Recurso em 2ª Instância.');
+            document.getElementById('ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA').value)=='null') {
+            alert('Informe a Unidade de Recurso em 3ª Instância.');
+            document.getElementById('ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO').value)=='null') {
+            alert('Informe a Unidade de Pedido de Revisão.');
+            document.getElementById('ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO').focus();
+            return false;
+        }
+        return true;
+    }
+    //</script>
 <?
 PaginaSEI::getInstance()->fecharJavaScript();
 PaginaSEI::getInstance()->fecharHead();
 PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
 ?>
-<form id="frmMdCguEouvParametroLista" method="post" action="<?=SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_alterar&acao_origem='.$_GET['acao'])?>">
+<form id="frmMdCguEouvParametroLista" method="post" onsubmit="return OnSubmitForm();" action="<?=SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_alterar&acao_origem='.$_GET['acao'])?>">
   <? PaginaSEI::getInstance()->montarBarraComandosSuperior($arrComandos); ?>
     <!-- 0 EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES -->
     <div class="infraAreaDados">
@@ -287,19 +361,19 @@ PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
         </select>
     </div>
     <div class="infraAreaDados">
-        <label id="lblESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA" for="ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA" accesskey="1" class="infraLabelObrigatorio">Unidade de Recurso em <span class="infraTeclaAtalho">1</span>ª instância:</label>
+        <label id="lblESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA" for="ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA" accesskey="1" class="infraLabelObrigatorio">Unidade de Recurso em <span class="infraTeclaAtalho">1</span>ª Instância:</label>
         <select id="ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA" name="ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA"  class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
             <?=$strItensSelUnidadePrimeira?>
         </select>
     </div>
     <div class="infraAreaDados">
-        <label id="lblESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA" for="ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA" accesskey="2" class="infraLabelObrigatorio">Unidade de Recurso em <span class="infraTeclaAtalho">2</span>ª instância:</label>
+        <label id="lblESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA" for="ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA" accesskey="2" class="infraLabelObrigatorio">Unidade de Recurso em <span class="infraTeclaAtalho">2</span>ª Instância:</label>
         <select id="ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA" name="ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA"  class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
             <?=$strItensSelUnidadeSegunda?>
         </select>
     </div>
     <div class="infraAreaDados">
-        <label id="lblESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" for="ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" accesskey="3" class="infraLabelObrigatorio">Unidade de Recurso em <span class="infraTeclaAtalho">3</span>ª instância:</label>
+        <label id="lblESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" for="ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" accesskey="3" class="infraLabelObrigatorio">Unidade de Recurso em <span class="infraTeclaAtalho">3</span>ª Instância:</label>
         <select id="ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" name="ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
             <?=$strItensSelUnidadeTerceira?>
         </select>
