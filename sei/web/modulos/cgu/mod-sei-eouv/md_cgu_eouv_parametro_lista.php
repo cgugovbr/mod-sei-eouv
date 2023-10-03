@@ -201,6 +201,9 @@ PaginaSEI::getInstance()->montarTitle(PaginaSEI::getInstance()->getStrNomeSistem
 PaginaSEI::getInstance()->montarStyle();
 PaginaSEI::getInstance()->abrirStyle();
 ?>
+.infraAreaDados {
+    margin-bottom: 1em;
+}
 <?
 PaginaSEI::getInstance()->fecharStyle();
 PaginaSEI::getInstance()->montarJavaScript();
@@ -246,7 +249,7 @@ PaginaSEI::getInstance()->abrirJavaScript();
             return false;
         }
         if (infraTrim(document.getElementById('EOUV_URL_WEBSERVICE_IMPORTACAO').value)=='') {
-            alert('Informe a url do Webservice.');
+            alert('Informe a URL do Webservice.');
             document.getElementById('EOUV_URL_WEBSERVICE_IMPORTACAO').focus();
             return false;
         }
@@ -290,7 +293,42 @@ PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
 ?>
 <form id="frmMdCguEouvParametroLista" method="post" onsubmit="return OnSubmitForm();" action="<?=SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_alterar&acao_origem='.$_GET['acao'])?>">
   <? PaginaSEI::getInstance()->montarBarraComandosSuperior($arrComandos); ?>
-    <!-- 0 EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES -->
+    <!-- EOUV_URL_WEBSERVICE_IMPORTACAO -->
+    <div class="infraAreaDados">
+        <label id="lblEOUV_URL_WEBSERVICE_IMPORTACAO" for="EOUV_URL_WEBSERVICE_IMPORTACAO" accesskey="W" class="infraLabelObrigatorio">
+            URL do <span class="infraTeclaAtalho">W</span>ebService:</label>
+        <input type="text" id="EOUV_URL_WEBSERVICE_IMPORTACAO" name="EOUV_URL_WEBSERVICE_IMPORTACAO" class="infraText"
+               value="<?=PaginaSEI::tratarHTML($urlWebServiceEOuv->getStrDeValorParametro());?>" onkeypress="return infraMascaraTexto(this,event,100);"
+               maxlength="100" size="50" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" />
+    </div>
+    <!-- EOUV_USUARIO_ACESSO_WEBSERVICE -->
+    <div class="infraAreaDados">
+        <label id="lblEOUV_USUARIO_ACESSO_WEBSERVICE for="EOUV_USUARIO_ACESSO_WEBSERVICE" accesskey="U" class="infraLabelObrigatorio">
+        <span class="infraTeclaAtalho">U</span>suário:</label>
+        <input type="text" id="EOUV_USUARIO_ACESSO_WEBSERVICE" name="EOUV_USUARIO_ACESSO_WEBSERVICE" class="infraText"
+               value="<?=PaginaSEI::tratarHTML($usuarioWebService->getStrDeValorParametro());?>" onkeypress="return infraMascaraTexto(this,event,50);"
+               maxlength="50" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" />
+        <!-- EOUV_SENHA_ACESSO_WEBSERVICE -->
+        <label id="lblEOUV_SENHA_ACESSO_WEBSERVICE" for="EOUV_SENHA_ACESSO_WEBSERVICE" accesskey="S" class="infraLabelObrigatorio">
+            <span class="infraTeclaAtalho">S</span>enha:</label>
+        <input type="password" id="EOUV_SENHA_ACESSO_WEBSERVICE" name="EOUV_SENHA_ACESSO_WEBSERVICE" onkeypress="return infraMascaraTexto(this,event,50);" class="infraText"
+                  tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" value="<?=PaginaSEI::tratarHTML($senhaUsuarioWebService->getStrDeValorParametro());?>" />
+    </div>
+    <!-- CLIENT_ID -->
+    <div class="infraAreaDados">
+        <label id="lblCLIENT_ID" for="CLIENT_ID" accesskey="C" class="infraLabelObrigatorio">
+        <span class="infraTeclaAtalho">C</span>lientID:</label>
+        <input type="text" id="CLIENT_ID" name="CLIENT_ID" class="infraText"
+               value="<?=PaginaSEI::tratarHTML($client_id->getStrDeValorParametro());?>" onkeypress="return infraMascaraTexto(this,event,50);"
+               maxlength="50" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" />
+        <!-- CLIENT_SECRET -->
+        <label id="lblCLIENT_SECRET" for="CLIENT_SECRET" accesskey="n" class="infraLabelObrigatorio">
+            Clie<span class="infraTeclaAtalho">n</span>tSecret:</label>
+        <input type="password" id="CLIENT_SECRET" name="CLIENT_SECRET" onkeypress="return infraMascaraTexto(this,event,50);" class="infraText"
+               tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" value="<?=PaginaSEI::tratarHTML($client_secret->getStrDeValorParametro());?>" />
+    </div>
+
+    <!-- EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES -->
     <div class="infraAreaDados">
         <label id="lblEOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES" for="EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES" accesskey="D" class="infraLabelObrigatorio">
             <span class="infraTeclaAtalho">D</span>ata Inicial de Importação:</label>
@@ -300,55 +338,22 @@ PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
         <img src="<?=PaginaSEI::getInstance()->getIconeCalendario()?>" id="imgCalDtaGeracaoInformar" title="Selecionar Data" alt="Selecionar Data"  class="infraImg"
              onclick="infraCalendario('EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES',this);" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" />
     </div>
-    <!-- 1 EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO -->
-    <div class="infraAreaDados">
-        <label id="lblEOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" for="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" accesskey="T" class="infraLabelObrigatorio"><span class="infraTeclaAtalho">T</span>ipo do Documento:</label>
-        <select id="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" name="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" class="infraSelect"
-                tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
-            <?=$strItensSelSerie?>
-        </select>
-    </div>
-    <!-- 2 EOUV_USUARIO_ACESSO_WEBSERVICE -->
-    <div class="infraAreaDados">
-        <label id="lblEOUV_USUARIO_ACESSO_WEBSERVICE for="EOUV_USUARIO_ACESSO_WEBSERVICE" accesskey="U" class="infraLabelObrigatorio">
-        <span class="infraTeclaAtalho">U</span>suário:</label>
-        <input type="text" id="EOUV_USUARIO_ACESSO_WEBSERVICE" name="EOUV_USUARIO_ACESSO_WEBSERVICE" class="infraText"
-               value="<?=PaginaSEI::tratarHTML($usuarioWebService->getStrDeValorParametro());?>" onkeypress="return infraMascaraTexto(this,event,50);"
-               maxlength="50" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" />
-        <!-- 3 EOUV_SENHA_ACESSO_WEBSERVICE -->
-        <label id="lblEOUV_SENHA_ACESSO_WEBSERVICE" for="EOUV_SENHA_ACESSO_WEBSERVICE" accesskey="S" class="infraLabelObrigatorio">
-            <span class="infraTeclaAtalho">S</span>enha:</label>
-        <input type="password" id="EOUV_SENHA_ACESSO_WEBSERVICE" name="EOUV_SENHA_ACESSO_WEBSERVICE" onkeypress="return infraMascaraTexto(this,event,50);" class="infraText"
-                  tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" value="<?=PaginaSEI::tratarHTML($senhaUsuarioWebService->getStrDeValorParametro());?>" />
-    </div>
-    <!-- 4 CLIENT_ID -->
-    <div class="infraAreaDados">
-        <label id="lblCLIENT_ID" for="CLIENT_ID" accesskey="C" class="infraLabelObrigatorio">
-        <span class="infraTeclaAtalho">C</span>lientID:</label>
-        <input type="password" id="CLIENT_ID" name="CLIENT_ID" class="infraText"
-               value="<?=PaginaSEI::tratarHTML($client_id->getStrDeValorParametro());?>" onkeypress="return infraMascaraTexto(this,event,50);"
-               maxlength="50" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" />
-        <!-- 5 CLIENT_SECRET -->
-        <label id="lblCLIENT_SECRET" for="CLIENT_SECRET" accesskey="n" class="infraLabelObrigatorio">
-            Clie<span class="infraTeclaAtalho">n</span>tSecret:</label>
-        <input type="password" id="CLIENT_SECRET" name="CLIENT_SECRET" onkeypress="return infraMascaraTexto(this,event,50);" class="infraText"
-               tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" value="<?=PaginaSEI::tratarHTML($client_secret->getStrDeValorParametro());?>" />
-    </div>
-    <!-- 6 EOUV_URL_WEBSERVICE_IMPORTACAO -->
-    <div class="infraAreaDados">
-        <label id="lblEOUV_URL_WEBSERVICE_IMPORTACAO" for="EOUV_URL_WEBSERVICE_IMPORTACAO" accesskey="W" class="infraLabelObrigatorio">
-            <span class="infraTeclaAtalho">W</span>ebService:</label>
-        <input type="text" id="EOUV_URL_WEBSERVICE_IMPORTACAO" name="EOUV_URL_WEBSERVICE_IMPORTACAO" class="infraText"
-               value="<?=PaginaSEI::tratarHTML($urlWebServiceEOuv->getStrDeValorParametro());?>" onkeypress="return infraMascaraTexto(this,event,100);"
-               maxlength="100" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" />
-    </div>
-
-    <!-- 9 IMPORTAR_DADOS_MANIFESTANTE -->
+    <!-- IMPORTAR_DADOS_MANIFESTANTE -->
     <div class="infraDivCheckbox infraAreaDados" style="height:3em;">
         <input type="checkbox" id="IMPORTAR_DADOS_MANIFESTANTE" name="IMPORTAR_DADOS_MANIFESTANTE" class="infraCheckbox"
             <?=PaginaSEI::getInstance()->setCheckbox($importarDadosManifestante->getStrDeValorParametro())?>   />
         <label id="lblIMPORTAR_DADOS_MANIFESTANTE" for="IMPORTAR_DADOS_MANIFESTANTE" accesskey="I" class="infraLabelCheckbox"><span class="infraTeclaAtalho">I</span>mportar Dados do Manifestante </label>
     </div>
+
+    <!-- EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO -->
+    <div class="infraAreaDados">
+        <label id="lblEOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" for="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" accesskey="T" class="infraLabelObrigatorio"><span class="infraTeclaAtalho">T</span>ipo de documento usado na importação:</label>
+        <select id="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" name="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" class="infraSelect"
+                tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
+            <?=$strItensSelSerie?>
+        </select>
+    </div>
+
     <div class="infraAreaDados">
         <label id="lblID_UNIDADE_OUVIDORIA" for="ID_UNIDADE_OUVIDORIA" accesskey="O" class="infraLabelObrigatorio">Unidade de <span class="infraTeclaAtalho">O</span>uvidoria:</label>
         <select id="ID_UNIDADE_OUVIDORIA" name="ID_UNIDADE_OUVIDORIA" class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
@@ -385,6 +390,8 @@ PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
             <?=$strItensSelUnidadeRevisao?>
         </select>
     </div>
+
+    <? PaginaSEI::getInstance()->montarBarraComandosInferior($arrComandos); ?>
 </form>
 <?
 PaginaSEI::getInstance()->fecharBody();
