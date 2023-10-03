@@ -20,7 +20,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
 {
     protected $urlWebServiceEOuv;
     protected $urlWebServiceESicRecursos;
-    protected $urlWebServiceAnexosEOuv;
     protected $idTipoDocumentoAnexoDadosManifestacao;
     protected $idUnidadeOuvidoria;
     protected $idUnidadeEsicPrincipal;
@@ -313,9 +312,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
                         $this->dataInicialImportacaoManifestacoes = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
                         break;
 
-                    case "EOUV_URL_WEBSERVICE_IMPORTACAO":
-                        $this->urlWebServiceAnexosEOuv = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro() + '/api/recursos';
-                        $this->urlWebServiceESicRecursos = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro() + '/api/recursos';
+                    case "EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO":
+                        $this->urlWebServiceEOuv = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro() . '/api/manifestacoes';
+                        $this->urlWebServiceESicRecursos = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro() . '/api/recursos';
                         break;
 
                     case "EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO":
