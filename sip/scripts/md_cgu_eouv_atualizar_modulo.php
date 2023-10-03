@@ -299,14 +299,14 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
       }
 
       $numIdPerfilSeiAdministrador = $objPerfilDTO->getNumIdPerfil();
-      /*$this->logar('Concedendo a permissão para ativar e desativar o tipo de manifestação');
+      $this->logar('Concedendo a permissão para ativar e desativar o tipo de manifestação');
 
       $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
           'md_cgu_eouv_depara_importacao_desativar', 'Desativar Tipo de Manifestação FalaBR',
           'controlador.php?acao=md_cgu_eouv_depara_importacao_desativar');
       $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
           'md_cgu_eouv_depara_importacao_reativar', 'Reativar Tipo de Manifestação FalaBR',
-          'controlador.php?acao=md_cgu_eouv_depara_importacao_reativar');*/
+          'controlador.php?acao=md_cgu_eouv_depara_importacao_reativar');
 
       $this->logar('Alterar item do menu');
       $objItemMenuDTOEouv = new ItemMenuDTO();
