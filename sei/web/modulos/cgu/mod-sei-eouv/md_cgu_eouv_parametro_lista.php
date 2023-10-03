@@ -9,19 +9,6 @@
 * Versão no CVS: $Id$
 */
 
-function alterarParametro(MdCguEouvParametroDTO $objMdCguEouvParametroDTO)
-{
-    try {
-        $objMdCguEouvAlterarParametroRN = new MdCguEouvParametroRN();
-        $objMdCguEouvAlterarParametroRN->alterarParametro($objMdCguEouvParametroDTO);
-        PaginaSEI::getInstance()->setBolExibirMensagens(true);
-        PaginaSEI::getInstance()->setStrMensagem('Parâmetro "' . $objMdCguEouvParametroDTO->getStrNoParametro() . '" alterado com sucesso.');
-        header('Location: ' . SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_listar' ));
-    } catch (Exception $e) {
-        PaginaSEI::getInstance()->processarExcecao($e);
-    }
-}
-
 try {
   require_once dirname(__FILE__).'/../../../SEI.php';
 
@@ -117,63 +104,69 @@ try {
   switch($_GET['acao']){
 
     case 'md_cgu_eouv_parametro_alterar':
+        $objMdCguEouvAlterarParametroRN = new MdCguEouvParametroRN();
+
         if($_POST['EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES'] != $dataInicialImportacaoManifestacoes->getStrDeValorParametro()){
             $dataInicialImportacaoManifestacoes->setStrDeValorParametro($_POST['EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES']);
-            alterarParametro($dataInicialImportacaoManifestacoes);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($dataInicialImportacaoManifestacoes);
         }
         if($_POST['EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO'] != $idTipoDocumentoAnexoDadosManifestacao->getStrDeValorParametro()){
             $idTipoDocumentoAnexoDadosManifestacao->setStrDeValorParametro($_POST['EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO']);
-            alterarParametro($idTipoDocumentoAnexoDadosManifestacao);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($idTipoDocumentoAnexoDadosManifestacao);
         }
         if($_POST['EOUV_USUARIO_ACESSO_WEBSERVICE'] != $usuarioWebService->getStrDeValorParametro()){
             $usuarioWebService->setStrDeValorParametro($_POST['EOUV_USUARIO_ACESSO_WEBSERVICE']);
-            alterarParametro($usuarioWebService);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($usuarioWebService);
         }
         if($_POST['EOUV_SENHA_ACESSO_WEBSERVICE'] != $senhaUsuarioWebService->getStrDeValorParametro()){
             $senhaUsuarioWebService->setStrDeValorParametro($_POST['EOUV_SENHA_ACESSO_WEBSERVICE']);
-            alterarParametro($senhaUsuarioWebService);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($senhaUsuarioWebService);
         }
         if($_POST['CLIENT_ID'] != $client_id->getStrDeValorParametro()){
             $client_id->setStrDeValorParametro($_POST['CLIENT_ID']);
-            alterarParametro($client_id);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($client_id);
         }
         if($_POST['CLIENT_SECRET'] != $client_secret->getStrDeValorParametro()){
             $client_secret->setStrDeValorParametro($_POST['CLIENT_SECRET']);
-            alterarParametro($client_secret);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($client_secret);
         }
         if($_POST['EOUV_URL_WEBSERVICE_IMPORTACAO'] != $urlWebServiceEOuv->getStrDeValorParametro()){
             $urlWebServiceEOuv->setStrDeValorParametro($_POST['EOUV_URL_WEBSERVICE_IMPORTACAO']);
-            alterarParametro($urlWebServiceEOuv);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($urlWebServiceEOuv);
         }
         if($_POST['ID_UNIDADE_OUVIDORIA'] != $idUnidadeOuvidoria->getStrDeValorParametro()){
             $idUnidadeOuvidoria->setStrDeValorParametro($_POST['ID_UNIDADE_OUVIDORIA']);
-            alterarParametro($idUnidadeOuvidoria);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeOuvidoria);
         }
         $ckImportarDadosManifestantes = ($_POST['IMPORTAR_DADOS_MANIFESTANTE'] == 'on'?'S':'N');
         if($ckImportarDadosManifestantes != $importarDadosManifestante->getStrDeValorParametro()){
             $importarDadosManifestante->setStrDeValorParametro($ckImportarDadosManifestantes);
-            alterarParametro($importarDadosManifestante);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($importarDadosManifestante);
         }
         if($_POST['ESIC_ID_UNIDADE_PRINCIPAL'] != $idUnidadeEsicPrincipal->getStrDeValorParametro()){
             $idUnidadeEsicPrincipal->setStrDeValorParametro($_POST['ESIC_ID_UNIDADE_PRINCIPAL']);
-            alterarParametro($idUnidadeEsicPrincipal);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeEsicPrincipal);
         }
         if($_POST['ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA'] != $idUnidadeRecursoPrimeiraInstancia->getStrDeValorParametro()){
             $idUnidadeRecursoPrimeiraInstancia->setStrDeValorParametro($_POST['ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA']);
-            alterarParametro($idUnidadeRecursoPrimeiraInstancia);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeRecursoPrimeiraInstancia);
         }
         if($_POST['ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA'] != $idUnidadeRecursoSegundaInstancia->getStrDeValorParametro()){
             $idUnidadeRecursoSegundaInstancia->setStrDeValorParametro($_POST['ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA']);
-            alterarParametro($idUnidadeRecursoSegundaInstancia);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeRecursoSegundaInstancia);
         }
         if($_POST['ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA'] != $idUnidadeRecursoTerceiraInstancia->getStrDeValorParametro()){
             $idUnidadeRecursoTerceiraInstancia->setStrDeValorParametro($_POST['ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA']);
-            alterarParametro($idUnidadeRecursoTerceiraInstancia);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeRecursoTerceiraInstancia);
         }
         if($_POST['ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO'] != $idUnidadeRecursoPedidoRevisao->getStrDeValorParametro()){
             $idUnidadeRecursoPedidoRevisao->setStrDeValorParametro($_POST['ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO']);
-            alterarParametro($idUnidadeRecursoPedidoRevisao);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeRecursoPedidoRevisao);
         }
+
+        PaginaSEI::getInstance()->setStrMensagem('Parâmetros alterados com sucesso.');
+        header('Location: ' . SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_listar' ));
+        die();
         break;
     case 'md_cgu_eouv_parametro_listar':
       break;
