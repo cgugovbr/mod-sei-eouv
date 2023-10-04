@@ -138,7 +138,7 @@ try {
             $idUnidadeOuvidoria->setStrDeValorParametro($_POST['ID_UNIDADE_OUVIDORIA']);
             $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeOuvidoria);
         }
-        $ckImportarDadosManifestantes = ($_POST['IMPORTAR_DADOS_MANIFESTANTE'] == 'on'?'S':'N');
+        $ckImportarDadosManifestantes = ($_POST['IMPORTAR_DADOS_MANIFESTANTE'] == 'on'?'1':'0');
         if($ckImportarDadosManifestantes != $importarDadosManifestante->getStrDeValorParametro()){
             $importarDadosManifestante->setStrDeValorParametro($ckImportarDadosManifestantes);
             $objMdCguEouvAlterarParametroRN->alterarParametro($importarDadosManifestante);
@@ -334,7 +334,7 @@ PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
     <!-- IMPORTAR_DADOS_MANIFESTANTE -->
     <div class="infraDivCheckbox infraAreaDados" style="height:3em;">
         <input type="checkbox" id="IMPORTAR_DADOS_MANIFESTANTE" name="IMPORTAR_DADOS_MANIFESTANTE" class="infraCheckbox"
-            <?=PaginaSEI::getInstance()->setCheckbox($importarDadosManifestante->getStrDeValorParametro())?>   />
+            <?=PaginaSEI::getInstance()->setCheckbox($importarDadosManifestante->getStrDeValorParametro(), '1', '0')?>   />
         <label id="lblIMPORTAR_DADOS_MANIFESTANTE" for="IMPORTAR_DADOS_MANIFESTANTE" accesskey="I" class="infraLabelCheckbox"><span class="infraTeclaAtalho">I</span>mportar Dados do Manifestante </label>
     </div>
 
