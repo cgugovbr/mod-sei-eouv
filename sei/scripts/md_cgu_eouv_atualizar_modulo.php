@@ -423,6 +423,28 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
       $infraAgendamentoNovaTarefaDTO->setStrEmailErro('');
 
       $infraAgendamentoTarefaRN->cadastrar($infraAgendamentoNovaTarefaDTO);
+
+      $this->logar('Remove coluna de_tipo da tabela de parâmetros');
+      $objInfraMetaBD->excluirColuna('md_eouv_parametros', 'de_tipo');
+
+      $this->logar('Remove parâmetro ESIC_URL_WEBSERVICE_IMPORTACAO_RECURSOS');
+      BancoSEI::getInstance()->executarSql('DELETE FROM md_eouv_parametros WHERE no_parametro = ?', ['ESIC_URL_WEBSERVICE_IMPORTACAO_RECURSOS']);
+
+      $this->logar('Ajusta parâmetro EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO');
+      $arrParametros = BancoSEI::getInstance()->consultarSql('SELECT * FROM md_eouv_parametros WHERE no_parametro = ?', ['EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO']);
+      if (count($arrParametros) == 0) {
+        throw new InfraException('Parâmetro EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO não encontrado');
+      }
+      $strURLWebService = $arrParametros[0]['de_valor_parametro'];
+      if (trim($strURLWebService) != '') {
+        $arrParsedURL = parse_url($strURLWebService);
+        $strURLWebService = $arrParsedURL['scheme'] . '://' . $arrParsedURL['host'];
+        BancoSEI::getInstance()->executarSql('UPDATE md_eouv_parametros SET de_valor_parametro = ? WHERE no_parametro = ?',
+          [$strURLWebService, 'EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO']);
+      }
+
+      $this->logar('Remove parâmetro ESIC_DATA_INICIAL_IMPORTACAO_MANIFESTACOES');
+      BancoSEI::getInstance()->executarSql('DELETE FROM md_eouv_parametros WHERE no_parametro = ?', ['ESIC_DATA_INICIAL_IMPORTACAO_MANIFESTACOES']);
   }
 }
 

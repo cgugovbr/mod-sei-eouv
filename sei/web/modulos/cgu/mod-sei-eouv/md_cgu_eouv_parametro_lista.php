@@ -21,179 +21,166 @@ try {
   //////////////////////////////////////////////////////////////////////////////
 
   SessaoSEI::getInstance()->validarLink();
-
-  PaginaSEI::getInstance()->prepararSelecao('md_cgu_eouv_parametro_selecionar');
-
   SessaoSEI::getInstance()->validarPermissao($_GET['acao']);
+    $strTitulo = 'Parâmetros do Módulo de Integração com o FalaBR';
+    $arrComandos = array();
+
+    $objMdCguEouvParametroDTO = new MdCguEouvParametroDTO();
+    $objMdCguEouvParametroDTO->retTodos();
+
+    PaginaSEI::getInstance()->prepararOrdenacao($objMdCguEouvParametroDTO, 'IdParametro', InfraDTO::$TIPO_ORDENACAO_ASC);
+
+    $objMdCguEouvParametroRN = new MdCguEouvParametroRN();
+    $arrObjMdCguEouvParametroDTO = $objMdCguEouvParametroRN->listarParametro($objMdCguEouvParametroDTO);
+    $numRegistros = count($arrObjMdCguEouvParametroDTO);
+    if ($numRegistros > 0) {
+        for ($i = 0; $i < $numRegistros; $i++) {
+
+            $strParametroNome = $arrObjMdCguEouvParametroDTO[$i]->getStrNoParametro();
+
+            switch ($strParametroNome) {
+
+                case "EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES":
+                    $dataInicialImportacaoManifestacoes = $arrObjMdCguEouvParametroDTO[$i];
+                    break;
+
+                case "EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO":
+                    $idTipoDocumentoAnexoDadosManifestacao = $arrObjMdCguEouvParametroDTO[$i];
+                    break;
+
+                case "EOUV_USUARIO_ACESSO_WEBSERVICE":
+                    $usuarioWebService = $arrObjMdCguEouvParametroDTO[$i];
+                    break;
+
+                case "EOUV_SENHA_ACESSO_WEBSERVICE":
+                    $senhaUsuarioWebService = $arrObjMdCguEouvParametroDTO[$i];
+                    break;
+
+                case "CLIENT_ID":
+                    $client_id = $arrObjMdCguEouvParametroDTO[$i];
+                    break;
+
+                case "CLIENT_SECRET":
+                    $client_secret = $arrObjMdCguEouvParametroDTO[$i];
+                    break;
+
+                case "EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO":
+                    $urlWebServiceEOuv = $arrObjMdCguEouvParametroDTO[$i];
+                    break;
+                    
+                case "ESIC_ID_UNIDADE_PRINCIPAL":
+                    $idUnidadeEsicPrincipal = $arrObjMdCguEouvParametroDTO[$i];
+                    break;
+
+                case "ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA":
+                    $idUnidadeRecursoPrimeiraInstancia = $arrObjMdCguEouvParametroDTO[$i];
+                    break;
+
+                case "ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA":
+                    $idUnidadeRecursoSegundaInstancia = $arrObjMdCguEouvParametroDTO[$i];
+                    break;
+
+                case "ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA":
+                    $idUnidadeRecursoTerceiraInstancia = $arrObjMdCguEouvParametroDTO[$i];
+                    break;
+
+                case "ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO":
+                    $idUnidadeRecursoPedidoRevisao = $arrObjMdCguEouvParametroDTO[$i];
+                    break;
+
+                case "IMPORTAR_DADOS_MANIFESTANTE":
+                    $importarDadosManifestante = $arrObjMdCguEouvParametroDTO[$i];
+                    break;
+
+                case "ID_UNIDADE_OUVIDORIA":
+                    $idUnidadeOuvidoria = $arrObjMdCguEouvParametroDTO[$i];
+                    break;
+            }
+        }
+    }
+
+    $arrComandos[] = '<button type="submit" accesskey="S" name="sbmCadastrarMdCguEouvParametro" value="Salvar" class="infraButton"><span class="infraTeclaAtalho">S</span>alvar</button>';
 
   switch($_GET['acao']){
-    case 'md_cgu_eouv_parametro_excluir':
-      try{
-        $arrStrIds = PaginaSEI::getInstance()->getArrStrItensSelecionados();
-        $arrObjMdCguEouvParametroDTO = array();
-        for ($i=0;$i<count($arrStrIds);$i++){
-          $objMdCguEouvParametroDTO = new MdCguEouvParametroDTO();
-          $objMdCguEouvParametroDTO->setNumIdParametro($arrStrIds[$i]);          
-          $arrObjMdCguEouvParametroDTO[] = $objMdCguEouvParametroDTO;
+
+    case 'md_cgu_eouv_parametro_alterar':
+        $objMdCguEouvAlterarParametroRN = new MdCguEouvParametroRN();
+
+        if($_POST['EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES'] != $dataInicialImportacaoManifestacoes->getStrDeValorParametro()){
+            $dataInicialImportacaoManifestacoes->setStrDeValorParametro($_POST['EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES']);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($dataInicialImportacaoManifestacoes);
         }
-        $objMdCguEouvParametroRN = new MdCguEouvParametroRN();
-        $objMdCguEouvParametroRN->excluirParametro($arrObjMdCguEouvParametroDTO);
-        PaginaSEI::getInstance()->setStrMensagem('Operação realizada com sucesso.');
-      }catch(Exception $e){
-        PaginaSEI::getInstance()->processarExcecao($e);
-      } 
-      header('Location: '.SessaoSEI::getInstance()->assinarLink('controlador.php?acao='.$_GET['acao_origem'].'&acao_origem='.$_GET['acao']));
-      die;
-
-    case 'md_cgu_eouv_parametro_selecionar':
-      $strTitulo = PaginaSEI::getInstance()->getTituloSelecao('Selecionar Paramêtro','Selecionar Paramêtros');
-
-      //Se cadastrou alguem
-      if ($_GET['acao_origem']=='md_cgu_eouv_parametro_cadastrar'){
-        if (isset($_GET['id_md_cgu_eouv_parametro'])){
-          PaginaSEI::getInstance()->adicionarSelecionado($_GET['id_md_cgu_eouv_parametro']);
+        if($_POST['EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO'] != $idTipoDocumentoAnexoDadosManifestacao->getStrDeValorParametro()){
+            $idTipoDocumentoAnexoDadosManifestacao->setStrDeValorParametro($_POST['EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO']);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($idTipoDocumentoAnexoDadosManifestacao);
         }
-      }
-      break;
+        if($_POST['EOUV_USUARIO_ACESSO_WEBSERVICE'] != $usuarioWebService->getStrDeValorParametro()){
+            $usuarioWebService->setStrDeValorParametro($_POST['EOUV_USUARIO_ACESSO_WEBSERVICE']);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($usuarioWebService);
+        }
+        if($_POST['EOUV_SENHA_ACESSO_WEBSERVICE'] != $senhaUsuarioWebService->getStrDeValorParametro()){
+            $senhaUsuarioWebService->setStrDeValorParametro($_POST['EOUV_SENHA_ACESSO_WEBSERVICE']);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($senhaUsuarioWebService);
+        }
+        if($_POST['CLIENT_ID'] != $client_id->getStrDeValorParametro()){
+            $client_id->setStrDeValorParametro($_POST['CLIENT_ID']);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($client_id);
+        }
+        if($_POST['CLIENT_SECRET'] != $client_secret->getStrDeValorParametro()){
+            $client_secret->setStrDeValorParametro($_POST['CLIENT_SECRET']);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($client_secret);
+        }
+        if($_POST['EOUV_URL_WEBSERVICE_IMPORTACAO'] != $urlWebServiceEOuv->getStrDeValorParametro()){
+            $urlWebServiceEOuv->setStrDeValorParametro($_POST['EOUV_URL_WEBSERVICE_IMPORTACAO']);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($urlWebServiceEOuv);
+        }
+        if($_POST['ID_UNIDADE_OUVIDORIA'] != $idUnidadeOuvidoria->getStrDeValorParametro()){
+            $idUnidadeOuvidoria->setStrDeValorParametro($_POST['ID_UNIDADE_OUVIDORIA']);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeOuvidoria);
+        }
+        $ckImportarDadosManifestantes = ($_POST['IMPORTAR_DADOS_MANIFESTANTE'] == 'on'?'1':'0');
+        if($ckImportarDadosManifestantes != $importarDadosManifestante->getStrDeValorParametro()){
+            $importarDadosManifestante->setStrDeValorParametro($ckImportarDadosManifestantes);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($importarDadosManifestante);
+        }
+        if($_POST['ESIC_ID_UNIDADE_PRINCIPAL'] != $idUnidadeEsicPrincipal->getStrDeValorParametro()){
+            $idUnidadeEsicPrincipal->setStrDeValorParametro($_POST['ESIC_ID_UNIDADE_PRINCIPAL']);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeEsicPrincipal);
+        }
+        if($_POST['ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA'] != $idUnidadeRecursoPrimeiraInstancia->getStrDeValorParametro()){
+            $idUnidadeRecursoPrimeiraInstancia->setStrDeValorParametro($_POST['ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA']);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeRecursoPrimeiraInstancia);
+        }
+        if($_POST['ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA'] != $idUnidadeRecursoSegundaInstancia->getStrDeValorParametro()){
+            $idUnidadeRecursoSegundaInstancia->setStrDeValorParametro($_POST['ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA']);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeRecursoSegundaInstancia);
+        }
+        if($_POST['ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA'] != $idUnidadeRecursoTerceiraInstancia->getStrDeValorParametro()){
+            $idUnidadeRecursoTerceiraInstancia->setStrDeValorParametro($_POST['ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA']);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeRecursoTerceiraInstancia);
+        }
+        if($_POST['ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO'] != $idUnidadeRecursoPedidoRevisao->getStrDeValorParametro()){
+            $idUnidadeRecursoPedidoRevisao->setStrDeValorParametro($_POST['ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO']);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeRecursoPedidoRevisao);
+        }
 
+        PaginaSEI::getInstance()->setStrMensagem('Parâmetros alterados com sucesso.');
+        header('Location: ' . SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_listar' ));
+        die();
+        break;
     case 'md_cgu_eouv_parametro_listar':
-      $strTitulo = 'Parâmetros do Módulo de Integração SEI x FalaBR (e-Ouv)';
       break;
 
     default:
       throw new InfraException("Ação '".$_GET['acao']."' não reconhecida.");
   }
-
-  $arrComandos = array();
-  if ($_GET['acao'] == 'md_cgu_eouv_parametro_selecionar'){
-    $arrComandos[] = '<button type="button" accesskey="T" id="btnTransportarSelecao" value="Transportar" onclick="infraTransportarSelecao();" class="infraButton"><span class="infraTeclaAtalho">T</span>ransportar</button>';
-  }
-
-  if ($_GET['acao'] == 'md_cgu_eouv_parametro_listar' || $_GET['acao'] == 'md_cgu_eouv_parametro_selecionar'){
-    $bolAcaoCadastrar = false; //SessaoSEI::getInstance()->verificarPermissao('md_cgu_eouv_parametro_cadastrar');
-    if ($bolAcaoCadastrar){
-      $arrComandos[] = '<button type="button" accesskey="N" id="btnNovo" value="Novo" onclick="location.href=\''.SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_cadastrar&acao_origem='.$_GET['acao'].'&acao_retorno='.$_GET['acao']).'\'" class="infraButton"><span class="infraTeclaAtalho">N</span>ovo</button>';
-    }
-  }
-   
-  $objMdCguEouvParametroDTO = new MdCguEouvParametroDTO();
-  $objMdCguEouvParametroDTO->setStrDeTipo('eouv');
-  $objMdCguEouvParametroDTO->retNumIdParametro();
-  $objMdCguEouvParametroDTO->retStrNoParametro();
-  $objMdCguEouvParametroDTO->retStrDeValorParametro();
-
-  PaginaSEI::getInstance()->prepararOrdenacao($objMdCguEouvParametroDTO, 'IdParametro', InfraDTO::$TIPO_ORDENACAO_ASC);
-  //PaginaSEI::getInstance()->prepararPaginacao($objMdCguEouvParametroDTO);
-
-  $objMdCguEouvParametroRN = new MdCguEouvParametroRN();
-  $arrObjMdCguEouvParametroDTO = $objMdCguEouvParametroRN->listarParametro($objMdCguEouvParametroDTO);
-
-  //PaginaSEI::getInstance()->processarPaginacao($objMdCguEouvParametroDTO);
-  $numRegistros = count($arrObjMdCguEouvParametroDTO);
-
-  if ($numRegistros > 0){
-
-    $bolCheck = false;
-
-    $bolAcaoReativar = false;
-    $bolAcaoConsultar = false;
-    $bolAcaoAlterar = SessaoSEI::getInstance()->verificarPermissao('md_cgu_eouv_parametro_alterar');
-    $bolAcaoImprimir = false;
-    $bolAcaoExcluir = false; //SessaoSEI::getInstance()->verificarPermissao('md_cgu_eouv_parametro_excluir');
-    $bolAcaoDesativar = false;
-
-    if ($bolAcaoDesativar){
-      $bolCheck = true;
-      $arrComandos[] = '<button type="button" accesskey="T" id="btnDesativar" value="Desativar" onclick="acaoDesativacaoMultipla();" class="infraButton">Desa<span class="infraTeclaAtalho">t</span>ivar</button>';
-      $strLinkDesativar = SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_desativar&acao_origem='.$_GET['acao']);
-    }
-
-    if ($bolAcaoReativar){
-      $bolCheck = true;
-      $arrComandos[] = '<button type="button" accesskey="R" id="btnReativar" value="Reativar" onclick="acaoReativacaoMultipla();" class="infraButton"><span class="infraTeclaAtalho">R</span>eativar</button>';
-      $strLinkReativar = SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_reativar&acao_origem='.$_GET['acao'].'&acao_confirmada=sim');
-    }
-    
-    if ($bolAcaoExcluir){
-      $bolCheck = true;
-      $arrComandos[] = '<button type="button" accesskey="E" id="btnExcluir" value="Excluir" onclick="acaoExclusaoMultipla();" class="infraButton"><span class="infraTeclaAtalho">E</span>xcluir</button>';
-      $strLinkExcluir = SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_excluir&acao_origem='.$_GET['acao']);
-    }
-
-    if ($bolAcaoImprimir){
-      $bolCheck = true;
-      $arrComandos[] = '<button type="button" accesskey="I" id="btnImprimir" value="Imprimir" onclick="infraImprimirTabela();" class="infraButton"><span class="infraTeclaAtalho">I</span>mprimir</button>';
-
-    }
-
-    $strResultado = '';
-
-    if ($_GET['acao']!='md_cgu_eouv_parametro_reativar'){
-      $strSumarioTabela = 'Tabela de Paramêtros.';
-      $strCaptionTabela = 'Paramêtros';
-    }else{
-      $strSumarioTabela = 'Tabela de Paramêtros Inativos.';
-      $strCaptionTabela = 'Paramêtros Inativos';
-    }
-
-    $strResultado .= '<table width="99%" class="infraTable" summary="'.$strSumarioTabela.'">'."\n";
-    $strResultado .= '<caption class="infraCaption">'.PaginaSEI::getInstance()->gerarCaptionTabela($strCaptionTabela,$numRegistros).'</caption>';
-    $strResultado .= '<tr>';
-    if ($bolCheck) {
-      $strResultado .= '<th class="infraTh" width="1%">'.PaginaSEI::getInstance()->getThCheck().'</th>'."\n";
-    }
-    $strResultado .= '<th class="infraTh">'.PaginaSEI::getInstance()->getThOrdenacao($objMdCguEouvParametroDTO,'ID','IdParametro',$arrObjMdCguEouvParametroDTO).'</th>'."\n";
-    $strResultado .= '<th class="infraTh">'.PaginaSEI::getInstance()->getThOrdenacao($objMdCguEouvParametroDTO,'Nome','NoParametro',$arrObjMdCguEouvParametroDTO).'</th>'."\n";
-    $strResultado .= '<th class="infraTh">Descrição</th>'."\n";
-    $strResultado .= '<th class="infraTh">Ações</th>'."\n";
-    $strResultado .= '</tr>'."\n";
-    $strCssTr='';
-    for($i = 0;$i < $numRegistros; $i++){
-
-      $strCssTr = ($strCssTr=='<tr class="infraTrClara">')?'<tr class="infraTrEscura">':'<tr class="infraTrClara">';
-      $strResultado .= $strCssTr;
-
-      if ($bolCheck){
-        $strResultado .= '<td valign="top">'.PaginaSEI::getInstance()->getTrCheck($i,$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro(),$arrObjMdCguEouvParametroDTO[$i]->getStrNoParametro()).'</td>';
-      }
-      $strResultado .= '<td width="10%" align="center">'.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'</td>';
-      $strResultado .= '<td width="30%">'.PaginaSEI::tratarHTML($arrObjMdCguEouvParametroDTO[$i]->getStrNoParametro()).'</td>';
-      $strResultado .= '<td>'.nl2br(PaginaSEI::tratarHTML($arrObjMdCguEouvParametroDTO[$i]->getStrDeValorParametro())).'</td>';
-      $strResultado .= '<td width="15%" align="center">';
-      
-      $strResultado .= PaginaSEI::getInstance()->getAcaoTransportarItem($i,$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro());
-      
-      if ($bolAcaoConsultar){
-        $strResultado .= '<a href="'.SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_consultar&acao_origem='.$_GET['acao'].'&acao_retorno='.$_GET['acao'].'&id_md_cgu_eouv_parametro='.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro()).'" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeConsultar().'" title="Consultar Paramêtro" alt="Consultar Paramêtro" class="infraImg" /></a>&nbsp;';
-      }
-
-      if ($bolAcaoAlterar){
-        $strResultado .= '<a href="'.SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_alterar&acao_origem='.$_GET['acao'].'&acao_retorno='.$_GET['acao'].'&id_md_cgu_eouv_parametro='.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro()).'" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeAlterar().'" title="Alterar Paramêtro" alt="Alterar Paramêtro" class="infraImg" /></a>&nbsp;';
-      }
-
-
-      if ($bolAcaoDesativar){
-        $strResultado .= '<a href="#ID-'.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'"  onclick="acaoDesativar(\''.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'\',\''.$arrObjMdCguEouvParametroDTO[$i]->getStrNoParametro().'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeDesativar().'" title="Desativar Paramêtro" alt="Desativar Paramêtro" class="infraImg" /></a>&nbsp;';
-      }
-
-      if ($bolAcaoReativar){
-        $strResultado .= '<a href="#ID-'.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'"  onclick="acaoReativar(\''.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'\',\''.$arrObjMdCguEouvParametroDTO[$i]->getStrNoParametro().'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeReativar().'" title="Reativar Paramêtro" alt="Reativar Paramêtro" class="infraImg" /></a>&nbsp;';
-      }
-
-
-      if ($bolAcaoExcluir){
-        $strResultado .= '<a href="#ID-'.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'"  onclick="acaoExcluir(\''.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'\',\''.$arrObjMdCguEouvParametroDTO[$i]->getStrNoParametro().'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeExcluir().'" title="Excluir Paramêtro" alt="Excluir Paramêtro" class="infraImg" /></a>&nbsp;';
-      }
-
-      $strResultado .= '</td></tr>'."\n";
-    }
-    $strResultado .= '</table>';
-  }
-  if ($_GET['acao'] == 'md_cgu_eouv_parametro_selecionar'){
-    $arrComandos[] = '<button type="button" accesskey="F" id="btnFecharSelecao" value="Fechar" onclick="window.close();" class="infraButton"><span class="infraTeclaAtalho">F</span>echar</button>';
-  }else{
-    $arrComandos[] = '<button type="button" accesskey="F" id="btnFechar" value="Fechar" onclick="location.href=\''.SessaoSEI::getInstance()->assinarLink('controlador.php?acao='.PaginaSEI::getInstance()->getAcaoRetorno().'&acao_origem='.$_GET['acao']).'\'" class="infraButton"><span class="infraTeclaAtalho">F</span>echar</button>';
-  }
+    $strItensSelSerie = SerieINT::montarSelectNomeExternos('null','&nbsp;',$idTipoDocumentoAnexoDadosManifestacao->getStrDeValorParametro());
+    $strItensSelUnidadeOuv = UnidadeINT::montarSelectSiglaDescricao('null','&nbsp;',$idUnidadeOuvidoria->getStrDeValorParametro());
+    $strItensSelUnidadeEsic = UnidadeINT::montarSelectSiglaDescricao('null','&nbsp;',$idUnidadeEsicPrincipal->getStrDeValorParametro());
+    $strItensSelUnidadePrimeira = UnidadeINT::montarSelectSiglaDescricao('null','&nbsp;',$idUnidadeRecursoPrimeiraInstancia->getStrDeValorParametro());
+    $strItensSelUnidadeSegunda = UnidadeINT::montarSelectSiglaDescricao('null','&nbsp;',$idUnidadeRecursoSegundaInstancia->getStrDeValorParametro());
+    $strItensSelUnidadeTerceira = UnidadeINT::montarSelectSiglaDescricao('null','&nbsp;',$idUnidadeRecursoTerceiraInstancia->getStrDeValorParametro());
+    $strItensSelUnidadeRevisao = UnidadeINT::montarSelectSiglaDescricao('null','&nbsp;',$idUnidadeRecursoPedidoRevisao->getStrDeValorParametro());
 
 }catch(Exception $e){
   PaginaSEI::getInstance()->processarExcecao($e);
@@ -207,100 +194,197 @@ PaginaSEI::getInstance()->montarTitle(PaginaSEI::getInstance()->getStrNomeSistem
 PaginaSEI::getInstance()->montarStyle();
 PaginaSEI::getInstance()->abrirStyle();
 ?>
+.infraAreaDados {
+    margin-bottom: 1em;
+}
 <?
 PaginaSEI::getInstance()->fecharStyle();
 PaginaSEI::getInstance()->montarJavaScript();
 PaginaSEI::getInstance()->abrirJavaScript();
 ?>
+    //<script>
+    function inicializar(){
 
-function inicializar(){
+    }
+    function OnSubmitForm() {
+    return ValidarCadastroParametro();
+    }
 
-  if ('<?=$_GET['acao']?>'=='md_cgu_eouv_parametro_selecionar'){
-    infraReceberSelecao();
-    document.getElementById('btnFecharSelecao').focus();
- }
-  
-  infraEfeitoTabelas();
-}
-
-<? if ($bolAcaoDesativar){ ?>
-function acaoDesativar(id,desc){
-  if (confirm("Confirma desativação do Paramêtro \""+desc+"\"?")){
-    document.getElementById('hdnInfraItemId').value=id;
-    document.getElementById('frmMdCguEouvParametroLista').action='<?=$strLinkDesativar?>';
-    document.getElementById('frmMdCguEouvParametroLista').submit();
-  }
-}
-
-function acaoDesativacaoMultipla(){
-  if (document.getElementById('hdnInfraItensSelecionados').value==''){
-    alert('Nenhum Paramêtro selecionado.');
-    return;
-  }
-  if (confirm("Confirma desativação dos Paramêtros selecionados?")){
-    document.getElementById('hdnInfraItemId').value='';
-    document.getElementById('frmMdCguEouvParametroLista').action='<?=$strLinkDesativar?>';
-    document.getElementById('frmMdCguEouvParametroLista').submit();
-  }
-}
-<? } ?>
-
-<? if ($bolAcaoReativar){ ?>
-function acaoReativar(id,desc){
-  if (confirm("Confirma reativação do Paramêtro \""+desc+"\"?")){
-    document.getElementById('hdnInfraItemId').value=id;
-    document.getElementById('frmMdCguEouvParametroLista').action='<?=$strLinkReativar?>';
-    document.getElementById('frmMdCguEouvParametroLista').submit();
-  }
-}
-
-function acaoReativacaoMultipla(){
-  if (document.getElementById('hdnInfraItensSelecionados').value==''){
-    alert('Nenhum Paramêtro selecionado.');
-    return;
-  }
-  if (confirm("Confirma reativação dos Paramêtros selecionados?")){
-    document.getElementById('hdnInfraItemId').value='';
-    document.getElementById('frmMdCguEouvParametroLista').action='<?=$strLinkReativar?>';
-    document.getElementById('frmMdCguEouvParametroLista').submit();
-  }
-}
-<? } ?>
-
-<? if ($bolAcaoExcluir){ ?>
-function acaoExcluir(id,desc){
-  if (confirm("Confirma exclusão do Paramêtro \""+desc+"\"?")){
-    document.getElementById('hdnInfraItemId').value=id;
-    document.getElementById('frmMdCguEouvParametroLista').action='<?=$strLinkExcluir?>';
-    document.getElementById('frmMdCguEouvParametroLista').submit();
-  }
-}
-
-function acaoExclusaoMultipla(){
-  if (document.getElementById('hdnInfraItensSelecionados').value==''){
-    alert('Nenhum Paramêtro selecionado.');
-    return;
-  }
-  if (confirm("Confirma exclusão dos Paramêtros selecionados?")){
-    document.getElementById('hdnInfraItemId').value='';
-    document.getElementById('frmMdCguEouvParametroLista').action='<?=$strLinkExcluir?>';
-    document.getElementById('frmMdCguEouvParametroLista').submit();
-  }
-}
-<? } ?>
-
+    function ValidarCadastroParametro() {
+        if (infraTrim(document.getElementById('EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES').value)=='') {
+            alert('Informe a Data Inicial de Importação.');
+            document.getElementById('EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO').value)=='null') {
+            alert('Informe o Tipo de Documento.');
+            document.getElementById('EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('EOUV_USUARIO_ACESSO_WEBSERVICE').value)=='') {
+            alert('Informe o Usuário.');
+            document.getElementById('EOUV_USUARIO_ACESSO_WEBSERVICE').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('EOUV_SENHA_ACESSO_WEBSERVICE').value)=='') {
+            alert('Informe a senha.');
+            document.getElementById('EOUV_SENHA_ACESSO_WEBSERVICE').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('CLIENT_ID').value)=='') {
+            alert('Informe o CLIENT_ID.');
+            document.getElementById('CLIENT_ID').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('CLIENT_SECRET').value)=='') {
+            alert('Informe o CLIENT_SECRET.');
+            document.getElementById('CLIENT_SECRET').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('EOUV_URL_WEBSERVICE_IMPORTACAO').value)=='') {
+            alert('Informe a URL do Webservice.');
+            document.getElementById('EOUV_URL_WEBSERVICE_IMPORTACAO').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('ID_UNIDADE_OUVIDORIA').value)=='null') {
+            alert('Informe a Unidade de Ouvidoria');
+            document.getElementById('ID_UNIDADE_OUVIDORIA').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_PRINCIPAL').value)=='null') {
+            alert('Informe a Unidade de Acesso a Informação.');
+            document.getElementById('ESIC_ID_UNIDADE_PRINCIPAL').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA').value)=='null') {
+            alert('Informe a Unidade de Recurso em 1ª Instância.');
+            document.getElementById('ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA').value)=='null') {
+            alert('Informe a Unidade de Recurso em 2ª Instância.');
+            document.getElementById('ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA').value)=='null') {
+            alert('Informe a Unidade de Recurso em 3ª Instância.');
+            document.getElementById('ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO').value)=='null') {
+            alert('Informe a Unidade de Pedido de Revisão.');
+            document.getElementById('ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO').focus();
+            return false;
+        }
+        return true;
+    }
+    //</script>
 <?
 PaginaSEI::getInstance()->fecharJavaScript();
 PaginaSEI::getInstance()->fecharHead();
 PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
 ?>
-<form id="frmMdCguEouvParametroLista" method="post" action="<?=SessaoSEI::getInstance()->assinarLink('controlador.php?acao='.$_GET['acao'].'&acao_origem='.$_GET['acao'])?>">
-  <?
-  PaginaSEI::getInstance()->montarBarraComandosSuperior($arrComandos);
-  PaginaSEI::getInstance()->montarAreaTabela($strResultado,$numRegistros);
-  //PaginaSEI::getInstance()->montarAreaDebug();
-  PaginaSEI::getInstance()->montarBarraComandosInferior($arrComandos);
-  ?>
+<form id="frmMdCguEouvParametroLista" method="post" onsubmit="return OnSubmitForm();" action="<?=SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_alterar&acao_origem='.$_GET['acao'])?>">
+  <? PaginaSEI::getInstance()->montarBarraComandosSuperior($arrComandos); ?>
+    <!-- EOUV_URL_WEBSERVICE_IMPORTACAO -->
+    <div class="infraAreaDados">
+        <label id="lblEOUV_URL_WEBSERVICE_IMPORTACAO" for="EOUV_URL_WEBSERVICE_IMPORTACAO" accesskey="W" class="infraLabelObrigatorio">
+            URL do <span class="infraTeclaAtalho">W</span>ebService:</label>
+        <input type="text" id="EOUV_URL_WEBSERVICE_IMPORTACAO" name="EOUV_URL_WEBSERVICE_IMPORTACAO" class="infraText"
+               value="<?=PaginaSEI::tratarHTML($urlWebServiceEOuv->getStrDeValorParametro());?>" onkeypress="return infraMascaraTexto(this,event,100);"
+               maxlength="100" size="50" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" />
+    </div>
+    <!-- EOUV_USUARIO_ACESSO_WEBSERVICE -->
+    <div class="infraAreaDados">
+        <label id="lblEOUV_USUARIO_ACESSO_WEBSERVICE for="EOUV_USUARIO_ACESSO_WEBSERVICE" accesskey="U" class="infraLabelObrigatorio">
+        <span class="infraTeclaAtalho">U</span>suário:</label>
+        <input type="text" id="EOUV_USUARIO_ACESSO_WEBSERVICE" name="EOUV_USUARIO_ACESSO_WEBSERVICE" class="infraText"
+               value="<?=PaginaSEI::tratarHTML($usuarioWebService->getStrDeValorParametro());?>" onkeypress="return infraMascaraTexto(this,event,50);"
+               maxlength="50" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" />
+        <!-- EOUV_SENHA_ACESSO_WEBSERVICE -->
+        <label id="lblEOUV_SENHA_ACESSO_WEBSERVICE" for="EOUV_SENHA_ACESSO_WEBSERVICE" accesskey="S" class="infraLabelObrigatorio">
+            <span class="infraTeclaAtalho">S</span>enha:</label>
+        <input type="password" id="EOUV_SENHA_ACESSO_WEBSERVICE" name="EOUV_SENHA_ACESSO_WEBSERVICE" onkeypress="return infraMascaraTexto(this,event,50);" class="infraText"
+                  tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" value="<?=PaginaSEI::tratarHTML($senhaUsuarioWebService->getStrDeValorParametro());?>" />
+    </div>
+    <!-- CLIENT_ID -->
+    <div class="infraAreaDados">
+        <label id="lblCLIENT_ID" for="CLIENT_ID" accesskey="C" class="infraLabelObrigatorio">
+        <span class="infraTeclaAtalho">C</span>lientID:</label>
+        <input type="text" id="CLIENT_ID" name="CLIENT_ID" class="infraText"
+               value="<?=PaginaSEI::tratarHTML($client_id->getStrDeValorParametro());?>" onkeypress="return infraMascaraTexto(this,event,50);"
+               maxlength="50" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" />
+        <!-- CLIENT_SECRET -->
+        <label id="lblCLIENT_SECRET" for="CLIENT_SECRET" accesskey="n" class="infraLabelObrigatorio">
+            Clie<span class="infraTeclaAtalho">n</span>tSecret:</label>
+        <input type="password" id="CLIENT_SECRET" name="CLIENT_SECRET" onkeypress="return infraMascaraTexto(this,event,50);" class="infraText"
+               tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" value="<?=PaginaSEI::tratarHTML($client_secret->getStrDeValorParametro());?>" />
+    </div>
+
+    <!-- EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES -->
+    <div class="infraAreaDados">
+        <label id="lblEOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES" for="EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES" accesskey="D" class="infraLabelObrigatorio">
+            <span class="infraTeclaAtalho">D</span>ata Inicial de Importação:</label>
+        <input type="text" id="EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES" name="EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES" onkeypress="return infraMascaraData(this, event)"
+               class="infraText" value="<?=PaginaSEI::tratarHTML($dataInicialImportacaoManifestacoes->getStrDeValorParametro());?>"
+               tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" />
+        <img src="<?=PaginaSEI::getInstance()->getIconeCalendario()?>" id="imgCalDtaGeracaoInformar" title="Selecionar Data" alt="Selecionar Data"  class="infraImg"
+             onclick="infraCalendario('EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES',this);" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" />
+    </div>
+    <!-- IMPORTAR_DADOS_MANIFESTANTE -->
+    <div class="infraDivCheckbox infraAreaDados" style="height:3em;">
+        <input type="checkbox" id="IMPORTAR_DADOS_MANIFESTANTE" name="IMPORTAR_DADOS_MANIFESTANTE" class="infraCheckbox"
+            <?=PaginaSEI::getInstance()->setCheckbox($importarDadosManifestante->getStrDeValorParametro(), '1', '0')?>   />
+        <label id="lblIMPORTAR_DADOS_MANIFESTANTE" for="IMPORTAR_DADOS_MANIFESTANTE" accesskey="I" class="infraLabelCheckbox"><span class="infraTeclaAtalho">I</span>mportar Dados do Manifestante </label>
+    </div>
+
+    <!-- EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO -->
+    <div class="infraAreaDados">
+        <label id="lblEOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" for="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" accesskey="T" class="infraLabelObrigatorio"><span class="infraTeclaAtalho">T</span>ipo de documento usado na importação:</label>
+        <select id="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" name="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" class="infraSelect"
+                tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
+            <?=$strItensSelSerie?>
+        </select>
+    </div>
+
+    <div class="infraAreaDados">
+        <label id="lblID_UNIDADE_OUVIDORIA" for="ID_UNIDADE_OUVIDORIA" accesskey="O" class="infraLabelObrigatorio">Unidade de <span class="infraTeclaAtalho">O</span>uvidoria:</label>
+        <select id="ID_UNIDADE_OUVIDORIA" name="ID_UNIDADE_OUVIDORIA" class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
+            <?=$strItensSelUnidadeOuv?>
+        </select>
+    </div> 
+    <div class="infraAreaDados">
+        <label id="lblESIC_ID_UNIDADE_PRINCIPAL" for="ESIC_ID_UNIDADE_PRINCIPAL" accesskey="A" class="infraLabelObrigatorio">Unidade de <span class="infraTeclaAtalho">A</span>cesso à Informação:</label>
+        <select id="ESIC_ID_UNIDADE_PRINCIPAL" name="ESIC_ID_UNIDADE_PRINCIPAL" class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
+            <?=$strItensSelUnidadeEsic?>
+        </select>
+    </div>
+    <div class="infraAreaDados">
+        <label id="lblESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA" for="ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA" accesskey="1" class="infraLabelObrigatorio">Unidade de Recurso em <span class="infraTeclaAtalho">1</span>ª Instância:</label>
+        <select id="ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA" name="ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA"  class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
+            <?=$strItensSelUnidadePrimeira?>
+        </select>
+    </div>
+    <div class="infraAreaDados">
+        <label id="lblESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA" for="ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA" accesskey="2" class="infraLabelObrigatorio">Unidade de Recurso em <span class="infraTeclaAtalho">2</span>ª Instância:</label>
+        <select id="ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA" name="ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA"  class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
+            <?=$strItensSelUnidadeSegunda?>
+        </select>
+    </div>
+    <div class="infraAreaDados">
+        <label id="lblESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" for="ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" accesskey="3" class="infraLabelObrigatorio">Unidade de Recurso em <span class="infraTeclaAtalho">3</span>ª Instância:</label>
+        <select id="ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" name="ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
+            <?=$strItensSelUnidadeTerceira?>
+        </select>
+    </div>
+    <div class="infraAreaDados">
+        <label id="lblESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO" for="ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO" accesskey="R" class="infraLabelObrigatorio">Unidade de Pedido de <span class="infraTeclaAtalho">R</span>evisão:</label>
+        <select id="ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO" name="ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO" class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
+            <?=$strItensSelUnidadeRevisao?>
+        </select>
+    </div>
+
+    <? PaginaSEI::getInstance()->montarBarraComandosInferior($arrComandos); ?>
 </form>
 <?
 PaginaSEI::getInstance()->fecharBody();

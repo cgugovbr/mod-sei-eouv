@@ -31,10 +31,6 @@ class MdCguEouvParametroDTO extends InfraDTO {
             'DeValorParametro',
             'de_valor_parametro');
 
-        $this->adicionarAtributoTabela(InfraDTO::$PREFIXO_STR,
-            'DeTipo',
-            'de_tipo');
-
         $this->configurarPK('IdParametro',InfraDTO::$TIPO_PK_INFORMADO);
 
     }

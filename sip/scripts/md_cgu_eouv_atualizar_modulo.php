@@ -274,6 +274,7 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
 
       $objSistemaRN = new SistemaRN();
       $objPerfilRN = new PerfilRN();
+      $objItemMenuRN = new ItemMenuRN();
 
       $objSistemaDTO = new SistemaDTO();
       $objSistemaDTO->retNumIdSistema();
@@ -298,6 +299,7 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
       }
 
       $numIdPerfilSeiAdministrador = $objPerfilDTO->getNumIdPerfil();
+      $this->logar('Concedendo a permissão para ativar e desativar o tipo de manifestação');
 
       $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
           'md_cgu_eouv_depara_importacao_desativar', 'Desativar Tipo de Manifestação FalaBR',
@@ -306,7 +308,21 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
           'md_cgu_eouv_depara_importacao_reativar', 'Reativar Tipo de Manifestação FalaBR',
           'controlador.php?acao=md_cgu_eouv_depara_importacao_reativar');
 
+      $this->logar('Alterar item de parâmetros do menu');
+      $objItemMenuDTOParametros = $this->localizarMenu($numIdSistemaSei, 'Parâmetros do Módulo E-ouv', 'E-Ouv');
+      if ($objItemMenuDTOParametros != null) {
+          $objItemMenuDTOParametros->setStrRotulo('Parâmetros do Módulo');
+          $objItemMenuRN->alterar($objItemMenuDTOParametros);
+      }
 
+      $this->logar('Remover item *Parâmetros do Módulo e-Sic* do menu');
+      $objItemMenuDTOParametros = $this->localizarMenu($numIdSistemaSei, 'Parâmetros do Módulo e-Sic', 'E-Ouv');
+      if ($objItemMenuDTOParametros != null) {
+        $this->removerItemMenu($numIdSistemaSei, $objItemMenuDTOParametros->getNumIdMenu(), $objItemMenuDTOParametros->getNumIdItemMenu());
+      }
+
+      $this->logar('Remover recurso md_cgu_eouv_parametro_listar_esic');
+      $this->removerRecurso($numIdSistemaSei, 'md_cgu_eouv_parametro_listar_esic');
   }
 
   private function adicionarItemMenu($numIdSistema, $numIdPerfil, $numIdMenu, $numIdItemMenuPai, $numIdRecurso, $strRotulo, $strDescricao, $numSequencia)
@@ -384,6 +400,61 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
     return $objItemMenuDTO;
   }
 
+  private function removerItemMenu($numIdSistema, $numIdMenu, $numIdItemMenu)
+  {
+    $objItemMenuDTO = new ItemMenuDTO();
+    $objItemMenuDTO->retNumIdMenu();
+    $objItemMenuDTO->retNumIdItemMenu();
+    $objItemMenuDTO->setNumIdSistema($numIdSistema);
+    $objItemMenuDTO->setNumIdMenu($numIdMenu);
+    $objItemMenuDTO->setNumIdItemMenu($numIdItemMenu);
+
+    $objItemMenuRN = new ItemMenuRN();
+    $objItemMenuDTO = $objItemMenuRN->consultar($objItemMenuDTO);
+
+    if ($objItemMenuDTO != null) {
+      $objRelPerfilItemMenuDTO = new RelPerfilItemMenuDTO();
+      $objRelPerfilItemMenuDTO->retTodos();
+      $objRelPerfilItemMenuDTO->setNumIdSistema($numIdSistema);
+      $objRelPerfilItemMenuDTO->setNumIdMenu($objItemMenuDTO->getNumIdMenu());
+      $objRelPerfilItemMenuDTO->setNumIdItemMenu($objItemMenuDTO->getNumIdItemMenu());
+
+      $objRelPerfilItemMenuRN = new RelPerfilItemMenuRN();
+      $objRelPerfilItemMenuRN->excluir($objRelPerfilItemMenuRN->listar($objRelPerfilItemMenuDTO));
+
+      $objItemMenuRN->excluir(array($objItemMenuDTO));
+    }
+  }
+
+  private function localizarMenu($numIdSistema, $strRotulo, $strRotuloMenuPai = null)
+  {
+    $objItemMenuRN = new ItemMenuRN();
+
+    // Monta busca pelo item de menu
+    $objItemMenuDTO = new ItemMenuDTO();
+    $objItemMenuDTO->retTodos();
+    $objItemMenuDTO->setNumIdSistema($numIdSistema);
+    $objItemMenuDTO->setStrRotulo($strRotulo);
+
+    // Localiza item pai, se passado
+    if ($strRotuloMenuPai != null) {
+      $objItemMenuPaiDTO = new ItemMenuDTO();
+      $objItemMenuPaiDTO->retTodos();
+      $objItemMenuPaiDTO->setNumIdSistema($numIdSistema);
+      $objItemMenuPaiDTO->setStrRotulo($strRotuloMenuPai);
+      $objItemMenuPaiDTO = $objItemMenuRN->consultar($objItemMenuPaiDTO);
+      if ($objItemMenuPaiDTO == null) {
+        return null;
+      }
+
+      $objItemMenuDTO->setNumIdItemMenuPai($objItemMenuPaiDTO->getNumIdItemMenu());
+    }
+
+    // Busca item de menu
+    $objItemMenuDTO = $objItemMenuRN->consultar($objItemMenuDTO);
+    return $objItemMenuDTO;
+  }
+
   private function adicionarRecursoPerfil($numIdSistema, $numIdPerfil, $strNome, $strDescricao, $strCaminho = null)
   {
     $objRecursoDTO = new RecursoDTO();
@@ -423,6 +494,52 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
     }
 
     return $objRecursoDTO->getNumIdRecurso();
+  }
+
+  private function removerRecurso($numIdSistema, $strNome)
+  {
+    $objRecursoDTO = new RecursoDTO();
+    $objRecursoDTO->setBolExclusaoLogica(false);
+    $objRecursoDTO->retNumIdRecurso();
+    $objRecursoDTO->setNumIdSistema($numIdSistema);
+    $objRecursoDTO->setStrNome($strNome);
+
+    $objRecursoRN = new RecursoRN();
+    $objRecursoDTO = $objRecursoRN->consultar($objRecursoDTO);
+
+    if ($objRecursoDTO != null) {
+      $objRelPerfilRecursoDTO = new RelPerfilRecursoDTO();
+      $objRelPerfilRecursoDTO->retTodos();
+      $objRelPerfilRecursoDTO->setNumIdSistema($numIdSistema);
+      $objRelPerfilRecursoDTO->setNumIdRecurso($objRecursoDTO->getNumIdRecurso());
+
+      $objRelPerfilRecursoRN = new RelPerfilRecursoRN();
+      $objRelPerfilRecursoRN->excluir($objRelPerfilRecursoRN->listar($objRelPerfilRecursoDTO));
+
+      $objItemMenuDTO = new ItemMenuDTO();
+      $objItemMenuDTO->retNumIdMenu();
+      $objItemMenuDTO->retNumIdItemMenu();
+      $objItemMenuDTO->setNumIdSistema($numIdSistema);
+      $objItemMenuDTO->setNumIdRecurso($objRecursoDTO->getNumIdRecurso());
+
+      $objItemMenuRN = new ItemMenuRN();
+      $arrObjItemMenuDTO = $objItemMenuRN->listar($objItemMenuDTO);
+
+      $objRelPerfilItemMenuRN = new RelPerfilItemMenuRN();
+
+      foreach ($arrObjItemMenuDTO as $objItemMenuDTO) {
+        $objRelPerfilItemMenuDTO = new RelPerfilItemMenuDTO();
+        $objRelPerfilItemMenuDTO->retTodos();
+        $objRelPerfilItemMenuDTO->setNumIdSistema($numIdSistema);
+        $objRelPerfilItemMenuDTO->setNumIdItemMenu($objItemMenuDTO->getNumIdItemMenu());
+
+        $objRelPerfilItemMenuRN->excluir($objRelPerfilItemMenuRN->listar($objRelPerfilItemMenuDTO));
+      }
+
+      $objItemMenuRN->excluir($arrObjItemMenuDTO);
+
+      $objRecursoRN->excluir(array($objRecursoDTO));
+    }
   }
 }
 
