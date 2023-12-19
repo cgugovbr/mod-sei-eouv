@@ -5,14 +5,15 @@ require_once dirname(__FILE__).'/../web/Sip.php';
 class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
 {
   private $nomeModulo = 'EOUV - Integração com sistema FalaBR (E-ouv)';
-  private $versaoAtual = '4.0.2';
+  private $versaoAtual = '4.1.0';
   private $parametroVersao = 'VERSAO_MODULO_CGU_EOUV';
   private $arrayVersoes = array(
     '2.0.5' => 'instalarv205',
     '3.0.*' => 'instalarv300',
     '4.0.0' => 'instalarv400',
-    '4.0.1' => 'instalarv401',
-    '4.0.2' => 'instalarv402'
+    '4.0.1' => 'semAlteracoes',
+    '4.0.2' => 'semAlteracoes',
+    '4.1.0' => 'instalarv410',
   );
   /**
    * 1. Começamos a contralar a partir da versão 2.0.5 que é a última estável para o SEI 3.0
@@ -42,6 +43,8 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
   {
     return BancoSip::getInstance();
   }
+
+  protected function semAlteracoes() {}
 
   protected function instalarv205(){
     $objSistemaRN = new SistemaRN();
@@ -266,12 +269,7 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
       $numIdRecursoDeParaListar, 'Tipos de Manifestação', 'Associações entre o Tipo de Manifestação no Falabr e o Tipo de Processo', 40);
   }
 
-  protected function instalarv401(){
-
-  }
-
-  protected function instalarv402(){
-
+  protected function instalarv410() {
       $objSistemaRN = new SistemaRN();
       $objPerfilRN = new PerfilRN();
       $objItemMenuRN = new ItemMenuRN();
