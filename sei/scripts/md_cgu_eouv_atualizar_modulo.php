@@ -5,13 +5,14 @@ require_once dirname(__FILE__) . '/../web/SEI.php';
 class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
 {
   private $nomeModulo = 'EOUV - Integração com sistema FalaBR (E-ouv)';
-  private $versaoAtual = '4.0.1';
+  private $versaoAtual = '4.0.2';
   private $parametroVersao = 'VERSAO_MODULO_CGU_EOUV';
   private $arrayVersoes = array(
     '2.0.5' => 'instalarv205',
     '3.0.*' => 'instalarv300',
     '4.0.0' => 'instalarv400',
-    '4.0.1' => 'instalarv401'
+    '4.0.1' => 'semAlteracoes',
+    '4.0.2' => 'instalarv402',
   );
   /**
    * 1. Começamos a contralar a partir da versão 2.0.5 que é a última estável para o SEI 3.0
@@ -41,6 +42,8 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
   {
     return BancoSEI::getInstance();
   }
+
+  protected function semAlteracoes() {}
 
   protected function instalarv205()
   {
@@ -365,8 +368,12 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
     }
   }
 
-  protected function instalarv401(){
+  protected function instalarv402() {
+    $objInfraMetaBD = new InfraMetaBD(BancoSEI::getInstance());
 
+    // Altera tipo da coluna 'valor' da tabela parâmetros para texto grande, a fim de
+    // evitar problemas com o tamanho do token da API
+    $objInfraMetaBD->alterarColuna('md_eouv_parametros', 'de_valor_parametro', $objInfraMetaBD->tipoTextoGrande(), 'not null');
   }
 }
 
