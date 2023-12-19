@@ -123,12 +123,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $this->preencheVariaveis($numRegistros, $arrObjEouvParametroDTO);
         $tiposValidos = self::tiposValidos();
 
-        /**
-         * Função para buscar o 'restante' do token sem o limite de 255 caracteres do SEI
-         */
-        $tokenPart2 = BancoSEI::getInstance()->consultarSql("select substring(de_valor_parametro, 256, 455) from md_eouv_parametros where no_parametro='TOKEN';")[0]['computed'];
-        $this->token = $this->token . $tokenPart2;
-
         // Busca parâmetros do banco de dados da tabela infra_parametros
         $objInfraParametro = new InfraParametro(BancoSEI::getInstance());
         $dataAtual = InfraData::getStrDataHoraAtual();
