@@ -4,7 +4,7 @@ require_once dirname(__FILE__).'/../web/Sip.php';
 
 class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
 {
-  private $nomeModulo = 'EOUV - Integração com sistema FalaBR (E-ouv)';
+  private $nomeModulo = 'EOUV - IntegraÃ§Ã£o com sistema FalaBR (E-ouv)';
   private $versaoAtual = '4.0.2';
   private $parametroVersao = 'VERSAO_MODULO_CGU_EOUV';
   private $arrayVersoes = array(
@@ -15,10 +15,10 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
     '4.0.2' => 'semAlteracoes',
   );
   /**
-   * 1. Começamos a contralar a partir da versão 2.0.5 que é a última estável para o SEI 3.0
-   * 2. A versão 3.0.0 começa a utilizar a versão REST dos webservices do E-Ouv
-   * 3. A versão 4.0.0 importa manifestações do tipo 8 (acesso à informação) que são oriundas antigo e-Sic integrado
-   * ao FalaBR, esta versão importa tambem os recursos de 1ª e 2ª instância
+   * 1. ComeÃ§amos a contralar a partir da versÃ£o 2.0.5 que Ã© a Ãºltima estÃ¡vel para o SEI 3.0
+   * 2. A versÃ£o 3.0.0 comeÃ§a a utilizar a versÃ£o REST dos webservices do E-Ouv
+   * 3. A versÃ£o 4.0.0 importa manifestaÃ§Ãµes do tipo 8 (acesso Ã  informaÃ§Ã£o) que sÃ£o oriundas antigo e-Sic integrado
+   * ao FalaBR, esta versÃ£o importa tambem os recursos de 1Âª e 2Âª instÃ¢ncia
    */
 
   public function __construct()
@@ -59,7 +59,7 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
     $objSistemaDTO = $objSistemaRN->consultar($objSistemaDTO);
 
     if ($objSistemaDTO == null) {
-      throw new InfraException('Sistema SEI não encontrado.');
+      throw new InfraException('Sistema SEI nÃ£o encontrado.');
     }
 
     $numIdSistemaSei = $objSistemaDTO->getNumIdSistema();
@@ -71,32 +71,32 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
     $objPerfilDTO = $objPerfilRN->consultar($objPerfilDTO);
 
     if ($objPerfilDTO == null) {
-      throw new InfraException('Perfil Administrador do sistema SEI não encontrado.');
+      throw new InfraException('Perfil Administrador do sistema SEI nÃ£o encontrado.');
     }
 
     $this->logar('ATUALIZANDO RECURSOS, MENUS E PERFIS DO MODULO '. $this->nomeDesteModulo .' NA BASE DO SIP...');
 
     $numIdPerfilSeiAdministrador = $objPerfilDTO->getNumIdPerfil();
     $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
-      'md_cgu_eouv_relatorio_importacao', 'Relatório de importação de manifestações do EOUV',
+      'md_cgu_eouv_relatorio_importacao', 'RelatÃ³rio de importaÃ§Ã£o de manifestaÃ§Ãµes do EOUV',
       'controlador.php?acao=md_cgu_eouv_relatorio_importacao');
     $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
-      'md_cgu_eouv_depara_importacao_consultar', 'Consulta a tabela DePara referente a importação de Tipo de manifestação',
+      'md_cgu_eouv_depara_importacao_consultar', 'Consulta a tabela DePara referente a importaÃ§Ã£o de Tipo de manifestaÃ§Ã£o',
       'controlador.php?acao=md_cgu_eouv_depara_importacao_consultar');
     $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
-      'md_cgu_eouv_depara_importacao_excluir', 'Excluir item da tabela DePara referente a importação de Tipo de manifestação',
+      'md_cgu_eouv_depara_importacao_excluir', 'Excluir item da tabela DePara referente a importaÃ§Ã£o de Tipo de manifestaÃ§Ã£o',
       'controlador.php?acao=md_cgu_eouv_depara_importacao_excluir');
     $numIdRecursoIntegracaoSei = $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
-      'md_cgu_eouv_integracao_sei', 'Integração entre E-ouv e SEI',
+      'md_cgu_eouv_integracao_sei', 'IntegraÃ§Ã£o entre E-ouv e SEI',
       'controlador.php?acao=md_cgu_eouv_integracao_sei');
 
     $this->logar('Valor id objeto' . $numIdRecursoIntegracaoSei);
 
     $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
-      'md_cgu_eouv_relatorio_importacao_detalhar', 'Relatório Detalhado de importação de manifestações do EOUV',
+      'md_cgu_eouv_relatorio_importacao_detalhar', 'RelatÃ³rio Detalhado de importaÃ§Ã£o de manifestaÃ§Ãµes do EOUV',
       'controlador.php?acao=md_cgu_eouv_relatorio_importacao_detalhar');
     $numIdRecursoRelatorioImportacaoEouvSei = $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
-      'md_cgu_eouv_relatorio_importacao_listar', 'Relatório de importação de manifestações do EOUV',
+      'md_cgu_eouv_relatorio_importacao_listar', 'RelatÃ³rio de importaÃ§Ã£o de manifestaÃ§Ãµes do EOUV',
       'controlador.php?acao=md_cgu_eouv_relatorio_importacao_listar');
 
     $objMenuDTO = new MenuDTO();
@@ -106,17 +106,17 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
     $objMenuDTO = $objMenuRN->consultar($objMenuDTO);
 
     if ($objMenuDTO == null) {
-      throw new InfraException('Menu do sistema SEI não encontrado.');
+      throw new InfraException('Menu do sistema SEI nÃ£o encontrado.');
     }
     $numIdMenuSei = $objMenuDTO->getNumIdMenu();
 
     $menuEouv = $this->adicionarItemMenu($numIdSistemaSei, $numIdPerfilSeiAdministrador,
       $numIdMenuSei, null, $numIdRecursoIntegracaoSei, 'E-Ouv',
-      'Integração entre E-ouv e SEI', 1100);
+      'IntegraÃ§Ã£o entre E-ouv e SEI', 1100);
 
     $this->adicionarItemMenu($numIdSistemaSei, $numIdPerfilSeiAdministrador,
       $numIdMenuSei, $menuEouv->getNumIdItemMenu(),
-      $numIdRecursoRelatorioImportacaoEouvSei, 'Importação de Manifestação', 'Relatório de Importação de Manifestação', 10);
+      $numIdRecursoRelatorioImportacaoEouvSei, 'ImportaÃ§Ã£o de ManifestaÃ§Ã£o', 'RelatÃ³rio de ImportaÃ§Ã£o de ManifestaÃ§Ã£o', 10);
   }
 
   protected function instalarv300()
@@ -134,7 +134,7 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
     $objSistemaDTO = $objSistemaRN->consultar($objSistemaDTO);
 
     if ($objSistemaDTO == null) {
-      throw new InfraException('Sistema SEI não encontrado.');
+      throw new InfraException('Sistema SEI nÃ£o encontrado.');
     }
 
     $numIdSistemaSei = $objSistemaDTO->getNumIdSistema();
@@ -146,7 +146,7 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
     $objPerfilDTO = $objPerfilRN->consultar($objPerfilDTO);
 
     if ($objPerfilDTO == null) {
-      throw new InfraException('Perfil Administrador do sistema SEI não encontrado.');
+      throw new InfraException('Perfil Administrador do sistema SEI nÃ£o encontrado.');
     }
 
     $objMenuDTO = new MenuDTO();
@@ -156,30 +156,30 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
     $objMenuDTO = $objMenuRN->consultar($objMenuDTO);
 
     if ($objMenuDTO == null) {
-      throw new InfraException('Menu do sistema SEI não encontrado.');
+      throw new InfraException('Menu do sistema SEI nÃ£o encontrado.');
     }
     $numIdMenuSei = $objMenuDTO->getNumIdMenu();
 
     $numIdPerfilSeiAdministrador = $objPerfilDTO->getNumIdPerfil();
 
     $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
-      'md_cgu_eouv_parametro', 'Controle de Parâmetros módulo SEI x E-ouv',
+      'md_cgu_eouv_parametro', 'Controle de ParÃ¢metros mÃ³dulo SEI x E-ouv',
       'controlador.php?acao=md_cgu_eouv_parametro');
 
     $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
-      'md_cgu_eouv_parametro_consultar', 'Consulta de Parâmetros módulo SEI x E-ouv',
+      'md_cgu_eouv_parametro_consultar', 'Consulta de ParÃ¢metros mÃ³dulo SEI x E-ouv',
       'controlador.php?acao=md_cgu_eouv_parametro_consultar');
 
     $numIdRecursoParametro = $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
-      'md_cgu_eouv_parametro_listar', 'Lista de Parâmetros módulo SEI x E-ouv',
+      'md_cgu_eouv_parametro_listar', 'Lista de ParÃ¢metros mÃ³dulo SEI x E-ouv',
       'controlador.php?acao=md_cgu_eouv_parametro_listar');
 
     $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
-      'md_cgu_eouv_parametro_cadastrar', 'Cadastro de Parâmetros módulo SEI x E-ouv',
+      'md_cgu_eouv_parametro_cadastrar', 'Cadastro de ParÃ¢metros mÃ³dulo SEI x E-ouv',
       'controlador.php?acao=md_cgu_eouv_parametro_cadastrar');
 
     $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
-      'md_cgu_eouv_parametro_alterar', 'Alteração de Parâmetros módulo SEI x E-ouv',
+      'md_cgu_eouv_parametro_alterar', 'AlteraÃ§Ã£o de ParÃ¢metros mÃ³dulo SEI x E-ouv',
       'controlador.php?acao=md_cgu_eouv_parametro_alterar');
 
     $this->logar('RECUPERANDO MENU DO E-OUV');
@@ -189,11 +189,11 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
     $objItemMenuDTOEouv->setStrRotulo('E-Ouv');
     $objItemMenuDTOEouv = $objItemMenuRN->consultar( $objItemMenuDTOEouv );
 
-    $this->logar('CRIANDO e VINCULANDO ITEM MENU A PERFIL - E-Ouv->Parâmetros');
+    $this->logar('CRIANDO e VINCULANDO ITEM MENU A PERFIL - E-Ouv->ParÃ¢metros');
 
     $this->adicionarItemMenu($numIdSistemaSei, $numIdPerfilSeiAdministrador,
       $numIdMenuSei, $objItemMenuDTOEouv->getNumIdItemMenu(),
-      $numIdRecursoParametro, 'Parâmetros do Módulo E-ouv', 'Parâmetros', 20);
+      $numIdRecursoParametro, 'ParÃ¢metros do MÃ³dulo E-ouv', 'ParÃ¢metros', 20);
   }
 
   protected function instalarv400()
@@ -211,7 +211,7 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
     $objSistemaDTO = $objSistemaRN->consultar($objSistemaDTO);
 
     if ($objSistemaDTO == null) {
-      throw new InfraException('Sistema SEI não encontrado.');
+      throw new InfraException('Sistema SEI nÃ£o encontrado.');
     }
 
     $numIdSistemaSei = $objSistemaDTO->getNumIdSistema();
@@ -223,7 +223,7 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
     $objPerfilDTO = $objPerfilRN->consultar($objPerfilDTO);
 
     if ($objPerfilDTO == null) {
-      throw new InfraException('Perfil Administrador do sistema SEI não encontrado.');
+      throw new InfraException('Perfil Administrador do sistema SEI nÃ£o encontrado.');
     }
 
     $objMenuDTO = new MenuDTO();
@@ -233,14 +233,14 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
     $objMenuDTO = $objMenuRN->consultar($objMenuDTO);
 
     if ($objMenuDTO == null) {
-      throw new InfraException('Menu do sistema SEI não encontrado.');
+      throw new InfraException('Menu do sistema SEI nÃ£o encontrado.');
     }
     $numIdMenuSei = $objMenuDTO->getNumIdMenu();
 
     $numIdPerfilSeiAdministrador = $objPerfilDTO->getNumIdPerfil();
 
     $numIdRecursoParametro = $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
-      'md_cgu_eouv_parametro_listar_esic', 'Lista de Parâmetros e-Sic',
+      'md_cgu_eouv_parametro_listar_esic', 'Lista de ParÃ¢metros e-Sic',
       'controlador.php?acao=md_cgu_eouv_parametro_listar_esic');
 
     $this->logar('RECUPERANDO MENU DO E-OUV');
@@ -250,23 +250,23 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
     $objItemMenuDTOEouv->setStrRotulo('E-Ouv');
     $objItemMenuDTOEouv = $objItemMenuRN->consultar( $objItemMenuDTOEouv );
 
-    $this->logar('CRIANDO e VINCULANDO ITEM MENU A PERFIL - E-Ouv->Parâmetros');
+    $this->logar('CRIANDO e VINCULANDO ITEM MENU A PERFIL - E-Ouv->ParÃ¢metros');
 
     $this->adicionarItemMenu($numIdSistemaSei, $numIdPerfilSeiAdministrador,
       $numIdMenuSei, $objItemMenuDTOEouv->getNumIdItemMenu(),
-      $numIdRecursoParametro, 'Parâmetros do Módulo e-Sic', 'Parâmetros', 30);
+      $numIdRecursoParametro, 'ParÃ¢metros do MÃ³dulo e-Sic', 'ParÃ¢metros', 30);
 
-    // Recursos e menu para edição do De Para entre tipos FalaBR e Processo
-    $this->logar('ADICIONANDO MENU DE CONFIGURAÇÃO DE TIPOS DE MANIFESTAÇÃO E PROCESSOS');
+    // Recursos e menu para ediÃ§Ã£o do De Para entre tipos FalaBR e Processo
+    $this->logar('ADICIONANDO MENU DE CONFIGURAÃ‡ÃƒO DE TIPOS DE MANIFESTAÃ‡ÃƒO E PROCESSOS');
     $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
-      'md_cgu_eouv_depara_importacao_alterar', 'Alterar uma Associação entre Tipo de Manifestação FalaBR e Processo',
+      'md_cgu_eouv_depara_importacao_alterar', 'Alterar uma AssociaÃ§Ã£o entre Tipo de ManifestaÃ§Ã£o FalaBR e Processo',
       'controlador.php?acao=md_cgu_eouv_depara_importacao_alterar');
     $numIdRecursoDeParaListar = $this->adicionarRecursoPerfil($numIdSistemaSei, $numIdPerfilSeiAdministrador,
-      'md_cgu_eouv_depara_importacao_listar', 'Listar Associações entre o Tipo de Manifestação FalaBR e Processo',
+      'md_cgu_eouv_depara_importacao_listar', 'Listar AssociaÃ§Ãµes entre o Tipo de ManifestaÃ§Ã£o FalaBR e Processo',
       'controlador.php?acao=md_cgu_eouv_depara_importacao_listar');
     $this->adicionarItemMenu($numIdSistemaSei, $numIdPerfilSeiAdministrador,
       $numIdMenuSei, $objItemMenuDTOEouv->getNumIdItemMenu(),
-      $numIdRecursoDeParaListar, 'Tipos de Manifestação', 'Associações entre o Tipo de Manifestação no Falabr e o Tipo de Processo', 40);
+      $numIdRecursoDeParaListar, 'Tipos de ManifestaÃ§Ã£o', 'AssociaÃ§Ãµes entre o Tipo de ManifestaÃ§Ã£o no Falabr e o Tipo de Processo', 40);
   }
 
   private function adicionarItemMenu($numIdSistema, $numIdPerfil, $numIdMenu, $numIdItemMenuPai, $numIdRecurso, $strRotulo, $strDescricao, $numSequencia)

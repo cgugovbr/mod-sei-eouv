@@ -1,12 +1,12 @@
 <?
 /**
-* CONTROLADORIA GERAL DA UNIÃO
+* CONTROLADORIA GERAL DA UNIÃƒO
 *
 * 18/10/2015 - criado por Rafaele Leandro
 *
-* Versão do Gerador de Código: 1.29.1
+* VersÃ£o do Gerador de CÃ³digo: 1.29.1
 *
-* Versão no CVS: $Id$
+* VersÃ£o no CVS: $Id$
 */
 
 require_once dirname(__FILE__) . '/../../../../SEI.php';

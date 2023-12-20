@@ -15,7 +15,7 @@ class MdCguEouvIntegracao extends SeiIntegracao
 
     public function getNome()
     {
-        return 'MÛdulo de IntegraÁ„o entre o sistema SEI e o FalaBR (Sistema de Ouvidorias - e-Ouv|e-Sic)';
+        return 'M√≥dulo de Integra√ß√£o entre o sistema SEI e o FalaBR (Sistema de Ouvidorias - e-Ouv|e-Sic)';
     }
 
     public function getVersao()
@@ -25,14 +25,14 @@ class MdCguEouvIntegracao extends SeiIntegracao
 
     public function getInstituicao()
     {
-        return 'CGU - Controladoria Geral da Uni„o';
+        return 'CGU - Controladoria Geral da Uni√£o';
     }
 
 //    public function inicializar($strVersaoSEI)
 //    {
 //        /*
 //        if (substr($strVersaoSEI, 0, 2) != '3.'){
-//          die('MÛdulo "'.$this->getNome().'" ('.$this->getVersao().') n„o È compatÌvel com esta vers„o do SEI ('.$strVersaoSEI.').');
+//          die('M√≥dulo "'.$this->getNome().'" ('.$this->getVersao().') n√£o √© compat√≠vel com esta vers√£o do SEI ('.$strVersaoSEI.').');
 //        }
 //        */
 //    }

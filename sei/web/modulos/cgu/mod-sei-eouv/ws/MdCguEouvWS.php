@@ -1,14 +1,14 @@
 <?
 /*
- * CONTROLADORIA GERAL DA UNIÃO - CGU
+ * CONTROLADORIA GERAL DA UNIÃƒO - CGU
  *
  * 23/06/2015 - criado por Rafael Leandro Ferreira
  *
  *
- *Este WebService tem o objetivo de atender a necessidade da CGU que não está suportada dentro dos métodos
+ *Este WebService tem o objetivo de atender a necessidade da CGU que nÃ£o estÃ¡ suportada dentro dos mÃ©todos
  *existentes em SeiWS.php.
- *Foi criado este arquivo para não fazer alterações neste arquivo. O ideal é que posteriormente estes métodos sejam incorporados
- *ao SeiWS para estar disponível como um método homologado pelo SEI.
+ *Foi criado este arquivo para nÃ£o fazer alteraÃ§Ãµes neste arquivo. O ideal Ã© que posteriormente estes mÃ©todos sejam incorporados
+ *ao SeiWS para estar disponÃ­vel como um mÃ©todo homologado pelo SEI.
  */
 
 
@@ -196,16 +196,16 @@ class MdCguEouvWS extends InfraWS {
             $nup = "00106.000005/2015-49";
             $dt_cadastro = "11/02/2015";
             $id_assunto = "3";
-            $desc_assunto = "Ciências";
+            $desc_assunto = "CiÃªncias";
             $id_sub_assunto = "1122";
             $desc_sub_assunto = "Tecnologia";
             $id_tipo_manifestacao = "1";
-            $desc_tipo_manifestacao = "Denúncia";
+            $desc_tipo_manifestacao = "DenÃºncia";
             $envolve_das4_superior = "Sim";
             $dt_prazo_atendimento = "17/05/2015";
-            $nome_orgao = "CGU - Controladoria Geral da União";
+            $nome_orgao = "CGU - Controladoria Geral da UniÃ£o";
 
-            $nome = "João José dos Santos";
+            $nome = "JoÃ£o JosÃ© dos Santos";
             $id_faixa_etaria = "3";
             $desc_faixa_etaria = "21 a 30";
             $id_raca_cor = "1";
@@ -216,7 +216,7 @@ class MdCguEouvWS extends InfraWS {
             $numero_documento_identificacao = "58749484 SSP-DF";
             $endereco = "SHIS QD 02 Conj. C Casa 25";
             $id_municipio = "1551";
-            $desc_municipio = "Brasília";
+            $desc_municipio = "BrasÃ­lia";
             $uf = "DF";
             $cep = "70005-080";
             $ddd_telefone = "61";
@@ -226,8 +226,8 @@ class MdCguEouvWS extends InfraWS {
             $id_municipio_fato = "540";
             $desc_municipio_fato = "Patos de Minas";
             $uf_fato = "MG";
-            $descricao_fato = "     O servidor público federal J.C.F foi denunciado pelo Ministério Público Federal (MPF) por fraudar o concurso para Analista Judiciário do Tribunal Regional do Trabalho da 3ª Região (TRT-3), em Belo Horizonte. A prova foi realizada em 26 de julho, dia em que o homem foi preso em flagrante pelo crime. Ele segue preso na Penitenciária Nelson Hungria, em Contagem, na Grande BH.
-            A Coordenação do concurso foi acionada e o candidato foi levado para uma sala para revista pessoal. O dispositivo eletrônico foi encontrado e o homem preso em flagrante. Laudo da perícia atestou que o dispositivo utilizado pelo denunciado consistia num ?botão espião micro câmera filmadora com 8 GB?, capaz de captar vídeo com áudio em formato digital e fotografias. Os peritos também atestaram que encontraram no dispositivo três registros audiovisuais com imagens do caderno de provas do concurso. O candidato já tinha sido denunciado ao MPF como um dos líderes de uma organização especializada em fraudes de concursos.";
+            $descricao_fato = "     O servidor pÃºblico federal J.C.F foi denunciado pelo MinistÃ©rio PÃºblico Federal (MPF) por fraudar o concurso para Analista JudiciÃ¡rio do Tribunal Regional do Trabalho da 3Âª RegiÃ£o (TRT-3), em Belo Horizonte. A prova foi realizada em 26 de julho, dia em que o homem foi preso em flagrante pelo crime. Ele segue preso na PenitenciÃ¡ria Nelson Hungria, em Contagem, na Grande BH.
+            A CoordenaÃ§Ã£o do concurso foi acionada e o candidato foi levado para uma sala para revista pessoal. O dispositivo eletrÃ´nico foi encontrado e o homem preso em flagrante. Laudo da perÃ­cia atestou que o dispositivo utilizado pelo denunciado consistia num ?botÃ£o espiÃ£o micro cÃ¢mera filmadora com 8 GB?, capaz de captar vÃ­deo com Ã¡udio em formato digital e fotografias. Os peritos tambÃ©m atestaram que encontraram no dispositivo trÃªs registros audiovisuais com imagens do caderno de provas do concurso. O candidato jÃ¡ tinha sido denunciado ao MPF como um dos lÃ­deres de uma organizaÃ§Ã£o especializada em fraudes de concursos.";
             $envolvidos = array();
             $envolvidos[0] = "Renan Calheiros";
             $envolvidos[1] = "Eduardo Cunha";
@@ -236,7 +236,7 @@ class MdCguEouvWS extends InfraWS {
 
             $campos_adicionais = array(
                 array("Categoria", "Categoria 1"),
-                array("É militar", "Não"),
+                array("Ã‰ militar", "NÃ£o"),
                 array("Cpf", "159.161.879-45")
             );
 
@@ -250,7 +250,7 @@ class MdCguEouvWS extends InfraWS {
             //$pdf->Image('logog8.jpg');
 
             $pdf->SetFont('arial','B',18);
-            $pdf->Cell(0,5,"Dados da Manifestação",0,1,'C');
+            $pdf->Cell(0,5,"Dados da ManifestaÃ§Ã£o",0,1,'C');
             $pdf->Cell(0,5,"","B",1,'C');
             $pdf->Ln(20);
 
@@ -258,7 +258,7 @@ class MdCguEouvWS extends InfraWS {
             //1. Dados INICIAIS
             //***********************************************************************************************
             $pdf->SetFont('arial','B',14);
-            $pdf->Cell(0,20,"1. Dados Iniciais da Manifestação",0,0,'L');
+            $pdf->Cell(0,20,"1. Dados Iniciais da ManifestaÃ§Ã£o",0,0,'L');
             $pdf->Ln(20);
 
             //NUP
@@ -279,15 +279,15 @@ class MdCguEouvWS extends InfraWS {
             $pdf->setFont('arial','',12);
             $pdf->Cell(0,20,$id_assunto ." - ". $desc_assunto." / ". $id_sub_assunto ." - ". $desc_sub_assunto,0,1,'L');
 
-            //Tipo de Manifestação
+            //Tipo de ManifestaÃ§Ã£o
             $pdf->SetFont('arial','B',12);
-            $pdf->Cell(150,20,"Tipo da Manifestação:",0,0,'L');
+            $pdf->Cell(150,20,"Tipo da ManifestaÃ§Ã£o:",0,0,'L');
             $pdf->setFont('arial','',12);
             $pdf->Cell(0,20,$id_tipo_manifestacao . " - " . $desc_tipo_manifestacao ,0,1,'L');
 
             //EnvolveDas4OuSuperior
             $pdf->SetFont('arial','B',12);
-            $pdf->Cell(450,20,"Denúncia Envolvendo Ocupante de Cargo Comissionado DAS4 ou Superior?:",0,0,'L');
+            $pdf->Cell(450,20,"DenÃºncia Envolvendo Ocupante de Cargo Comissionado DAS4 ou Superior?:",0,0,'L');
             $pdf->setFont('arial','',12);
             $pdf->Cell(20,20,$envolve_das4_superior,0,1,'L');
 
@@ -297,9 +297,9 @@ class MdCguEouvWS extends InfraWS {
             $pdf->setFont('arial','',12);
             $pdf->Cell(70,20,$dt_prazo_atendimento,0,1,'L');
 
-            //Nome do Órgão
+            //Nome do Ã“rgÃ£o
             $pdf->SetFont('arial','B',12);
-            $pdf->Cell(150,20,"Nome do Órgão:",0,0,'L');
+            $pdf->Cell(150,20,"Nome do Ã“rgÃ£o:",0,0,'L');
             $pdf->setFont('arial','',12);
             $pdf->Cell(70,20,$nome_orgao,0,1,'L');
 
@@ -317,15 +317,15 @@ class MdCguEouvWS extends InfraWS {
             $pdf->setFont('arial','',12);
             $pdf->Cell(70,20,$nome,0,1,'L');
 
-            //Faixa Etária
+            //Faixa EtÃ¡ria
             $pdf->SetFont('arial','B',12);
-            $pdf->Cell(150,20,"Faixa Etária:",0,0,'L');
+            $pdf->Cell(150,20,"Faixa EtÃ¡ria:",0,0,'L');
             $pdf->setFont('arial','',12);
             $pdf->Cell(70,20,$id_faixa_etaria . " - " . $desc_faixa_etaria,0,1,'L');
 
-            //Raça Cor
+            //RaÃ§a Cor
             $pdf->SetFont('arial','B',12);
-            $pdf->Cell(150,20,"Raça/Cor:",0,0,'L');
+            $pdf->Cell(150,20,"RaÃ§a/Cor:",0,0,'L');
             $pdf->setFont('arial','',12);
             $pdf->Cell(70,20,$id_raca_cor . " - " . $desc_raca_cor,0,1,'L');
 
@@ -335,22 +335,22 @@ class MdCguEouvWS extends InfraWS {
             $pdf->setFont('arial','',12);
             $pdf->Cell(70,20,$sexo,0,1,'L');
 
-            //Documento Identificação
+            //Documento IdentificaÃ§Ã£o
             $pdf->SetFont('arial','B',12);
-            $pdf->Cell(170,20,"Documento de Identificação:",0,0,'L');
+            $pdf->Cell(170,20,"Documento de IdentificaÃ§Ã£o:",0,0,'L');
             $pdf->setFont('arial','',12);
             $pdf->Cell(70,20,$id_documento_identificacao . " - " . $desc_documento_identificacao ,0,1,'L');
 
-            //Número do Documento Identificação
+            //NÃºmero do Documento IdentificaÃ§Ã£o
             $pdf->SetFont('arial','B',12);
-            $pdf->Cell(150,20,"Número do Documento:",0,0,'L');
+            $pdf->Cell(150,20,"NÃºmero do Documento:",0,0,'L');
             $pdf->setFont('arial','',12);
             $pdf->Cell(70,20,$numero_documento_identificacao,0,1,'L');
 
             $pdf->ln(4);
-            //Endereço
+            //EndereÃ§o
             $pdf->SetFont('arial','B',12);
-            $pdf->Cell(70,20,"Endereço:",0,1,'L');
+            $pdf->Cell(70,20,"EndereÃ§o:",0,1,'L');
             $pdf->setFont('arial','',12);
             $pdf->Cell(70,20,$endereco,0,1,'L');
             $pdf->Cell(70,20,$desc_municipio . " - " . $uf,0,1,'L');
@@ -373,22 +373,22 @@ class MdCguEouvWS extends InfraWS {
             $pdf->Cell(70,20,$email,0,1,'L');
 
             //***********************************************************************************************
-            //3. Dados do Fato da Manifestação
+            //3. Dados do Fato da ManifestaÃ§Ã£o
             //***********************************************************************************************
             $pdf->Ln(20);
             $pdf->SetFont('arial','B',14);
-            $pdf->Cell(70,20,"3. Fato da Manifestação:",0,0,'L');
+            $pdf->Cell(70,20,"3. Fato da ManifestaÃ§Ã£o:",0,0,'L');
             $pdf->Ln(20);
 
-            //Município/UF
+            //MunicÃ­pio/UF
             $pdf->SetFont('arial','B',12);
-            $pdf->Cell(115,20,"Município/UF:",0,0,'L');
+            $pdf->Cell(115,20,"MunicÃ­pio/UF:",0,0,'L');
             $pdf->setFont('arial','',12);
             $pdf->Cell(70,20,$id_municipio_fato . " - " . $desc_municipio_fato . " / " . $uf_fato,0,1,'L');
 
-            //Descrição
+            //DescriÃ§Ã£o
             $pdf->SetFont('arial','B',12);
-            $pdf->Cell(115,20,"Descrição:",0,1,'L');
+            $pdf->Cell(115,20,"DescriÃ§Ã£o:",0,1,'L');
             $pdf->setFont('arial','',12);
             $pdf->MultiCell(0,20,$descricao_fato,0,'J');
 
@@ -434,7 +434,7 @@ class MdCguEouvWS extends InfraWS {
         $objUsuarioDTO = $objUsuarioRN->consultarRN0489($objUsuarioDTO);
 
         if ($objUsuarioDTO==null){
-            throw new InfraException('Sistema ['.$SiglaSistema.'] não encontrado.');
+            throw new InfraException('Sistema ['.$SiglaSistema.'] nÃ£o encontrado.');
         }
 
         $objServicoDTO = new ServicoDTO();
@@ -452,7 +452,7 @@ class MdCguEouvWS extends InfraWS {
         $objServicoDTO = $objServicoRN->consultar($objServicoDTO);
 
         if ($objServicoDTO==null){
-            throw new InfraException('Serviço ['.$IdentificacaoServico.'] do sistema ['.$SiglaSistema.'] não encontrado.');
+            throw new InfraException('ServiÃ§o ['.$IdentificacaoServico.'] do sistema ['.$SiglaSistema.'] nÃ£o encontrado.');
         }
 
         return $objServicoDTO;
@@ -476,7 +476,7 @@ class MdCguEouvWS extends InfraWS {
         $objUnidadeDTO = $objUnidadeRN->consultarRN0125($objUnidadeDTO);
 
         if ($objUnidadeDTO==null){
-            throw new InfraException('Unidade ['.$IdUnidade.'] não encontrada.');
+            throw new InfraException('Unidade ['.$IdUnidade.'] nÃ£o encontrada.');
         }
 
         return $objUnidadeDTO;
@@ -487,7 +487,7 @@ class MdCguEouvWS extends InfraWS {
  $servidorSoap = new SoapServer("sei.wsdl",array('encoding'=>'ISO-8859-1'));
  $servidorSoap->setClass("SeiWS");
 
- //Só processa se acessado via POST
+ //SÃ³ processa se acessado via POST
  if ($_SERVER['REQUEST_METHOD']=='POST') {
  $servidorSoap->handle();
  }
@@ -498,7 +498,7 @@ class MdCguEouvWS extends InfraWS {
     'attachment_type'=>BeSimple\SoapCommon\Helper::ATTACHMENTS_TYPE_MTOM));
 $servidorSoap->setClass ( "CguWS" );
 
-//Só processa se acessado via POST
+//SÃ³ processa se acessado via POST
 if ($_SERVER['REQUEST_METHOD']=='POST') {
     $servidorSoap->handle($HTTP_RAW_POST_DATA);
 }*/

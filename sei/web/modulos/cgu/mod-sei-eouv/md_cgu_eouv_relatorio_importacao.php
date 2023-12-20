@@ -1,12 +1,12 @@
 <?
 /**
-* TRIBUNAL REGIONAL FEDERAL DA 4ª REGIÃO
+* TRIBUNAL REGIONAL FEDERAL DA 4Âª REGIÃƒO
 *
 * 15/12/2011 - criado por tamir_db
 *
-* Versão do Gerador de Código: 1.32.1
+* VersÃ£o do Gerador de CÃ³digo: 1.32.1
 *
-* Versão no CVS: $Id$
+* VersÃ£o no CVS: $Id$
 */
 
 //try {
@@ -27,11 +27,11 @@
   switch($_GET['acao']){
 
     case 'md_cgu_eouv_relatorio_importacao_listar':
-      $strTitulo = 'Lista de Importações Realizadas';
+      $strTitulo = 'Lista de ImportaÃ§Ãµes Realizadas';
       break;
 
     default:
-      throw new InfraException("Ação '".$_GET['acao']."' não reconhecida.");
+      throw new InfraException("AÃ§Ã£o '".$_GET['acao']."' nÃ£o reconhecida.");
   }
 
   $arrComandos = array();
@@ -93,20 +93,20 @@
 
     $strResultado = '';
 
-    $strCaptionTabela = 'Importações';
+    $strCaptionTabela = 'ImportaÃ§Ãµes';
 
-    $strResultado .= '<table width="99%" class="infraTable" summary="' . ($strSumarioTabela ?? '$strSumarioTabela não definido') . '">'."\n";
+    $strResultado .= '<table width="99%" class="infraTable" summary="' . ($strSumarioTabela ?? '$strSumarioTabela nÃ£o definido') . '">'."\n";
     $strResultado .= '<caption class="infraCaption">'.PaginaSEI::getInstance()->gerarCaptionTabela($strCaptionTabela,$numRegistros).'</caption>';
     $strResultado .= '<tr>';
 
     $strResultado .= '<th class="infraTh" width="5%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'ID','IdRelatorioImportacao',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
-    $strResultado .= '<th class="infraTh" width="10%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'Data da Execução','DthImportacao',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
+    $strResultado .= '<th class="infraTh" width="10%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'Data da ExecuÃ§Ã£o','DthImportacao',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh" width="7%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'Tipo','TipManifestacao',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh" width="7%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'Sucesso','SinSucesso',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
-    $strResultado .= '<th class="infraTh" width="10%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'Período Inicial','DthPeriodoInicial',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
-    $strResultado .= '<th class="infraTh" width="10%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'Período Final','DthPeriodoFinal',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
+    $strResultado .= '<th class="infraTh" width="10%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'PerÃ­odo Inicial','DthPeriodoInicial',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
+    $strResultado .= '<th class="infraTh" width="10%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'PerÃ­odo Final','DthPeriodoFinal',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh" >'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'Log do Processamento','StrDeLogProcessamento',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
-    $strResultado .= '<th class="infraTh" width="15%">Ações</th>'."\n";
+    $strResultado .= '<th class="infraTh" width="15%">AÃ§Ãµes</th>'."\n";
     $strResultado .= '</tr>'."\n";
     $strCssTr='';
     for($i = 0;$i < $numRegistros; $i++){
@@ -134,7 +134,7 @@
       //$strDescricao = PaginaSEI::getInstance()->formatarParametrosJavaScript($arrObjEouvRelatorioImportacaoDTO[$i]->getStrComando());
 
       if ($bolAcaoConsultar){
-        $strResultado .= '<a href="'.PaginaSEI::getInstance()->formatarXHTML(SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_relatorio_importacao_detalhar&acao_origem='.$_GET['acao'].'&acao_retorno='.$_GET['acao'].'&id_relatorio_importacao='.$arrObjEouvRelatorioImportacaoDTO[$i]->getNumIdRelatorioImportacao())).'" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeConsultar().'" title="Detalhar Importação" alt="Detalhar Importacação" class="infraImg" /></a>&nbsp;';
+        $strResultado .= '<a href="'.PaginaSEI::getInstance()->formatarXHTML(SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_relatorio_importacao_detalhar&acao_origem='.$_GET['acao'].'&acao_retorno='.$_GET['acao'].'&id_relatorio_importacao='.$arrObjEouvRelatorioImportacaoDTO[$i]->getNumIdRelatorioImportacao())).'" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeConsultar().'" title="Detalhar ImportaÃ§Ã£o" alt="Detalhar ImportacaÃ§Ã£o" class="infraImg" /></a>&nbsp;';
       }
 
       $strResultado .= '</td></tr>'."\n";

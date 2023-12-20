@@ -1,7 +1,7 @@
 <?php
 
 /**
- * CONTROLADORIA GERAL DA UNIÃO- CGU
+ * CONTROLADORIA GERAL DA UNIÃƒO- CGU
  *
  * 09/10/2015 - criado por Rafael Leandro
  *
@@ -35,7 +35,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
     public function apiRestRequest($url, $token, $tipo)
     {
         /**
-         * Debug do token antes da requisição
+         * Debug do token antes da requisiÃ§Ã£o
          */
 //        var_dump($token);
 //        die();
@@ -43,7 +43,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $curl = curl_init();
 
         /**
-         * @test - teste de opções do Curl
+         * @test - teste de opÃ§Ãµes do Curl
          */
 //        $ua = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/525.13 (KHTML, like Gecko) Chrome/0.A.B.C Safari/525.13';
 
@@ -71,7 +71,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         $response = curl_exec($curl);
         $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        // Verifica erro ao fazer requisição
+        // Verifica erro ao fazer requisiÃ§Ã£o
         if ($response === false) {
             $err = curl_error($curl);
             throw new Exception($err);
@@ -97,7 +97,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
             case 200:
                 $response = json_decode($response, true);
 
-                // Verifica erro na decodificação JSON
+                // Verifica erro na decodificaÃ§Ã£o JSON
                 if ($response === null) {
                     throw new Exception('Erro ao decodificar resposta JSON da API ('. json_last_error_msg(). ')');
                 }
@@ -110,7 +110,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $response = 'Nenhum retorno encontrado! HTTP Status: ' . $httpcode;
                 break;
             default:
-                $response = "Erro: Ocorreu algum erro não tratado. HTTP Status: " . $httpcode;
+                $response = "Erro: Ocorreu algum erro nÃ£o tratado. HTTP Status: " . $httpcode;
                 throw new Exception($response);
                 break;
         }
@@ -210,7 +210,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
     public function executarServicoConsultaManifestacoes($urlConsultaManifestacao, $token, $ultimaDataExecucao, $dataAtual, $numprotocolo = null, $numIdRelatorio = null)
     {
         /**
-         * Debug do token antes da requisição
+         * Debug do token antes da requisiÃ§Ã£o
          */
 //        var_dump($token);
 //        die();
@@ -230,16 +230,16 @@ class MdCguEouvAgendamentoRN extends InfraRN
         if (is_null($numprotocolo)) {
             // Verifica se retornou Token Invalido
             if (is_string($retornoWs)) {
-                // Token expirado, necessário gerar novo Token
+                // Token expirado, necessÃ¡rio gerar novo Token
                 if (strpos($retornoWs, 'Invalidado') !== false) {
                     return "Token Invalidado";
                 }
             }
         } else {
-            // Faz tratamento diferenciado para consulta por Protocolo específico
+            // Faz tratamento diferenciado para consulta por Protocolo especÃ­fico
             if(is_string($retornoWs)) {
                 if (strpos($retornoWs, '404') !== false) {
-//                        $this->gravarLogLinha($this->formatarProcesso($numprotocolo), $numIdRelatorio, "Usuário não possui permissão de acesso neste protocolo.", 'N');
+//                        $this->gravarLogLinha($this->formatarProcesso($numprotocolo), $numIdRelatorio, "UsuÃ¡rio nÃ£o possui permissÃ£o de acesso neste protocolo.", 'N');
                     $this->gravarLogLinha($this->formatarProcesso($numprotocolo), $numIdRelatorio, 'Nenhum retorno encontrado!', 'S');
                     $retornoWs = null;
                 } elseif (strpos($retornoWs, 'Erro') !== false) {
@@ -257,7 +257,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
     {
 
         $debugLocal = false;
-        $debugLocal && LogSEI::getInstance()->gravar('[executarServicoConsultaRecursos] Parâmetros: $ultimaDataExecucao: ' . $ultimaDataExecucao . ' | $dataAtual: ' . $dataAtual . ' | $numprotocolo: ' . $numprotocolo);
+        $debugLocal && LogSEI::getInstance()->gravar('[executarServicoConsultaRecursos] ParÃ¢metros: $ultimaDataExecucao: ' . $ultimaDataExecucao . ' | $dataAtual: ' . $dataAtual . ' | $numprotocolo: ' . $numprotocolo);
 
         $arrParametrosUrl = array(
             'dataAberturaInicio' => $ultimaDataExecucao,
@@ -275,16 +275,16 @@ class MdCguEouvAgendamentoRN extends InfraRN
             //Verifica se retornou Token Invalido
             if (is_string($retornoWs)) {
                 if (strpos($retornoWs, 'Invalidado') !== false) {
-                    //Token expirado, necessÃ¡rio gerar novo Token
+                    //Token expirado, necessÃƒÂ¡rio gerar novo Token
                     return "Token Invalidado";
                 }
             }
         } else {
-            //Faz tratamento diferenciado para consulta por Protocolo específico
+            //Faz tratamento diferenciado para consulta por Protocolo especÃ­fico
             if(is_string($retornoWs)) {
                 if (strpos($retornoWs, 'Erro') !== false) {
                     if (strpos($retornoWs, '404') !== false) {
-                        $this->gravarLogLinha($this->formatarProcesso($numprotocolo), $numIdRelatorio, "Usuário não possui permissão de acesso neste protocolo.", 'N');
+                        $this->gravarLogLinha($this->formatarProcesso($numprotocolo), $numIdRelatorio, "UsuÃ¡rio nÃ£o possui permissÃ£o de acesso neste protocolo.", 'N');
                         $retornoWs = null;
                     } else {
                         $this->gravarLogLinha($this->formatarProcesso($numprotocolo), $numIdRelatorio, "Erro desconhecido" . $retornoWs, 'N');
@@ -312,8 +312,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
     public function verificaRetornoWS($retornoWsLista)
     {
         /*
-        função criada para tratar o retorno de dados do WS, pois quando existe apenas um unico resultado retorna um objeto e
-        quando tem mais de um resultado retorna um array ocasionando falhas na exibição dos dados.
+        funÃ§Ã£o criada para tratar o retorno de dados do WS, pois quando existe apenas um unico resultado retorna um objeto e
+        quando tem mais de um resultado retorna um array ocasionando falhas na exibiÃ§Ã£o dos dados.
         */
         if (isset($retornoWsLista) and key_exists(0, $retornoWsLista)) {
             $resultado = $retornoWsLista;
@@ -400,7 +400,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
             $numProtocolo = preg_replace("/[^0-9]/", "", $erro->getStrProtocoloFormatado());
 
-            //Se já estiver na lista não faz novamente para determinado protocolo
+            //Se jÃ¡ estiver na lista nÃ£o faz novamente para determinado protocolo
             if (!in_array($numProtocolo, $arrProtocolos)){
 
                 //Adiciona no array de Protocolos
@@ -429,7 +429,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $objUsuarioDTO = $objUsuarioRN->consultarRN0489($objUsuarioDTO);
 
         if ($objUsuarioDTO==null){
-            throw new InfraException('Sistema ['.$SiglaSistema.'] não encontrado.');
+            throw new InfraException('Sistema ['.$SiglaSistema.'] nÃ£o encontrado.');
         }
 
         $objServicoDTO = new ServicoDTO();
@@ -447,7 +447,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $objServicoDTO = $objServicoRN->consultar($objServicoDTO);
 
         if ($objServicoDTO==null){
-            throw new InfraException('Serviço ['.$IdentificacaoServico.'] do sistema ['.$SiglaSistema.'] não encontrado.');
+            throw new InfraException('ServiÃ§o ['.$IdentificacaoServico.'] do sistema ['.$SiglaSistema.'] nÃ£o encontrado.');
         }
 
         return $objServicoDTO;
@@ -471,7 +471,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $objUnidadeDTO = $objUnidadeRN->consultarRN0125($objUnidadeDTO);
 
         if ($objUnidadeDTO==null){
-            throw new InfraException('Unidade ['.$IdUnidade.'] não encontrada.');
+            throw new InfraException('Unidade ['.$IdUnidade.'] nÃ£o encontrada.');
         }
 
         return $objUnidadeDTO;
@@ -492,7 +492,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
     }
 
     /**
-     * Função para importar as manifestações e-Ouv do FalaBR
+     * FunÃ§Ã£o para importar as manifestaÃ§Ãµes e-Ouv do FalaBR
      *
      * Tipos: 1, 2, 3, 4, 5, 6 e 7
      */
@@ -505,7 +505,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //        InfraDebug::getInstance()->limpar();
 
         // Log
-        LogSEI::getInstance()->gravar('Rotina de Importação de Manifestações do E-Ouv', InfraLog::$INFORMACAO);
+        LogSEI::getInstance()->gravar('Rotina de ImportaÃ§Ã£o de ManifestaÃ§Ãµes do E-Ouv', InfraLog::$INFORMACAO);
 
         global $objEouvRelatorioImportacaoDTO,
                $objEouvRelatorioImportacaoRN,
@@ -529,7 +529,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $objEouvParametroDTO = new MdCguEouvParametroDTO();
         $objEouvParametroDTO -> retTodos();
 
-        // Busca parâmetros do banco de dados
+        // Busca parÃ¢metros do banco de dados
         $objEouvParametroRN = new MdCguEouvParametroRN();
         $arrObjEouvParametroDTO = $objEouvParametroRN->listarParametro($objEouvParametroDTO);
 
@@ -606,13 +606,13 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         try {
 
-            //Retorna dados da Última execução com Sucesso
+            //Retorna dados da Ãšltima execuÃ§Ã£o com Sucesso
             $objUltimaExecucao = MdCguEouvAgendamentoINT::retornarUltimaExecucaoSucesso();
 
             if ($objUltimaExecucao != null) {
                 $ultimaDataExecucao = $objUltimaExecucao->getDthDthPeriodoFinal();
                 $idUltimaExecucao = $objUltimaExecucao->getNumIdRelatorioImportacao();
-            } //Primeira execução ou nenhuma executada com sucesso
+            } //Primeira execuÃ§Ã£o ou nenhuma executada com sucesso
             else {
                 $ultimaDataExecucao = $dataInicialImportacaoManifestacoes;
             }
@@ -633,7 +633,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
             /**
              * Exemplo de retorno da API
              */
-//            $retornoWs = [["Links"=>[["rel"=>"self","href"=>"https://sistema.ouvidorias.gov.br/api/manifestacoes/2670732"]],"IndPossuiIdentidadePreservada"=>false,"IdManifestacao"=>2670732,"NumerosProtocolo"=>["23546059531202007"],"OuvidoriaDestino"=>["IdOuvidoria"=>65,"IdOrgaoSiorg"=>100911,"NomeOuvidoria"=>"IFCE – Instituto Federal de Educação, Ciência e Tecnologia do Ceará"],"Assunto"=>["IdAssunto"=>57,"DescAssunto"=>"Defesa do Consumidor"],"Servico"=>null,"TipoFormulario"=>["IdTipoFormulario"=>1,"DescTipoFormulario"=>"Padrão"],"TipoManifestacao"=>["IdTipoManifestacao"=>2,"DescTipoManifestacao"=>"Reclamação"],"EmailManifestante"=>"luanaalbuquerquev@gmail.com","DataCadastro"=>"24/11/2020","PrazoAtendimento"=>null,"Situacao"=>["IdSituacaoManifestacao"=>5,"DescSituacaoManifestacao"=>"Complementação Solicitada"],"ResponsavelAnalise"=>"Tércio Victor de Oliveira Leal"]];
+//            $retornoWs = [["Links"=>[["rel"=>"self","href"=>"https://sistema.ouvidorias.gov.br/api/manifestacoes/2670732"]],"IndPossuiIdentidadePreservada"=>false,"IdManifestacao"=>2670732,"NumerosProtocolo"=>["23546059531202007"],"OuvidoriaDestino"=>["IdOuvidoria"=>65,"IdOrgaoSiorg"=>100911,"NomeOuvidoria"=>"IFCE Â– Instituto Federal de EducaÃ§Ã£o, CiÃªncia e Tecnologia do CearÃ¡"],"Assunto"=>["IdAssunto"=>57,"DescAssunto"=>"Defesa do Consumidor"],"Servico"=>null,"TipoFormulario"=>["IdTipoFormulario"=>1,"DescTipoFormulario"=>"PadrÃ£o"],"TipoManifestacao"=>["IdTipoManifestacao"=>2,"DescTipoManifestacao"=>"ReclamaÃ§Ã£o"],"EmailManifestante"=>"luanaalbuquerquev@gmail.com","DataCadastro"=>"24/11/2020","PrazoAtendimento"=>null,"Situacao"=>["IdSituacaoManifestacao"=>5,"DescSituacaoManifestacao"=>"ComplementaÃ§Ã£o Solicitada"],"ResponsavelAnalise"=>"TÃ©rcio Victor de Oliveira Leal"]];
 
             //Caso retornado algum erro
             if (is_string($retornoWs)) {
@@ -642,13 +642,13 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     $tokenValido = $this->apiValidarToken($urlWebServiceEOuv, $usuarioWebService, $senhaUsuarioWebService, $client_id, $client_secret);
 
                     if (isset($tokenValido['error'])) {
-                        $textoMensagemErroToken = 'Não foi possível validar o Token de acesso aos WebServices do E-ouv. <br>Verifique as informações de Usuário, Senha, Client_Id e Client_Secret nas configurações de Parâmetros do Módulo';
+                        $textoMensagemErroToken = 'NÃ£o foi possÃ­vel validar o Token de acesso aos WebServices do E-ouv. <br>Verifique as informaÃ§Ãµes de UsuÃ¡rio, Senha, Client_Id e Client_Secret nas configuraÃ§Ãµes de ParÃ¢metros do MÃ³dulo';
 
                     } elseif (isset($tokenValido['access_token'])) {
                         $this->gravarParametroToken($tokenValido['access_token']);
                         $token = $tokenValido['access_token'];
 
-                        //Chama novamente a execução da ConsultaManifestacao que deu errado por causa do Token
+                        //Chama novamente a execuÃ§Ã£o da ConsultaManifestacao que deu errado por causa do Token
                         $retornoWs = $this->executarServicoConsultaManifestacoes($urlWebServiceEOuv, $token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
                     }
                 }
@@ -660,7 +660,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $arrManifestacoes = array();
 
                 if (is_array($retornoWs)) {
-                    // Filtra as manifestações e-Ouv
+                    // Filtra as manifestaÃ§Ãµes e-Ouv
                     $arrManifestacoes = array_filter($retornoWs, function($manifestacao) {
                         return $manifestacao['TipoManifestacao']['IdTipoManifestacao'] <> 8;
                     });
@@ -679,13 +679,13 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     }
                 }
 
-                $textoMensagemFinal = 'Execução Finalizada com Sucesso!';
+                $textoMensagemFinal = 'ExecuÃ§Ã£o Finalizada com Sucesso!';
                 $SinSucessoExecucao = 'S';
 
                 if ($semManifestacoesEncontradas) {
-                    $textoMensagemFinal = $textoMensagemFinal . ' Não foram encontradas manifestações para o período.';
+                    $textoMensagemFinal = $textoMensagemFinal . ' NÃ£o foram encontradas manifestaÃ§Ãµes para o perÃ­odo.';
                 } else {
-                    $textoMensagemFinal = $textoMensagemFinal . '<br>Quantidade de Manifestações novas encontradas (e-Ouv): ' . $qtdManifestacoesNovas . '<br>Quantidade de Manifestações encontadas que ocorreram erro em outras importações: ' . $qtdManifestacoesAntigas;
+                    $textoMensagemFinal = $textoMensagemFinal . '<br>Quantidade de ManifestaÃ§Ãµes novas encontradas (e-Ouv): ' . $qtdManifestacoesNovas . '<br>Quantidade de ManifestaÃ§Ãµes encontadas que ocorreram erro em outras importaÃ§Ãµes: ' . $qtdManifestacoesAntigas;
                 }
 
                 if ($ocorreuErroEmProtocolo) {
@@ -695,7 +695,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $textoMensagemFinal = $textoMensagemErroToken;
             }
 
-            //Grava a execução com sucesso se tiver corrido tudo bem
+            //Grava a execuÃ§Ã£o com sucesso se tiver corrido tudo bem
             $objEouvRelatorioImportacaoDTO2 = new MdCguEouvRelatorioImportacaoDTO();
 
             $objEouvRelatorioImportacaoDTO2->setNumIdRelatorioImportacao($objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao());
@@ -717,13 +717,13 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
             PaginaSEI::getInstance()->processarExcecao($e);
         } finally {
-            //Restaura a sessão
+            //Restaura a sessÃ£o
             SessaoSEI::getInstance()->setBolHabilitada($isBolHabilitada);
         }
     }
 
     /**
-     * Função para importar as manifestações e-Sic do FalaBR (tipo 8)
+     * FunÃ§Ã£o para importar as manifestaÃ§Ãµes e-Sic do FalaBR (tipo 8)
      */
     public function executarImportacaoManifestacaoESic()
     {
@@ -737,7 +737,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $debugLocal = false;
 
         // Log
-        LogSEI::getInstance()->gravar('Rotina de Importação de Manifestações do FalaBR (e-Sic)', InfraLog::$INFORMACAO);
+        LogSEI::getInstance()->gravar('Rotina de ImportaÃ§Ã£o de ManifestaÃ§Ãµes do FalaBR (e-Sic)', InfraLog::$INFORMACAO);
 
         global $objEouvRelatorioImportacaoDTO,
                $objEouvRelatorioImportacaoRN,
@@ -762,16 +762,16 @@ class MdCguEouvAgendamentoRN extends InfraRN
                $token,
                $importar_dados_manifestante;
 
-        // Lista parâmetros
+        // Lista parÃ¢metros
         $objEouvParametroDTO = new MdCguEouvParametroDTO();
         $objEouvParametroDTO->retTodos();
 
-        // Busca parâmetros do banco de dados da tabela md_eouv_parametros
+        // Busca parÃ¢metros do banco de dados da tabela md_eouv_parametros
         $objEouvParametroRN = new MdCguEouvParametroRN();
         $arrObjEouvParametroDTO = $objEouvParametroRN->listarParametro($objEouvParametroDTO);
         $numRegistros = count($arrObjEouvParametroDTO);
 
-        // Preenche variáveis locais com dados da tabela md_eouv_parametros
+        // Preenche variÃ¡veis locais com dados da tabela md_eouv_parametros
         if ($numRegistros > 0) {
             for($i = 0;$i < $numRegistros; $i++) {
 
@@ -852,7 +852,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
             }
         }
 
-        // Busca parâmetros do banco de dados da tabela infra_parametros
+        // Busca parÃ¢metros do banco de dados da tabela infra_parametros
         $objInfraParametro = new InfraParametro(BancoSEI::getInstance());
         $idUsuarioSei = $objInfraParametro->getValor('ID_USUARIO_SEI');
         $dataAtual = InfraData::getStrDataHoraAtual();
@@ -865,10 +865,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
         // Simula login inicial
         $this->simulaLogin($SiglaSistema, $IdentificacaoServico, $idUnidadeEsicPrincipal);
 
-        // Executa a importação dos dados
+        // Executa a importaÃ§Ã£o dos dados
         try {
 
-            //Retorna dados da Última execução com Sucesso
+            //Retorna dados da Ãšltima execuÃ§Ã£o com Sucesso
             $objUltimaExecucao = MdCguEouvAgendamentoINT::retornarUltimaExecucaoSucesso('R');
 
             if ($objUltimaExecucao != null) {
@@ -879,15 +879,15 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $idUltimaExecucao = $objUltimaExecucao->getNumIdRelatorioImportacao();
             } else {
                 // Debug Logs
-                $debugLocal && LogSEI::getInstance()->gravar('$objUltimaExecuxao (e-Sic) é NULL');
+                $debugLocal && LogSEI::getInstance()->gravar('$objUltimaExecuxao (e-Sic) Ã© NULL');
 
-                //Primeira execução ou nenhuma executada com sucesso
+                //Primeira execuÃ§Ã£o ou nenhuma executada com sucesso
                 $ultimaDataExecucao = $dataInicialImportacaoManifestacoes;
             }
 
             /**
              * @debug data
-             * Para auxiliar no debug pode-se definir uma data específica para um determinado processo
+             * Para auxiliar no debug pode-se definir uma data especÃ­fica para um determinado processo
              */
 //            var_dump($ultimaDataExecucao);
 //            $ultimaDataExecucao = '03/01/2022 00:00:00';
@@ -905,7 +905,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $qtdRecursosAntigos = 0;
 
             /**
-             * A função abaixo gravarLogImportacao recebe o tipo de manifestação 'R' (Recursos) para as manifestações do e-Sic
+             * A funÃ§Ã£o abaixo gravarLogImportacao recebe o tipo de manifestaÃ§Ã£o 'R' (Recursos) para as manifestaÃ§Ãµes do e-Sic
              */
 
             /**
@@ -923,14 +923,14 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $textoMensagemErroToken = '';
 
             /**
-             * Debug do token antes da requisição
+             * Debug do token antes da requisiÃ§Ã£o
              */
 //            var_dump($token);
 //            var_dump('<hr>');
 //            die();
 
             /**
-             * As funções abaixo fazem a busca no webservice dos dados a serem trabalhados na rotina de importação
+             * As funÃ§Ãµes abaixo fazem a busca no webservice dos dados a serem trabalhados na rotina de importaÃ§Ã£o
              */
             $debugLocal && LogSEI::getInstance()->gravar('Iniciando a consulta inicial');
             $retornoWs = $this->executarServicoConsultaManifestacoes($urlWebServiceEOuv, $token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
@@ -938,8 +938,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
             /**
              * @debug retorno 1
-             * Caso esteja debugando, e queira inserir o retorno direto, pode-se fazer aqui ou até mesmo descomentar a
-             * abaixo para deixar vazio acelerando os testes das funções subsequêntes.
+             * Caso esteja debugando, e queira inserir o retorno direto, pode-se fazer aqui ou atÃ© mesmo descomentar a
+             * abaixo para deixar vazio acelerando os testes das funÃ§Ãµes subsequÃªntes.
              */
 //            $retornoWs = [];
 //            $retornoWsRecursos = [];
@@ -966,21 +966,21 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //                "OuvidoriaDestino"=>[
 //                    "IdOuvidoria"=>6,
 //                    "IdOrgaoSiorg"=>214460,
-//                    "NomOuvidoria"=>"CGU – Controladoria-Geral da União"
+//                    "NomOuvidoria"=>"CGU Â– Controladoria-Geral da UniÃ£o"
 //
 //                ],
 //                "Assunto"=>[
 //                    "IdAssunto"=>377,
-//                    "DescAssunto"=>"Acesso à informação"
+//                    "DescAssunto"=>"Acesso Ã  informaÃ§Ã£o"
 //                ],
 //                "Servico"=>null,
 //                "TipoFormulario"=>[
 //                    "IdTipoFormulario"=>3,
-//                    "DescTipoFormulario"=>"Acesso à Informação"
+//                    "DescTipoFormulario"=>"Acesso Ã  InformaÃ§Ã£o"
 //                ],
 //                "TipoManifestacao"=>[
 //                    "IdTipoManifestacao"=>8,
-//                    "DescTipoManifestacao"=>"Acesso à Informação"
+//                    "DescTipoManifestacao"=>"Acesso Ã  InformaÃ§Ã£o"
 //                ],
 //                "EmailManifestante"=>"daianecalado@yahoo.com.br",
 //                "DataCadastro"=>"14/10/2021",
@@ -1001,11 +1001,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //                ]
 //            ]];
 
-            //Caso retornado algum erro - Manifestações e-Sic
+            //Caso retornado algum erro - ManifestaÃ§Ãµes e-Sic
             if (is_string($retornoWs)) {
-                $debugLocal && LogSEI::getInstance()->gravar('Retorno da consulta $retornoWs é uma string: ' . $retornoWs);
+                $debugLocal && LogSEI::getInstance()->gravar('Retorno da consulta $retornoWs Ã© uma string: ' . $retornoWs);
                 // Debug de retorno com erro
-//                var_dump('$retornoWS é uma string');
+//                var_dump('$retornoWS Ã© uma string');
 //                var_dump($retornoWs);
 //                die();
 
@@ -1014,7 +1014,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     $tokenValido = $this->apiValidarToken($urlWebServiceEOuv, $usuarioWebService, $senhaUsuarioWebService, $client_id, $client_secret);
 
                     if (isset($tokenValido['error'])) {
-                        $textoMensagemErroToken = 'Não foi possível validar o Token de acesso aos WebServices do E-ouv. <br>Verifique as informações de Usuário, Senha, Client_Id e Client_Secret nas configurações de Parâmetros do Módulo';
+                        $textoMensagemErroToken = 'NÃ£o foi possÃ­vel validar o Token de acesso aos WebServices do E-ouv. <br>Verifique as informaÃ§Ãµes de UsuÃ¡rio, Senha, Client_Id e Client_Secret nas configuraÃ§Ãµes de ParÃ¢metros do MÃ³dulo';
 
                     } elseif (isset($tokenValido['access_token'])) {
                         $this->gravarParametroToken($tokenValido['access_token']);
@@ -1027,7 +1027,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //                        var_dump($token);
 //                        die();
 
-                        //Chama novamente a execução da ConsultaManifestacao que deu errado por causa do Token
+                        //Chama novamente a execuÃ§Ã£o da ConsultaManifestacao que deu errado por causa do Token
                         $retornoWs = $this->executarServicoConsultaManifestacoes($urlWebServiceEOuv, $token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
                         $retornoWsRecursos = $this->executarServicoConsultaRecursos($urlWebServiceESicRecursos, $token, $ultimaDataExecucao, $dataAtual, null, $idRelatorioImportacao);
                     }
@@ -1036,8 +1036,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
             /**
              * @debug retorno 2
-             * Caso esteja debugando, e queira inserir o retorno direto, pode-se fazer aqui ou até mesmo descomentar a
-             * abaixo para deixar vazio acelerando os testes das funções subsequêntes.
+             * Caso esteja debugando, e queira inserir o retorno direto, pode-se fazer aqui ou atÃ© mesmo descomentar a
+             * abaixo para deixar vazio acelerando os testes das funÃ§Ãµes subsequÃªntes.
              */
 //            $retornoWs = [];
 //            $retornoWsRecursos = [];
@@ -1046,7 +1046,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //            die();
 
             /**
-             * @todo - criar rotina para buscar recursos das manifestções com erro caso exista alguma na tabela de log
+             * @todo - criar rotina para buscar recursos das manifestÃ§Ãµes com erro caso exista alguma na tabela de log
              */
 
             if ($textoMensagemErroToken == '') {
@@ -1055,18 +1055,18 @@ class MdCguEouvAgendamentoRN extends InfraRN
                  * @debug - manifestacao com erro
                  * Comentar a linha abaixo para debugar um retorno manual
                  */
-                $debugLocal && LogSEI::getInstance()->gravar('Inicia busca manifestação com erros');
+                $debugLocal && LogSEI::getInstance()->gravar('Inicia busca manifestaÃ§Ã£o com erros');
                 $arrComErro = $this->obterManifestacoesComErro($urlWebServiceEOuv, $token, $ultimaDataExecucao, $dataAtual, $idRelatorioImportacao, 'R');
 
                 $arrManifestacoes = array();
 
                 if (is_array($retornoWs)) {
-                    // Filtra as manifestações e-Sic
+                    // Filtra as manifestaÃ§Ãµes e-Sic
                     $arrManifestacoes = array_filter($retornoWs, function($manifestacao) {
                         return $manifestacao['TipoManifestacao']['IdTipoManifestacao'] == 8;
                     });
                     $qtdManifestacoesNovas = count($arrManifestacoes);
-                    $debugLocal && LogSEI::getInstance()->gravar('Possui novas manifestações qtd: ' . $qtdManifestacoesNovas);
+                    $debugLocal && LogSEI::getInstance()->gravar('Possui novas manifestaÃ§Ãµes qtd: ' . $qtdManifestacoesNovas);
 //                    var_dump('<hr>');
 //                    var_dump('Qtd retornoWS: <br />');
 //                    var_dump(count($retornoWs));
@@ -1085,7 +1085,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 }
 
                 if (is_array($arrComErro)) {
-                    $debugLocal && LogSEI::getInstance()->gravar('Possui manifestações com erros - qtd: ' . count($arrComErro));
+                    $debugLocal && LogSEI::getInstance()->gravar('Possui manifestaÃ§Ãµes com erros - qtd: ' . count($arrComErro));
                     $qtdManifestacoesAntigas = count($arrComErro);
                     $arrManifestacoes = array_merge($arrManifestacoes, $arrComErro);
 //                    var_dump('<hr>');
@@ -1094,17 +1094,17 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //                    var_dump('<hr>');
                 }
 
-                // Importa manifestações e-Sic
+                // Importa manifestaÃ§Ãµes e-Sic
                 if (count($arrManifestacoes) > 0) {
                     $semManifestacoesEncontradas = false;
                     foreach ($arrManifestacoes as $retornoWsLinha) {
                             /**
-                             * Para fazer debug de uma Manifestação por ID (IdManifestacao)
-                             * descomente o if abaixo e coloque o número do IdManifestacao
-                             * para somente fazer o loop de importação se for passar no if!
+                             * Para fazer debug de uma ManifestaÃ§Ã£o por ID (IdManifestacao)
+                             * descomente o if abaixo e coloque o nÃºmero do IdManifestacao
+                             * para somente fazer o loop de importaÃ§Ã£o se for passar no if!
                              */
 //                            var_dump('<hr>');
-//                            var_dump('Manifestação: <br />');
+//                            var_dump('ManifestaÃ§Ã£o: <br />');
 //                            var_dump($retornoWsLinha['NumerosProtocolo']);
 //                            var_dump('<hr>');
 //                            continue;
@@ -1112,18 +1112,18 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //                            var_dump('<hr>');
 //                            die();
 //                            if ($retornoWsLinha['IdManifestacao'] <> '38796') {
-//                                $debugLocal && LogSEI::getInstance()->gravar('Pulou a idManifestação: ' . $retornoWsLinha['IdManifestacao']);
+//                                $debugLocal && LogSEI::getInstance()->gravar('Pulou a idManifestaÃ§Ã£o: ' . $retornoWsLinha['IdManifestacao']);
 //                                continue;
 //                            }
 //                            if ($retornoWsLinha['NumerosProtocolo'][0] <> '00106000003202289') {
-//                                $debugLocal && LogSEI::getInstance()->gravar('Pulou a idManifestação: ' . $retornoWsLinha['IdManifestacao']);
+//                                $debugLocal && LogSEI::getInstance()->gravar('Pulou a idManifestaÃ§Ã£o: ' . $retornoWsLinha['IdManifestacao']);
 //                                continue;
 //                            }
 //                            var_dump($retornoWsLinha['NumerosProtocolo']);
 //                            var_dump('passou pra importar...');
 //                            die();
 
-                        $debugLocal && LogSEI::getInstance()->gravar('Inicia importação por Linha');
+                        $debugLocal && LogSEI::getInstance()->gravar('Inicia importaÃ§Ã£o por Linha');
                         $this->executarImportacaoLinha($retornoWsLinha, 'R');
                     }
                 }
@@ -1134,7 +1134,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     foreach ($arrRecursos as $retornoWsLinha) {
 
                         /**
-                         * Debug importação de recursos
+                         * Debug importaÃ§Ã£o de recursos
                          */
 //                        var_dump('<hr>');
 //                        var_dump('Recurso: <br />');
@@ -1149,7 +1149,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //                        var_dump($retornoWsLinha);
 //                        var_dump('<hr>');
 //                        die();
-                        $debugLocal && LogSEI::getInstance()->gravar('Inicia importação por linha de Recursos - protocolo: ' . $retornoWsLinha['numProtocolo']);
+                        $debugLocal && LogSEI::getInstance()->gravar('Inicia importaÃ§Ã£o por linha de Recursos - protocolo: ' . $retornoWsLinha['numProtocolo']);
                         $this->executarImportacaoLinhaRecursos($retornoWsLinha);
                     }
                 }
@@ -1161,19 +1161,19 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //                var_dump('fim...');
 //                die();
 
-                $textoMensagemFinal = 'Execução Finalizada com Sucesso!';
+                $textoMensagemFinal = 'ExecuÃ§Ã£o Finalizada com Sucesso!';
                 $SinSucessoExecucao = 'S';
 
                 if ($semManifestacoesEncontradas) {
-                    $textoMensagemFinal = $textoMensagemFinal . ' Não foram encontradas manifestações para o período.';
+                    $textoMensagemFinal = $textoMensagemFinal . ' NÃ£o foram encontradas manifestaÃ§Ãµes para o perÃ­odo.';
                 } else {
-                    $textoMensagemFinal = $textoMensagemFinal . '<br>Quantidade de Manifestações novas encontradas (e-Sic): ' . $qtdManifestacoesNovas . '<br>Quantidade de Manifestações encontadas que ocorreram erro em outras importações: ' . $qtdManifestacoesAntigas;
+                    $textoMensagemFinal = $textoMensagemFinal . '<br>Quantidade de ManifestaÃ§Ãµes novas encontradas (e-Sic): ' . $qtdManifestacoesNovas . '<br>Quantidade de ManifestaÃ§Ãµes encontadas que ocorreram erro em outras importaÃ§Ãµes: ' . $qtdManifestacoesAntigas;
                 }
 
                 if ($semRecursosEncontrados) {
-                    $textoMensagemFinal = $textoMensagemFinal . ' Não foram encontrados recursos para o período.';
+                    $textoMensagemFinal = $textoMensagemFinal . ' NÃ£o foram encontrados recursos para o perÃ­odo.';
                 } else {
-//                    $textoMensagemFinal = $textoMensagemFinal . '<br>Quantidade de Recursos novos encontrados (e-Sic): ' . $qtdRecursosNovos . '<br>Quantidade de Recursos encontados que ocorreram erro em outras importações: ' . $qtdRecursosAntigos;
+//                    $textoMensagemFinal = $textoMensagemFinal . '<br>Quantidade de Recursos novos encontrados (e-Sic): ' . $qtdRecursosNovos . '<br>Quantidade de Recursos encontados que ocorreram erro em outras importaÃ§Ãµes: ' . $qtdRecursosAntigos;
                     $textoMensagemFinal = $textoMensagemFinal . '<br>Quantidade de Recursos novos encontrados (e-Sic): ' . $qtdRecursosNovos;
                 }
 
@@ -1184,7 +1184,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $textoMensagemFinal = $textoMensagemErroToken;
             }
 
-            //Grava a execução com sucesso se tiver corrido tudo bem
+            //Grava a execuÃ§Ã£o com sucesso se tiver corrido tudo bem
             $objEouvRelatorioImportacaoDTO2 = new MdCguEouvRelatorioImportacaoDTO();
 
             $objEouvRelatorioImportacaoDTO2->setNumIdRelatorioImportacao($objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao());
@@ -1193,7 +1193,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $objEouvRelatorioImportacaoDTO2->setStrTipManifestacao('R');
             $objEouvRelatorioImportacaoRN->alterar($objEouvRelatorioImportacaoDTO2);
 
-            LogSEI::getInstance()->gravar('Finalizado a importção dos processos e-Sic - FalaBR');
+            LogSEI::getInstance()->gravar('Finalizado a importÃ§Ã£o dos processos e-Sic - FalaBR');
 
         } catch(Exception $e) {
 
@@ -1207,7 +1207,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
             PaginaSEI::getInstance()->processarExcecao($e);
 
         } finally {
-            //Restaura a Sessão
+            //Restaura a SessÃ£o
             SessaoSEI::getInstance()->setBolHabilitada($isBolHabilitada);
         }
     }
@@ -1247,19 +1247,19 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $arrDetalheManifestacao = $this->apiRestRequest($linkDetalheManifestacao, $token, 2);
 
         /**
-         * Verifica Tipo de Manifestação e-Ouv ou e-Sic
+         * Verifica Tipo de ManifestaÃ§Ã£o e-Ouv ou e-Sic
          */
         if ($tipoManifestacao == 'P' && $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'] <> 8) {
-            $debugLocal && LogSEI::getInstance()->gravar('Importação tipo "P" - tipoManifestação <> "8"');
+            $debugLocal && LogSEI::getInstance()->gravar('ImportaÃ§Ã£o tipo "P" - tipoManifestaÃ§Ã£o <> "8"');
             $manifestacaoESic = false;
             $idUnidadeDestino = $idUnidadeOuvidoria;
         } elseif ($tipoManifestacao == 'R' && $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'] == 8) {
-            $debugLocal && LogSEI::getInstance()->gravar('Importação tipo "R" - tipoManifestação == "8"');
+            $debugLocal && LogSEI::getInstance()->gravar('ImportaÃ§Ã£o tipo "R" - tipoManifestaÃ§Ã£o == "8"');
             $manifestacaoESic = true;
             $idUnidadeDestino = $idUnidadeEsicPrincipal;
 
             /**
-             * Importar Recursos caso seja manifestação e-Sic (Tipo 8)
+             * Importar Recursos caso seja manifestaÃ§Ã£o e-Sic (Tipo 8)
              */
             $arrRecursosManifestacao = $this->apiRestRequest($urlWebServiceESicRecursos . '?NumProtocolo=' . $arrDetalheManifestacao['NumerosProtocolo'][0], $token, 2);
         }
@@ -1267,39 +1267,39 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $dataRegistro = $arrDetalheManifestacao['DataCadastro'];
         $numProtocoloFormatado =  $this->formatarProcesso($arrDetalheManifestacao['NumerosProtocolo'][0]);
 
-        // Verifica se o tipo de manifestação é suportado
+        // Verifica se o tipo de manifestaÃ§Ã£o Ã© suportado
         $numIdTipoManifestacao = $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'];
         if ($numIdTipoManifestacao > 8) {
-            // Se não for marca como sucesso para evitar reimportação na próxima execução.
+            // Se nÃ£o for marca como sucesso para evitar reimportaÃ§Ã£o na prÃ³xima execuÃ§Ã£o.
             $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao,
-                'Tipo de manifestação não suportado (ID = '.$numIdTipoManifestacao.'). Não será importada.', 'S');
+                'Tipo de manifestaÃ§Ã£o nÃ£o suportado (ID = '.$numIdTipoManifestacao.'). NÃ£o serÃ¡ importada.', 'S');
             return;
         }
 
 
         /**
-         * Esta data é gravada na tabela de log detalhada
-         * Em caso de alteração no prazo do atendimento será feita nova importação dos dados do recurso
-         * Verifica se o retorno dos recursos não é uma string
+         * Esta data Ã© gravada na tabela de log detalhada
+         * Em caso de alteraÃ§Ã£o no prazo do atendimento serÃ¡ feita nova importaÃ§Ã£o dos dados do recurso
+         * Verifica se o retorno dos recursos nÃ£o Ã© uma string
          */
         if ($arrRecursosManifestacao <> '' && !is_string($arrRecursosManifestacao)) {
             $debugLocal && LogSEI::getInstance()->gravar('Possui $arrRecursosManifestacao - qtd: ' . count($arrRecursosManifestacao['Recursos']));
             $dataPrazoAtendimento = $arrRecursosManifestacao['Recursos'][(count($arrRecursosManifestacao['Recursos']) - 1)]['prazoAtendimento'];
         } else {
-            $debugLocal && LogSEI::getInstance()->gravar('NÃO possui $arrRecursosManifestacao');
+            $debugLocal && LogSEI::getInstance()->gravar('NÃƒO possui $arrRecursosManifestacao');
             $dataPrazoAtendimento = $retornoWsLinha['PrazoAtendimento'];
         }
 
         /**
-         * Limpa os registros de detalhe de importação com erro para este NUP.
-         * Caso ocorra um novo, será criado novo registro de erro para o NUP no tratamento desta function.
+         * Limpa os registros de detalhe de importaÃ§Ã£o com erro para este NUP.
+         * Caso ocorra um novo, serÃ¡ criado novo registro de erro para o NUP no tratamento desta function.
          */
         $this->limparErrosParaNup($numProtocoloFormatado);
 
         if (!isset($arrDetalheManifestacao['TipoManifestacao']['IdTipoManifestacao'])) {
-            $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Tipo de processo não foi informado.', 'N');
+            $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Tipo de processo nÃ£o foi informado.', 'N');
             /**
-             * @todo - não deveria parara aqui? se não tiver um tipo de processo não informado?
+             * @todo - nÃ£o deveria parara aqui? se nÃ£o tiver um tipo de processo nÃ£o informado?
              */
         } else {
             $objEouvDeparaImportacaoDTO = new MdCguEouvDeparaImportacaoDTO();
@@ -1312,17 +1312,17 @@ class MdCguEouvAgendamentoRN extends InfraRN
             if (!$objEouvDeparaImportacaoDTO == null) {
                 $idTipoManifestacaoSei = $objEouvDeparaImportacaoDTO->getNumIdTipoProcedimento();
             } else {
-                $this->gravarLogLinha($numProtocoloFormatado, $objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao(), 'Não existe mapeamento DePara do Tipo de Manifestação do FalaBR (E-Ouv|E-Sic) para o tipo de procedimento do SEI.', 'N');
+                $this->gravarLogLinha($numProtocoloFormatado, $objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao(), 'NÃ£o existe mapeamento DePara do Tipo de ManifestaÃ§Ã£o do FalaBR (E-Ouv|E-Sic) para o tipo de procedimento do SEI.', 'N');
                 //continue;
             }
         }
 
         /**
-         * Se for Manifestação do e-Sic verificar:houve alteração na data 'PrazoAtendimento' e
-         * gera novo arquivo PDF com as alterações para inserção no mesmo protocolo (NUP) e
-         * importa anexos comparando o hash do arquivo para não duplicidade no processo
+         * Se for ManifestaÃ§Ã£o do e-Sic verificar:houve alteraÃ§Ã£o na data 'PrazoAtendimento' e
+         * gera novo arquivo PDF com as alteraÃ§Ãµes para inserÃ§Ã£o no mesmo protocolo (NUP) e
+         * importa anexos comparando o hash do arquivo para nÃ£o duplicidade no processo
          */
-        // Vefificar se o NUP já existe
+        // Vefificar se o NUP jÃ¡ existe
         $objProtocoloDTOExistente = $this->verificarProtocoloExistente($this->formatarProcesso($numProtocoloFormatado));
 
         /**
@@ -1339,33 +1339,33 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //        var_dump('<hr>');
 //        die();
 
-        // 1. Caso já exista um Protocolo no SEI com o mesmo NUP
+        // 1. Caso jÃ¡ exista um Protocolo no SEI com o mesmo NUP
         if (! is_null($objProtocoloDTOExistente)) {
             // 2. Se existir e for e-Ouv
             if ($tipoManifestacao == 'P') {
-                $debugLocal && LogSEI::getInstance()->gravar('Importando Linha Manifestação e-ouv - protocolo: ' . $this->formatarProcesso($numProtocoloFormatado));
+                $debugLocal && LogSEI::getInstance()->gravar('Importando Linha ManifestaÃ§Ã£o e-ouv - protocolo: ' . $this->formatarProcesso($numProtocoloFormatado));
                 // 2.1 Importar anexos novos se existirem... e retornar log
-                // @todo - melhoria próxima versão e-Ouv
-                $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Erro na gravação: ' . 'Já existe um processo (e-Ouv) utilizando o número de protocolo.', 'N', $tipoManifestacao);
+                // @todo - melhoria prÃ³xima versÃ£o e-Ouv
+                $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Erro na gravaÃ§Ã£o: ' . 'JÃ¡ existe um processo (e-Ouv) utilizando o nÃºmero de protocolo.', 'N', $tipoManifestacao);
             }
 
             // 3. Se existir e for e-Sic
             if ($tipoManifestacao == 'R') {
 
-                $debugLocal && LogSEI::getInstance()->gravar('Importando Linha Manifestação e-SIC - protocolo: ' . $this->formatarProcesso($numProtocoloFormatado));
+                $debugLocal && LogSEI::getInstance()->gravar('Importando Linha ManifestaÃ§Ã£o e-SIC - protocolo: ' . $this->formatarProcesso($numProtocoloFormatado));
 
                 /**
                  * @todo - @teste
-                 * Teste aqui pra validar se o prazo sendo 'maior' na petição inicial já não deve importar os recursos..... (??)
+                 * Teste aqui pra validar se o prazo sendo 'maior' na petiÃ§Ã£o inicial jÃ¡ nÃ£o deve importar os recursos..... (??)
                  */
-                // Data do último prazo de atendimento para este protocolo
+                // Data do Ãºltimo prazo de atendimento para este protocolo
 //                $objUltimaDataPrazoAtendimento = MdCguEouvAgendamentoINT::retornarUltimaDataPrazoAtendimento($numProtocoloFormatado, $tipoManifestacao);
                 $objUltimaDataPrazoAtendimento = MdCguEouvAgendamentoINT::retornarUltimaDataPrazoAtendimento($numProtocoloFormatado);
 
                 /**
                  * Debug
                  */
-//                var_dump('começa aqui o debug das datas:');
+//                var_dump('comeÃ§a aqui o debug das datas:');
 //                var_dump('<hr>');
 //                var_dump('$objUltimaDataPrazoAtendimento: ' . $objUltimaDataPrazoAtendimento);
 //                var_dump('<hr>');
@@ -1373,11 +1373,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //                var_dump('<hr>');
 //                var_dump('$dataPrazoAtendimento: ' . $dataPrazoAtendimento);
 //                var_dump('<hr>');
-//                var_dump('data é diferente? :' . isset($objUltimaDataPrazoAtendimento) && $objUltimaDataPrazoAtendimento->getDthDthPrazoAtendimento() <> $dataPrazoAtendimento);
+//                var_dump('data Ã© diferente? :' . isset($objUltimaDataPrazoAtendimento) && $objUltimaDataPrazoAtendimento->getDthDthPrazoAtendimento() <> $dataPrazoAtendimento);
 //                var_dump('<hr>');
 //                die();
 
-                // 4. Verificar se houve alteração na data 'PrazoAtendimento'
+                // 4. Verificar se houve alteraÃ§Ã£o na data 'PrazoAtendimento'
                 if (isset($objUltimaDataPrazoAtendimento) && $objUltimaDataPrazoAtendimento->getDthDthPrazoAtendimento() > $dataPrazoAtendimento) {
 
                     // Importar anexos do novo recurso
@@ -1392,7 +1392,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                             // Carregar documento recurso
                             $this->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacao, $objProtocoloDTOExistente->getDblIdProtocolo(), $tipo_recurso);
-                            LogSEI::getInstance()->gravar('Módulo Integração FalaBR - Importação de Recurso ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . $anexoCount, InfraLog::$INFORMACAO);
+                            LogSEI::getInstance()->gravar('MÃ³dulo IntegraÃ§Ã£o FalaBR - ImportaÃ§Ã£o de Recurso ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . $anexoCount, InfraLog::$INFORMACAO);
                             $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Recurso com protocolo ' . $numProtocoloFormatado . ' importado com sucesso com ' . $anexoCount . ' anexos incluidos no protocolo.', 'S', $tipoManifestacao, $dataPrazoAtendimento);
 
                             // Carregar anexos
@@ -1407,7 +1407,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                             }
 
                             // Vincular Recursos com as unidades corretas conforme o tipo de recurso
-                            // Se for 1 instância envia processo para ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA
+                            // Se for 1 instÃ¢ncia envia processo para ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA
                             if ($tipo_recurso == 'R1') {
                                 $unidadeDestino = $idUnidadeRecursoPrimeiraInstancia;
                             } elseif ($tipo_recurso == 'R2') {
@@ -1431,29 +1431,29 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                                 $objSeiRN = new SeiRN();
                                 $objSeiRN->enviarProcesso($objEntradaEnviarProcesso);
-                                LogSEI::getInstance()->gravar('Módulo Integração FalaBR - (Recurso tipo ' . $tipo_recurso . ') Processo ' . $numProtocoloFormatado . ' enviado para unidade ' . $idUnidadeRecursoPrimeiraInstancia, InfraLog::$INFORMACAO);
+                                LogSEI::getInstance()->gravar('MÃ³dulo IntegraÃ§Ã£o FalaBR - (Recurso tipo ' . $tipo_recurso . ') Processo ' . $numProtocoloFormatado . ' enviado para unidade ' . $idUnidadeRecursoPrimeiraInstancia, InfraLog::$INFORMACAO);
 
                             } catch (Exception $e) {
-                                LogSEI::getInstance()->gravar('Módulo Integração FalaBR - (Recurso tipo ' . $tipo_recurso . ') Não foi possivel abrir o Processo ' . $numProtocoloFormatado . ' na unidade ' . $idUnidadeRecursoPrimeiraInstancia . ' - erro: ' . $e, InfraLog::$INFORMACAO);
+                                LogSEI::getInstance()->gravar('MÃ³dulo IntegraÃ§Ã£o FalaBR - (Recurso tipo ' . $tipo_recurso . ') NÃ£o foi possivel abrir o Processo ' . $numProtocoloFormatado . ' na unidade ' . $idUnidadeRecursoPrimeiraInstancia . ' - erro: ' . $e, InfraLog::$INFORMACAO);
                             }
                         } else {
                             /**
-                             * @todo - confirmar - aqui deve ficar como 'N' ou 'S'? Se fircar como 'N' entra como erro... ?? e é preciso gravar que não houve recurso mas teve alteração na data de prazo de atencimento,
+                             * @todo - confirmar - aqui deve ficar como 'N' ou 'S'? Se fircar como 'N' entra como erro... ?? e Ã© preciso gravar que nÃ£o houve recurso mas teve alteraÃ§Ã£o na data de prazo de atencimento,
                              * esta data precisa ser salva no banco de dados... comentar/documentar aqui!
                              */
                             $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Sem recursos novos.', 'S', $tipoManifestacao, $dataPrazoAtendimento);
                         }
                     } catch (Exception $e) {
-                        $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Erro na gravação recurso: ' . $e, 'N', $tipoManifestacao);
+                        $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Erro na gravaÃ§Ã£o recurso: ' . $e, 'N', $tipoManifestacao);
                     }
                 } else {
-                    // 4.2 Se não houve alteração na data 'PrazoAtendimento' retornar log
-                    $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Já existe um processo (e-Sic) utilizando o número de protocolo e não há alteração para nova importação.', 'S', $tipoManifestacao, $dataPrazoAtendimento);
+                    // 4.2 Se nÃ£o houve alteraÃ§Ã£o na data 'PrazoAtendimento' retornar log
+                    $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'JÃ¡ existe um processo (e-Sic) utilizando o nÃºmero de protocolo e nÃ£o hÃ¡ alteraÃ§Ã£o para nova importaÃ§Ã£o.', 'S', $tipoManifestacao, $dataPrazoAtendimento);
                 }
             }
         } else {
             /**
-             * Inicia criação do Procedimento de criação de novo Processo
+             * Inicia criaÃ§Ã£o do Procedimento de criaÃ§Ã£o de novo Processo
              */
             try {
                 $objTipoProcedimentoDTO = new TipoProcedimentoDTO();
@@ -1469,7 +1469,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $objTipoProcedimentoDTO = $objTipoProcedimentoRN->consultarRN0267($objTipoProcedimentoDTO);
 
                 if ($objTipoProcedimentoDTO == null) {
-                    throw new Exception('Tipo de processo não encontrado: ' . $idTipoManifestacaoSei);
+                    throw new Exception('Tipo de processo nÃ£o encontrado: ' . $idTipoManifestacaoSei);
                 }
 
                 /*
@@ -1498,7 +1498,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $objProcedimentoAPI->setNivelAcesso($objTipoProcedimentoDTO->getStrStaNivelAcessoSugestao());
                 $objProcedimentoAPI->setGrauSigilo($objTipoProcedimentoDTO->getStrStaGrauSigiloSugestao());
                 $objProcedimentoAPI->setIdHipoteseLegal($objTipoProcedimentoDTO->getNumIdHipoteseLegalSugestao());
-                $objProcedimentoAPI->setObservacao("Processo Gerado Automaticamente pela Integração SEI x FalaBR");
+                $objProcedimentoAPI->setObservacao("Processo Gerado Automaticamente pela IntegraÃ§Ã£o SEI x FalaBR");
 
                 $objEntradaGerarProcedimentoAPI = new EntradaGerarProcedimentoAPI();
                 $objEntradaGerarProcedimentoAPI->setProcedimento($objProcedimentoAPI);
@@ -1518,10 +1518,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     $documentoManifestacao = $this->gerarPDFPedidoInicial($arrDetalheManifestacao);
                 }
 
-                LogSEI::getInstance()->gravar('Importação de Manifestação ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . count($arrDocumentos), InfraLog::$INFORMACAO);
+                LogSEI::getInstance()->gravar('ImportaÃ§Ã£o de ManifestaÃ§Ã£o ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . count($arrDocumentos), InfraLog::$INFORMACAO);
 
                 /**
-                 * Alteramos de 'push' para 'unshift' para ir para o último da lista!
+                 * Alteramos de 'push' para 'unshift' para ir para o Ãºltimo da lista!
                  */
 //                array_push($arrDocumentos, $documentoManifestacao);
                 array_unshift($arrDocumentos, $documentoManifestacao);
@@ -1534,7 +1534,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 if ($objSaidaGerarProcedimentoAPI != null and $objSaidaGerarProcedimentoAPI->getIdProcedimento() > 0){
                     $this->excluirProcessoComErro($objSaidaGerarProcedimentoAPI->getIdProcedimento());
                 }
-                $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Erro na gravação: ' . $e, 'N', $tipoManifestacao);
+                $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Erro na gravaÃ§Ã£o: ' . $e, 'N', $tipoManifestacao);
             }
         }
     }
@@ -1574,20 +1574,20 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $dataPrazoAtendimento = $arrRecursosManifestacao['prazoAtendimento'];
 
         /**
-         * Limpa os registros de detalhe de importação com erro para este NUP.
-         * Caso ocorra um novo, será criado novo registro de erro para o NUP no tratamento desta function.
+         * Limpa os registros de detalhe de importaÃ§Ã£o com erro para este NUP.
+         * Caso ocorra um novo, serÃ¡ criado novo registro de erro para o NUP no tratamento desta function.
          */
         $this->limparErrosParaNup($numProtocoloFormatado);
 
         /**
-         * Se for Manifestação do e-Sic verificar:houve alteração na data 'PrazoAtendimento' e
-         * gera novo arquivo PDF com as alterações para inserção no mesmo protocolo (NUP) e
-         * importa anexos comparando o hash do arquivo para não duplicidade no processo
+         * Se for ManifestaÃ§Ã£o do e-Sic verificar:houve alteraÃ§Ã£o na data 'PrazoAtendimento' e
+         * gera novo arquivo PDF com as alteraÃ§Ãµes para inserÃ§Ã£o no mesmo protocolo (NUP) e
+         * importa anexos comparando o hash do arquivo para nÃ£o duplicidade no processo
          */
-        // Vefificar se o NUP já existe
+        // Vefificar se o NUP jÃ¡ existe
         $objProtocoloDTOExistente = $this->verificarProtocoloExistente($numProtocoloFormatado);
 
-        // Caso já exista um Protocolo no SEI continua, caso contrário apenas registra o log
+        // Caso jÃ¡ exista um Protocolo no SEI continua, caso contrÃ¡rio apenas registra o log
         if (! is_null($objProtocoloDTOExistente)) {
 
             $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] Existe o protocolo: ' . $numProtocoloFormatado);
@@ -1595,11 +1595,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
             // Se existir e for e-Sic
             if ($tipoManifestacao == 'R') {
 
-                $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] É do tipo: ' . $tipoManifestacao . ' > ' . $this->verificaTipo($arrRecursosManifestacao, 'R'));
+                $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] Ã‰ do tipo: ' . $tipoManifestacao . ' > ' . $this->verificaTipo($arrRecursosManifestacao, 'R'));
 
-                // Data do último prazo de atendimento para este protocolo sem o tipo de recurso para buscar qualquer um recurso anterior
+                // Data do Ãºltimo prazo de atendimento para este protocolo sem o tipo de recurso para buscar qualquer um recurso anterior
                 $objUltimaDataPrazoAtendimento = MdCguEouvAgendamentoINT::retornarUltimaDataPrazoAtendimento($numProtocoloFormatado);
-                $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] Último prazo de atendimento: ' . $objUltimaDataPrazoAtendimento);
+                $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] Ãšltimo prazo de atendimento: ' . $objUltimaDataPrazoAtendimento);
 
                 /**
                  * Debug do prazo de atendimento
@@ -1621,8 +1621,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //                die();
 
                 /**
-                 * Regra de bloqueio na criação de novos recursos caso já exista um recurso superior ao atualmente listado
-                 * - regra implementada devido à duplicidade na importação dos processos
+                 * Regra de bloqueio na criaÃ§Ã£o de novos recursos caso jÃ¡ exista um recurso superior ao atualmente listado
+                 * - regra implementada devido Ã  duplicidade na importaÃ§Ã£o dos processos
                  */
                 $ultimoTipoRecursoImportado = MdCguEouvAgendamentoINT::retornarTipoManifestacao($idRelatorioImportacao, $numProtocoloFormatado);
                 $ultimoTipoRecursoImportado = $ultimoTipoRecursoImportado ? $ultimoTipoRecursoImportado->getStrTipManifestacao() : $this->verificaTipo($arrRecursosManifestacao, 'R1');
@@ -1632,16 +1632,16 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] Permite criar o recurso atual: ' . $permiteImportacaoRecursoAtual);
 
                 if ($permiteImportacaoRecursoAtual == 'bloquear') {
-                    $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] Não foi permitido criar o recurso, pode deve haver recurso anterior já importado');
-                    // Se não for permitido criar o recurso
-                    $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'O recurso existente no FalaBR não será importado devido à regra implementada - tipoAtual: "' . $this->verificaTipo($arrRecursosManifestacao, 'R') . '" | tipoAnterior: '. $ultimoTipoRecursoImportado .' | protocolo.', 'S', $ultimoTipoRecursoImportado, $objUltimaDataPrazoAtendimento->getDthDthPrazoAtendimento());
+                    $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] NÃ£o foi permitido criar o recurso, pode deve haver recurso anterior jÃ¡ importado');
+                    // Se nÃ£o for permitido criar o recurso
+                    $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'O recurso existente no FalaBR nÃ£o serÃ¡ importado devido Ã  regra implementada - tipoAtual: "' . $this->verificaTipo($arrRecursosManifestacao, 'R') . '" | tipoAnterior: '. $ultimoTipoRecursoImportado .' | protocolo.', 'S', $ultimoTipoRecursoImportado, $objUltimaDataPrazoAtendimento->getDthDthPrazoAtendimento());
                     return;
                 }
 
-                // Verificar se houve alteração na data 'PrazoAtendimento'
+                // Verificar se houve alteraÃ§Ã£o na data 'PrazoAtendimento'
                 if (($objUltimaDataPrazoAtendimento && $objUltimaDataPrazoAtendimento->getDthDthPrazoAtendimento() <> $dataPrazoAtendimento) || $objUltimaDataPrazoAtendimento === null) {
 
-                    $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] Data de prazo de atendimento diferente da última, incinia importacao');
+                    $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] Data de prazo de atendimento diferente da Ãºltima, incinia importacao');
 
                     // Importar anexos do novo recurso
                     try {
@@ -1652,7 +1652,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                             $tipo_recurso = $this->verificaTipo($arrRecursosManifestacao);
 
                             // Vincular Recursos com as unidades corretas conforme o tipo de recurso
-                            // Se for 1 instância envia processo para ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA
+                            // Se for 1 instÃ¢ncia envia processo para ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA
                             if ($tipo_recurso == 'R1') {
                                 $unidadeDestino = $idUnidadeRecursoPrimeiraInstancia;
                             } elseif ($tipo_recurso == 'R2') {
@@ -1667,7 +1667,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                             $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] Tipo de recurso: ' . $tipo_recurso);
 
-                            // Buscar dados da Manifestação
+                            // Buscar dados da ManifestaÃ§Ã£o
                             $numProtocoloSemFormatacao = str_replace(['.', '/', '-'], ['', '', ''], $numProtocoloFormatado);
                             $retornoWsLinha = $this->executarServicoConsultaManifestacoes($urlWebServiceEOuv, $token, null, null, $numProtocoloSemFormatacao, $idRelatorioImportacao);
                             $linkDetalheManifestacao = $retornoWsLinha[0]['Links'][0]['href'];
@@ -1685,11 +1685,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //                            die();
 
                             /**
-                             * Verificar o tipo de recurso de for diferente de segunda instãncia, trazer todos os recursos para o documento pdf
+                             * Verificar o tipo de recurso de for diferente de segunda instÃ£ncia, trazer todos os recursos para o documento pdf
                              */
                             if ($tipo_recurso <> 'R1') {
                                 /**
-                                 * Debug recursos disponíveis para o mesmo protocolo que devem retornar no mesmo arquivo
+                                 * Debug recursos disponÃ­veis para o mesmo protocolo que devem retornar no mesmo arquivo
                                  */
 //                                var_dump('<hr>');
 //                                var_dump($arrRecursosManifestacao);
@@ -1717,7 +1717,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                             $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Recurso tipo ' . $tipo_recurso . ' com protocolo ' . $numProtocoloFormatado . ' importado com sucesso com ' . $anexoCount . ' anexos incluidos no protocolo.', 'S', $tipo_recurso, $dataPrazoAtendimento);
                             $debugLocal && LogSEI::getInstance()->gravar('Importando Recurso processo: ' . $numProtocoloFormatado . ' | tipo: ' . $tipo_recurso . 'depois de gravar log ?!');
                             // $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Recurso com protocolo ' . $numProtocoloFormatado . ' importado com sucesso com ' . $anexoCount . ' anexos incluidos no protocolo.', 'S', $tipoManifestacao, $dataPrazoAtendimento);
-                            LogSEI::getInstance()->gravar('Módulo Integração FalaBR - Importação de Recurso ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . $anexoCount, InfraLog::$INFORMACAO);
+                            LogSEI::getInstance()->gravar('MÃ³dulo IntegraÃ§Ã£o FalaBR - ImportaÃ§Ã£o de Recurso ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . $anexoCount, InfraLog::$INFORMACAO);
 
                             // Carregar anexos
                             if (count($arrRecursosManifestacao['anexos']) > 0) {
@@ -1735,26 +1735,26 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                                 $objSeiRN = new SeiRN();
                                 $objSeiRN->enviarProcesso($objEntradaEnviarProcesso);
-                                LogSEI::getInstance()->gravar('Módulo Integração FalaBR - (Recurso tipo ' . $tipo_recurso . ') Processo ' . $numProtocoloFormatado . ' enviado para unidade ' . $idUnidadeRecursoPrimeiraInstancia, InfraLog::$INFORMACAO);
+                                LogSEI::getInstance()->gravar('MÃ³dulo IntegraÃ§Ã£o FalaBR - (Recurso tipo ' . $tipo_recurso . ') Processo ' . $numProtocoloFormatado . ' enviado para unidade ' . $idUnidadeRecursoPrimeiraInstancia, InfraLog::$INFORMACAO);
 
                             } catch (Exception $e) {
-                                LogSEI::getInstance()->gravar('Módulo Integração FalaBR - (Recurso tipo ' . $tipo_recurso . ') Não foi possivel abrir o Processo ' . $numProtocoloFormatado . ' na unidade ' . $idUnidadeRecursoPrimeiraInstancia . ' - erro: ' . $e, InfraLog::$INFORMACAO);
+                                LogSEI::getInstance()->gravar('MÃ³dulo IntegraÃ§Ã£o FalaBR - (Recurso tipo ' . $tipo_recurso . ') NÃ£o foi possivel abrir o Processo ' . $numProtocoloFormatado . ' na unidade ' . $idUnidadeRecursoPrimeiraInstancia . ' - erro: ' . $e, InfraLog::$INFORMACAO);
                             }
                         } else {
                             $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Sem recursos novos.', 'S', $ultimoTipoRecursoImportado, $dataPrazoAtendimento);
                         }
                     } catch (Exception $e) {
                         $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] Erro importando anexo do recruso');
-                        $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Erro na gravação recurso: ' . $e, 'N', $tipoManifestacao);
+                        $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Erro na gravaÃ§Ã£o recurso: ' . $e, 'N', $tipoManifestacao);
                     }
                 } else {
-                    $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] Não importou recurso pois o prazo de atendimento é igual e não faz nada.. não atualiza o log para não atualizar a data do novo prazo nem o tipo de recurso');
-                    // Se não houve alteração na data 'PrazoAtendimento' retornar log
-                    $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Já existe um recurso (e-Sic) do tipo "' . $this->verificaTipo($arrRecursosManifestacao, 'R') . '" para este protocolo e não há alteração para nova importação.', 'S', $ultimoTipoRecursoImportado, $objUltimaDataPrazoAtendimento->getDthDthPrazoAtendimento());
+                    $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] NÃ£o importou recurso pois o prazo de atendimento Ã© igual e nÃ£o faz nada.. nÃ£o atualiza o log para nÃ£o atualizar a data do novo prazo nem o tipo de recurso');
+                    // Se nÃ£o houve alteraÃ§Ã£o na data 'PrazoAtendimento' retornar log
+                    $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'JÃ¡ existe um recurso (e-Sic) do tipo "' . $this->verificaTipo($arrRecursosManifestacao, 'R') . '" para este protocolo e nÃ£o hÃ¡ alteraÃ§Ã£o para nova importaÃ§Ã£o.', 'S', $ultimoTipoRecursoImportado, $objUltimaDataPrazoAtendimento->getDthDthPrazoAtendimento());
                 }
             }
         } else {
-            $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Existe recurso para o processo ' . $numProtocoloFormatado . ', porém este processo não existe no SEI. Provavelmente é um processo antes da data de início de utilização do módulo ou o Tipo de Manifestação do FalaBR não foi registrada para este módulo.', 'S', $tipoManifestacao);
+            $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Existe recurso para o processo ' . $numProtocoloFormatado . ', porÃ©m este processo nÃ£o existe no SEI. Provavelmente Ã© um processo antes da data de inÃ­cio de utilizaÃ§Ã£o do mÃ³dulo ou o Tipo de ManifestaÃ§Ã£o do FalaBR nÃ£o foi registrada para este mÃ³dulo.', 'S', $tipoManifestacao);
         }
     }
 
@@ -1780,9 +1780,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
                $importar_dados_manifestante;
 
         /***********************************************************************************************
-         * // DADOS INICIAIS DA MANIFESTAÇÃO
-         * Primeiro é gerado o PDF com todas as informações referentes a Manifestação, e mais abaixo
-         * é incluindo como um anexo do novo Processo Gerado
+         * // DADOS INICIAIS DA MANIFESTAÃ‡ÃƒO
+         * Primeiro Ã© gerado o PDF com todas as informaÃ§Ãµes referentes a ManifestaÃ§Ã£o, e mais abaixo
+         * Ã© incluindo como um anexo do novo Processo Gerado
          * **********************************************************************************************/
         $nup = $retornoWsLinha['NumerosProtocolo'][0];
         $dt_cadastro = $retornoWsLinha['DataCadastro'];
@@ -1818,8 +1818,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
             if (is_array($retornoWsLinha['Manifestante']['FaixaEtaria'])) {
                 $desc_faixa_etaria = $retornoWsLinha['Manifestante']['FaixaEtaria']['DescFaixaEtaria'];
             }
-            if (is_array($retornoWsLinha['Manifestante'][utf8_encode('corRaça')])) {
-                $desc_raca_cor = $retornoWsLinha['Manifestante'][utf8_encode('corRaça')]['DescRacaCor'];
+            if (is_array($retornoWsLinha['Manifestante'][utf8_encode('corRaÃ§a')])) {
+                $desc_raca_cor = $retornoWsLinha['Manifestante'][utf8_encode('corRaÃ§a')]['DescRacaCor'];
             }
             $sexo = $retornoWsLinha['Manifestante']['genero'];
             if (is_array($retornoWsLinha['Manifestante']['TipoDocumentoIdentificacao'])) {
@@ -1890,7 +1890,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         //$pdf->Image('logog8.jpg');
 
         $pdf->SetFont('arial', 'B', 18);
-        $pdf->Cell(0, 5, "Dados da Manifestação", 0, 1, 'C');
+        $pdf->Cell(0, 5, "Dados da ManifestaÃ§Ã£o", 0, 1, 'C');
         $pdf->Cell(0, 5, "", "B", 1, 'C');
         $pdf->Ln(20);
 
@@ -1898,7 +1898,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         //1. Dados INICIAIS
         //***********************************************************************************************
         $pdf->SetFont('arial', 'B', 14);
-        $pdf->Cell(0, 20, "1. Dados Iniciais da Manifestação", 0, 0, 'L');
+        $pdf->Cell(0, 20, "1. Dados Iniciais da ManifestaÃ§Ã£o", 0, 0, 'L');
         $pdf->Ln(20);
 
         //NUP
@@ -1919,21 +1919,21 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(0, 20, $desc_assunto . " / " . $desc_sub_assunto, 0, 1, 'L');
 
-        //Tipo de Manifestação
+        //Tipo de ManifestaÃ§Ã£o
         $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(150, 20, "Tipo da Manifestação:", 0, 0, 'L');
+        $pdf->Cell(150, 20, "Tipo da ManifestaÃ§Ã£o:", 0, 0, 'L');
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(0, 20, $id_tipo_manifestacao . " - " . $desc_tipo_manifestacao, 0, 1, 'L');
 
-        // Tipo de formulário
+        // Tipo de formulÃ¡rio
         $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(150, 20, "Tipo de Formulário:", 0, 0, 'L');
+        $pdf->Cell(150, 20, "Tipo de FormulÃ¡rio:", 0, 0, 'L');
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(0, 20, $desc_tipo_formulario, 0, 1, 'L');
 
         //EnvolveDas4OuSuperior
         $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(450, 20, "Denúncia Envolvendo Ocupante de Cargo Comissionado DAS4 ou Superior?:", 0, 0, 'L');
+        $pdf->Cell(450, 20, "DenÃºncia Envolvendo Ocupante de Cargo Comissionado DAS4 ou Superior?:", 0, 0, 'L');
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(20, 20, $envolve_das4_superior, 0, 1, 'L');
 
@@ -1943,15 +1943,15 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(70, 20, $dt_prazo_atendimento, 0, 1, 'L');
 
-        // Esfera do Órgão
+        // Esfera do Ã“rgÃ£o
         $pdf->SetFont('arial', 'B', 12);
         $pdf->Cell(150, 20, "Esfera:", 0, 0, 'L');
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(0, 20, $esfera_orgao, 0, 1, 'L');
 
-        //Nome do Órgão
+        //Nome do Ã“rgÃ£o
         $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(150, 20, "Nome do Órgão:", 0, 0, 'L');
+        $pdf->Cell(150, 20, "Nome do Ã“rgÃ£o:", 0, 0, 'L');
         $pdf->setFont('arial', '', 12);
         $pdf->MultiCell(0, 20, $nome_orgao, 0, 'L');
 
@@ -1982,15 +1982,15 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $pdf->setFont('arial', '', 12);
             $pdf->Cell(70, 20, $nome, 0, 1, 'L');
 
-            //Faixa Etária
+            //Faixa EtÃ¡ria
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(150, 20, "Faixa Etária:", 0, 0, 'L');
+            $pdf->Cell(150, 20, "Faixa EtÃ¡ria:", 0, 0, 'L');
             $pdf->setFont('arial', '', 12);
             $pdf->Cell(70, 20, $desc_faixa_etaria, 0, 1, 'L');
 
-            //Raça Cor
+            //RaÃ§a Cor
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(150, 20, "Raça/Cor:", 0, 0, 'L');
+            $pdf->Cell(150, 20, "RaÃ§a/Cor:", 0, 0, 'L');
             $pdf->setFont('arial', '', 12);
             $pdf->Cell(70, 20, $desc_raca_cor, 0, 1, 'L');
 
@@ -2000,22 +2000,22 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $pdf->setFont('arial', '', 12);
             $pdf->Cell(70, 20, $sexo, 0, 1, 'L');
 
-            //Documento Identificação
+            //Documento IdentificaÃ§Ã£o
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(170, 20, "Documento de Identificação:", 0, 0, 'L');
+            $pdf->Cell(170, 20, "Documento de IdentificaÃ§Ã£o:", 0, 0, 'L');
             $pdf->setFont('arial', '', 12);
             $pdf->Cell(70, 20, $desc_documento_identificacao, 0, 1, 'L');
 
-            //NÃºmero do Documento Identificação
+            //NÃƒÂºmero do Documento IdentificaÃ§Ã£o
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(150, 20, "Número do Documento:", 0, 0, 'L');
+            $pdf->Cell(150, 20, "NÃºmero do Documento:", 0, 0, 'L');
             $pdf->setFont('arial', '', 12);
             $pdf->Cell(70, 20, $numero_documento_identificacao, 0, 1, 'L');
 
             $pdf->ln(4);
-            //Endereço
+            //EndereÃ§o
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(70, 20, "Endereço:", 0, 1, 'L');
+            $pdf->Cell(70, 20, "EndereÃ§o:", 0, 1, 'L');
             $pdf->setFont('arial', '', 12);
             $pdf->Cell(70, 20, $endereco, 0, 1, 'L');
             $pdf->Cell(70, 20, $bairro, 0, 1, 'L');
@@ -2040,21 +2040,21 @@ class MdCguEouvAgendamentoRN extends InfraRN
         }
         else{
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(150, 20, "Não importado do E-Ouv devido a configuração no módulo.", 0, 0, 'L');
+            $pdf->Cell(150, 20, "NÃ£o importado do E-Ouv devido a configuraÃ§Ã£o no mÃ³dulo.", 0, 0, 'L');
         }
         $pdf->Ln(20);
 
         //***********************************************************************************************
-        //3. Dados do Fato da Manifestação
+        //3. Dados do Fato da ManifestaÃ§Ã£o
         //***********************************************************************************************
         $pdf->Ln(20);
         $pdf->SetFont('arial', 'B', 14);
-        $pdf->Cell(70, 20, "3. Fato da Manifestação:", 0, 0, 'L');
+        $pdf->Cell(70, 20, "3. Fato da ManifestaÃ§Ã£o:", 0, 0, 'L');
         $pdf->Ln(20);
 
-        //Município/UF
+        //MunicÃ­pio/UF
         $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(115, 20, "Município/UF:", 0, 0, 'L');
+        $pdf->Cell(115, 20, "MunicÃ­pio/UF:", 0, 0, 'L');
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(70, 20, $desc_municipio_fato, 0, 1, 'L');
 
@@ -2064,9 +2064,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(70, 20, $descricao_local_fato, 0, 1, 'L');
 
-        //Descrição
+        //DescriÃ§Ã£o
         $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(115, 20, "Descrição:", 0, 1, 'L');
+        $pdf->Cell(115, 20, "DescriÃ§Ã£o:", 0, 1, 'L');
         $pdf->setFont('arial', '', 12);
         $pdf->MultiCell(0, 20, $descricao_fato, 0, 'J');
 
@@ -2076,11 +2076,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $pdf->setFont('arial', '', 12);
 
         for ($x = 0; $x < count($envolvidos); $x++) {
-            $pdf->Cell(70, 20, "Função:", 0, 0, 'L');
+            $pdf->Cell(70, 20, "FunÃ§Ã£o:", 0, 0, 'L');
             $pdf->Cell(0, 20, $envolvidos[$x][0], 0, 1, 'L');
             $pdf->Cell(70, 20, "Nome:", 0, 0, 'L');
             $pdf->Cell(0, 20, $envolvidos[$x][1], 0, 1, 'L');
-            $pdf->Cell(70, 20, "Órgão:", 0, 0, 'L');
+            $pdf->Cell(70, 20, "Ã“rgÃ£o:", 0, 0, 'L');
             $pdf->Cell(0, 20, $envolvidos[$x][2], 0, 1, 'L');
             $pdf->Ln(10);
         }
@@ -2103,11 +2103,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
         if($ocorreuErroAdicionarAnexo == true){
             $pdf->Ln(20);
             $pdf->SetFont('arial', 'B', 14);
-            $pdf->Cell(70, 20, "5. Observações:", 0, 0, 'L');
+            $pdf->Cell(70, 20, "5. ObservaÃ§Ãµes:", 0, 0, 'L');
             $pdf->Ln(20);
 
             $pdf->SetFont('arial', '', 12);
-            $pdf->MultiCell(0, 20, "Um ou mais anexos da manifestação não foram importados para o SEI devido a restrições da extensão do arquivo. Acesse a manifestação através do link abaixo para mais detalhes. ", 0, 'J');
+            $pdf->MultiCell(0, 20, "Um ou mais anexos da manifestaÃ§Ã£o nÃ£o foram importados para o SEI devido a restriÃ§Ãµes da extensÃ£o do arquivo. Acesse a manifestaÃ§Ã£o atravÃ©s do link abaixo para mais detalhes. ", 0, 'J');
         }
 
         $objAnexoRN = new AnexoRN();
@@ -2115,14 +2115,14 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         $pdf->Output(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", "F");
 
-        //Renomeia tirando a extensï¿½o para o SEI trabalhar o Arquivo
+        //Renomeia tirando a extensÃ¯Â¿Â½o para o SEI trabalhar o Arquivo
         rename(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload);
 
         $objDocumentoManifestacao = new DocumentoAPI();
         $objDocumentoManifestacao->setTipo('R');
         $objDocumentoManifestacao->setIdSerie($idTipoDocumentoAnexoDadosManifestacao);
         $objDocumentoManifestacao->setData($retornoWsLinha['DataCadastro']);
-        $objDocumentoManifestacao->setNomeArquivo('RelatórioDadosManifestação.pdf');
+        $objDocumentoManifestacao->setNomeArquivo('RelatÃ³rioDadosManifestaÃ§Ã£o.pdf');
         $objDocumentoManifestacao->setConteudo(base64_encode(file_get_contents(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload)));
 
         return $objDocumentoManifestacao;
@@ -2136,7 +2136,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                $idRelatorioImportacao;
 
         /**
-         * Testa acessar dado da manifestação se não conseguir salva log
+         * Testa acessar dado da manifestaÃ§Ã£o se nÃ£o conseguir salva log
          */
         try {
             $IdTipoManifestacao = $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'];
@@ -2146,9 +2146,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
         }
 
         /***********************************************************************************************
-         * DADOS INICIAIS DA MANIFESTAÇÃO
-         * Primeiro é gerado o PDF com todas as informações referentes a Manifestação e mais abaixo
-         * é incluído como um anexo do novo Processo Gerado
+         * DADOS INICIAIS DA MANIFESTAÃ‡ÃƒO
+         * Primeiro Ã© gerado o PDF com todas as informaÃ§Ãµes referentes a ManifestaÃ§Ã£o e mais abaixo
+         * Ã© incluÃ­do como um anexo do novo Processo Gerado
          * *********************************************************************************************/
 
         $pdf = new InfraPDF("P", "pt", "A4");
@@ -2156,35 +2156,35 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $pdf->AddPage();
 
         /**
-         * Arquivo PDF - manifestação e-Sic
+         * Arquivo PDF - manifestaÃ§Ã£o e-Sic
          */
 
-        // Cabeçalho
+        // CabeÃ§alho
         $pdf->SetFont('arial', 'B', 18);
-        $pdf->Cell(0, 5, "Plataforma Integrada de Ouvidoria e Acesso à Informação", 0, 1, 'C');
+        $pdf->Cell(0, 5, "Plataforma Integrada de Ouvidoria e Acesso Ã  InformaÃ§Ã£o", 0, 1, 'C');
         $pdf->Ln(20);
-        $pdf->Cell(0, 5, "Detalhes da Manifestação", 0, 1, 'C');
+        $pdf->Cell(0, 5, "Detalhes da ManifestaÃ§Ã£o", 0, 1, 'C');
         $pdf->Ln(30);
 
         /**
-         * Dados básicos da manifestação
+         * Dados bÃ¡sicos da manifestaÃ§Ã£o
          */
         $menu_count = 1;
         $pdf->SetFont('arial', 'B', 14);
 //        $pdf->SetDrawColor(135,206,250);
-        $pdf->Cell(0, 20, $menu_count . ". Dados Básicos da Manifestação", 1, 0, 'L');
+        $pdf->Cell(0, 20, $menu_count . ". Dados BÃ¡sicos da ManifestaÃ§Ã£o", 1, 0, 'L');
 //        $pdf->SetDrawColor(255,255,255);
         $pdf->Ln(30);
 
-        // Tipo de Manifestação
+        // Tipo de ManifestaÃ§Ã£o
         $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(180, 20, "Tipo da Manifestação:", 0, 0, 'R');
+        $pdf->Cell(180, 20, "Tipo da ManifestaÃ§Ã£o:", 0, 0, 'R');
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(0, 20, $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'] . " - " . $retornoWsLinha['TipoManifestacao']['DescTipoManifestacao'], 0, 1, 'L');
 
         // Tipo de formulario
         $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(180, 20, "Tipo de Formulário:", 0, 0, 'R');
+        $pdf->Cell(180, 20, "Tipo de FormulÃ¡rio:", 0, 0, 'R');
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(0, 20, $retornoWsLinha['TipoFormulario']['DescTipoFormulario'], 0, 1, 'L');
 
@@ -2200,16 +2200,16 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(0, 20, $retornoWsLinha['OuvidoriaDestino']['Esfera']['DescEsfera'], 0, 1, 'L');
 
-        // Órgão Destinatário - NomeOuvidoria
+        // Ã“rgÃ£o DestinatÃ¡rio - NomeOuvidoria
         $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(180, 20, "Órgão Destinatário:", 0, 0, 'R');
+        $pdf->Cell(180, 20, "Ã“rgÃ£o DestinatÃ¡rio:", 0, 0, 'R');
         $pdf->setFont('arial', '', 12);
         $pdf->MultiCell(0, 20, $retornoWsLinha['OuvidoriaDestino']['NomOuvidoria'], 0, 'L');
 
-        // Órgão de Interesse
+        // Ã“rgÃ£o de Interesse
         if ($retornoWsLinha['OrgaoInteresse'] && $retornoWsLinha['OrgaoInteresse']['NomeOrgao']) {
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(180, 20, "Órgão de Interesse:", 0, 0, 'R');
+            $pdf->Cell(180, 20, "Ã“rgÃ£o de Interesse:", 0, 0, 'R');
             $pdf->setFont('arial', '', 12);
             $pdf->Cell(0, 20, $retornoWsLinha['OrgaoInteresse']['NomeOrgao'], 0, 1, 'L');
         }
@@ -2237,9 +2237,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(0, 20, $retornoWsLinha['DataCadastro'], 0, 1, 'L');
 
-        // Situação
+        // SituaÃ§Ã£o
         $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(180, 20, "Situação:", 0, 0, 'R');
+        $pdf->Cell(180, 20, "SituaÃ§Ã£o:", 0, 0, 'R');
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(0, 20, $retornoWsLinha['Situacao']['DescSituacaoManifestacao'], 0, 1, 'L');
 
@@ -2267,25 +2267,25 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(70, 20, $retornoWsLinha['ModoResposta']['DescModoResposta'], 0, 1, 'L');
 
-        // Serviço
+        // ServiÃ§o
         $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(180, 20, "Serviço:", 0, 0, 'R');
+        $pdf->Cell(180, 20, "ServiÃ§o:", 0, 0, 'R');
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(70, 20, $retornoWsLinha['Servico'], 0, 1, 'L');
 
-        // Outro Serviço (?)
+        // Outro ServiÃ§o (?)
 //        $pdf->SetFont('arial', 'B', 12);
-//        $pdf->Cell(180, 20, "Outro Serviço:", 0, 0, 'R');
+//        $pdf->Cell(180, 20, "Outro ServiÃ§o:", 0, 0, 'R');
 //        $pdf->setFont('arial', '', 12);
 //        $pdf->Cell(70, 20, $retornoWsLinha['Servico'], 0, 1, 'L');
 
         /**
-         * Dados básicos da manifestação
+         * Dados bÃ¡sicos da manifestaÃ§Ã£o
          */
         $menu_count++;
         $pdf->Ln(30);
         $pdf->SetFont('arial', 'B', 14);
-        $pdf->Cell(0, 20, $menu_count . ". Teor da Manifestação", 1, 0, 'L');
+        $pdf->Cell(0, 20, $menu_count . ". Teor da ManifestaÃ§Ã£o", 1, 0, 'L');
         $pdf->Ln(30);
 
         // Resumo
@@ -2306,9 +2306,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //        $pdf->setFont('arial', '', 12);
 //        $pdf->Cell(0, 20, $retornoWsLinha['Teor']['PropostaMelhoria'], 0, 1, 'L');
 
-        // Município do local do fato
+        // MunicÃ­pio do local do fato
 //        $pdf->SetFont('arial', 'B', 12);
-//        $pdf->Cell(180, 20, "Município do local do fato:", 0, 0, 'R');
+//        $pdf->Cell(180, 20, "MunicÃ­pio do local do fato:", 0, 0, 'R');
 //        if (is_array($retornoWsLinha['Teor']['LocalFato'])) {
 //            if (is_array($retornoWsLinha['Teor']['LocalFato']['Municipio'])) {
 //                $pdf->setFont('arial', '', 12);
@@ -2338,7 +2338,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
          * Anexos
          *
          * - IdTipoAnexoManifestacao : DescTipoAnexoManifestacao
-         * - 1 : "Anexo Manifestação"
+         * - 1 : "Anexo ManifestaÃ§Ã£o"
          * - 2 : "Anexo Resposta"
          */
         // Anexos
@@ -2379,7 +2379,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     $pdf->SetFont('arial', 'B', 12);
                     $pdf->Cell(180, 20, "Anexo Complementar:", 0, 0, 'R');
                     $pdf->setFont('arial', '', 12);
-                    $pdf->Cell(70, 20, $anexo['IndComplementar'] ? 'sim' : 'não', 0, 1, 'L');
+                    $pdf->Cell(70, 20, $anexo['IndComplementar'] ? 'sim' : 'nÃ£o', 0, 1, 'L');
 
                     $pdf->Ln(20);
                 }
@@ -2388,19 +2388,19 @@ class MdCguEouvAgendamentoRN extends InfraRN
         if ($anexo_tipo_original == 0) {
             // Sem anexo original
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(180, 20, "Não há anexos originais da manifestação.", 0, 0, 'L');
+            $pdf->Cell(180, 20, "NÃ£o hÃ¡ anexos originais da manifestaÃ§Ã£o.", 0, 0, 'L');
             $pdf->Ln(20);
         }
         if ($anexo_tipo_complementar == 0) {
             // Sem anexo complementar
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(180, 20, "Não há anexos complementares.", 0, 0, 'L');
+            $pdf->Cell(180, 20, "NÃ£o hÃ¡ anexos complementares.", 0, 0, 'L');
             $pdf->Ln(20);
         }
 
-        // Textos Complementares - @todo - onde estão os textos complementares?
+        // Textos Complementares - @todo - onde estÃ£o os textos complementares?
 //        $pdf->SetFont('arial', 'B', 12);
-//        $pdf->Cell(150, 20, "Descrição:", 0, 1, 'L');
+//        $pdf->Cell(150, 20, "DescriÃ§Ã£o:", 0, 1, 'L');
 //        $pdf->setFont('arial', '', 12);
 //        $pdf->Cell(0, 20, '??', 0, 1, 'L');
 
@@ -2426,13 +2426,13 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //
 //                // Tipo de Anexo
 //                $pdf->SetFont('arial', 'B', 12);
-//                $pdf->Cell(180, 20, "Função:", 0, 0, 'R');
+//                $pdf->Cell(180, 20, "FunÃ§Ã£o:", 0, 0, 'R');
 //                $pdf->setFont('arial', '', 12);
 //                $pdf->Cell(70, 20, $envolvido['Funcao'], 0, 1, 'L');
 //
 //                // Anexo Complementar
 //                $pdf->SetFont('arial', 'B', 12);
-//                $pdf->Cell(180, 20, "Orgão:", 0, 0, 'R');
+//                $pdf->Cell(180, 20, "OrgÃ£o:", 0, 0, 'R');
 //                $pdf->setFont('arial', '', 12);
 //                $pdf->Cell(70, 20, $envolvido['Orgao'], 0, 1, 'L');
 //
@@ -2441,7 +2441,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 //        } else {
 //            // Sem envolvidos
 //            $pdf->SetFont('arial', 'B', 12);
-//            $pdf->Cell(180, 20, "Não há envolvidos na manifestação.", 0, 0, 'L');
+//            $pdf->Cell(180, 20, "NÃ£o hÃ¡ envolvidos na manifestaÃ§Ã£o.", 0, 0, 'L');
 //            $pdf->Ln(20);
 //        }
 
@@ -2469,7 +2469,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         } else {
             // Sem envolvidos
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(180, 20, "Não há campos adicionais.", 0, 0, 'L');
+            $pdf->Cell(180, 20, "NÃ£o hÃ¡ campos adicionais.", 0, 0, 'L');
             $pdf->Ln(20);
         }
 
@@ -2484,28 +2484,28 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         // Envolve DAS4 ou superior
 //        $pdf->SetFont('arial', 'B', 12);
-//        $pdf->MultiCell(180, 20, "Envolve ocupante de cargo comissionado DAS a partir do nível 4 ou equivalente?", 0, 'R');
+//        $pdf->MultiCell(180, 20, "Envolve ocupante de cargo comissionado DAS a partir do nÃ­vel 4 ou equivalente?", 0, 'R');
 //        $pdf->setFont('arial', '', 12);
 //        $pdf->MultiCell(380, 20,$retornoWsLinha['InformacoesAdicionais']['EnvolveCargoComissionadoDAS4OuSuperior'], 0, 'C');
 //        $pdf->Ln(20);
 
-        // Manifestação Apta?
+        // ManifestaÃ§Ã£o Apta?
 //        $pdf->SetFont('arial', 'B', 12);
-//        $pdf->MultiCell(180, 20, "Manifestação Apta?", 0, 'R');
+//        $pdf->MultiCell(180, 20, "ManifestaÃ§Ã£o Apta?", 0, 'R');
 //        $pdf->setFont('arial', '', 12);
 //        $pdf->MultiCell(380, 20, $retornoWsLinha['InformacoesAdicionais']['Apta'], 0, 'C');
 //        $pdf->Ln(20);
 
-        // Há envolvimento de Empresa?
+        // HÃ¡ envolvimento de Empresa?
 //        $pdf->SetFont('arial', 'B', 12);
-//        $pdf->MultiCell(180, 20, "Há envolvimento de Empresa?", 0, 'R');
+//        $pdf->MultiCell(180, 20, "HÃ¡ envolvimento de Empresa?", 0, 'R');
 //        $pdf->setFont('arial', '', 12);
 //        $pdf->MultiCell(380, 20, $retornoWsLinha['InformacoesAdicionais']['EnvolveEmpresa'], 0, 'C');
 //        $pdf->Ln(20);
 
-        // Há envolvimento de Servidor Público?
+        // HÃ¡ envolvimento de Servidor PÃºblico?
 //        $pdf->SetFont('arial', 'B', 12);
-//        $pdf->MultiCell(180, 20, "Há envolvimento de Servidor Público?", 0, 'R');
+//        $pdf->MultiCell(180, 20, "HÃ¡ envolvimento de Servidor PÃºblico?", 0, 'R');
 //        $pdf->setFont('arial', '', 12);
 //        $pdf->MultiCell(380, 20, $retornoWsLinha['InformacoesAdicionais']['EnvolveServidorPublico'], 0, 'J');
 //        $pdf->Ln(20);
@@ -2540,9 +2540,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     $pdf->setFont('arial', '', 12);
                     $pdf->Cell(70, 20, $historico['HistoricoAcao']['DataHoraAcao'], 0, 1, 'L');
 
-                    // Decisão
+                    // DecisÃ£o
                     $pdf->SetFont('arial', 'B', 12);
-                    $pdf->Cell(180, 20, "Decisão:", 0, 0, 'R');
+                    $pdf->Cell(180, 20, "DecisÃ£o:", 0, 0, 'R');
                     $pdf->setFont('arial', '', 12);
                     $pdf->Cell(70, 20, $historico['Resposta']['Decisao']['descricaoDecisao'], 0, 1, 'L');
 
@@ -2568,7 +2568,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         if (!count($historicos) > 0 || (isset($i) && $i == 1)) {
             // Sem respostas
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(180, 20, "Não há registro de respostas.", 0, 0, 'L');
+            $pdf->Cell(180, 20, "NÃ£o hÃ¡ registro de respostas.", 0, 0, 'L');
             $pdf->Ln(20);
         }
 
@@ -2606,7 +2606,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     $pdf->SetFont('arial', 'B', 12);
                     $pdf->Cell(180, 20, "Anexo Complementar:", 0, 0, 'R');
                     $pdf->setFont('arial', '', 12);
-                    $pdf->Cell(70, 20, $anexo['IndComplementar'] ? 'sim' : 'não', 0, 1, 'L');
+                    $pdf->Cell(70, 20, $anexo['IndComplementar'] ? 'sim' : 'nÃ£o', 0, 1, 'L');
 
                     $pdf->Ln(20);
                 }
@@ -2615,17 +2615,17 @@ class MdCguEouvAgendamentoRN extends InfraRN
         if (! isset($possui_anexo_resposta)) {
             // Sem anexo resposta
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(180, 20, "Não há anexos de respostas.", 0, 0, 'L');
+            $pdf->Cell(180, 20, "NÃ£o hÃ¡ anexos de respostas.", 0, 0, 'L');
             $pdf->Ln(20);
         }
 
         /**
          * Recursos
          *
-         * Neste item importamos as seguintes opções de recursos:
-         * - Pedido de Revisão
-         * - Recurso de Primeira Instância
-         * - Recurso de Segunda Instãncia
+         * Neste item importamos as seguintes opÃ§Ãµes de recursos:
+         * - Pedido de RevisÃ£o
+         * - Recurso de Primeira InstÃ¢ncia
+         * - Recurso de Segunda InstÃ£ncia
          */
         if ($retornoWsRecursos && $retornoWsRecursos <> '' && !is_string($retornoWsRecursos)) {
             $menu_count++;
@@ -2641,7 +2641,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $reversedRecursos = array_reverse($recursos);
 
                 /**
-                 * Debug de reversão do Array para colocar dados do recurso em ordem crescente
+                 * Debug de reversÃ£o do Array para colocar dados do recurso em ordem crescente
                  */
 //                var_dump('<hr>');
 //                var_dump($reversedRecursos);
@@ -2653,7 +2653,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 foreach ($reversedRecursos as $recurso) {
 
                     /**
-                     * Somente gerará documento caso seja recursos 1ª ou 2ª instancia ou pedido de revisão,
+                     * Somente gerarÃ¡ documento caso seja recursos 1Âª ou 2Âª instancia ou pedido de revisÃ£o,
                      * IdInstanciaRecurso = [1, 2, 6] conforme API FalaBR consultado dia 01/12/2020
                      * url: https://falabr.cgu.gov.br/Help
                      */
@@ -2661,9 +2661,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
                         $pdf->SetFont('arial', 'B', 12);
                         $pdf->Cell(0, 20, "Dados do Recurso -  " . $recurso['instancia']['DescInstanciaRecurso'], true, 1, 'L');
 
-                        // Destinatário
+                        // DestinatÃ¡rio
                         $pdf->SetFont('arial', 'B', 12);
-                        $pdf->Cell(180, 20, "Destinatário:", 0, 0, 'R');
+                        $pdf->Cell(180, 20, "DestinatÃ¡rio:", 0, 0, 'R');
                         $pdf->setFont('arial', '', 12);
                         $pdf->Cell(70, 20, $retornoWsLinha['OuvidoriaDestino']['NomOuvidoria'], 0, 1, 'L');
 
@@ -2703,7 +2703,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                                 $pdf->Cell(70, 20, $anexoRecurso['nomeArquivo'], 0, 1, 'L');
                             }
                         } else {
-                            $pdf->Cell(70, 20, 'Não possui anexos', 0, 1, 'L');
+                            $pdf->Cell(70, 20, 'NÃ£o possui anexos', 0, 1, 'L');
                         }
 
                         $pdf->Ln(20);
@@ -2713,12 +2713,12 @@ class MdCguEouvAgendamentoRN extends InfraRN
         }
 
         /**
-         * Denúncia de Descumprimento
+         * DenÃºncia de Descumprimento
          */
         $menu_count++;
         $pdf->Ln(30);
         $pdf->SetFont('arial', 'B', 14);
-        $pdf->Cell(0, 20, $menu_count . " Denúncia de Descumprimento", true, 0, 'L');
+        $pdf->Cell(0, 20, $menu_count . " DenÃºncia de Descumprimento", true, 0, 'L');
         $pdf->Ln(30);
 
         $denuncias = $retornoWsLinha['Historico'];
@@ -2728,7 +2728,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                     $possui_denuncia = true;
 
-                    // Denúncia
+                    // DenÃºncia
                     $pdf->setFont('arial', '', 12);
                     $pdf->MultiCell(0, 20, $denuncia['HistoricoAcao']['Denuncia']['TxtFato'], 0, 'L');
 
@@ -2739,7 +2739,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         if (!count($denuncias) > 0 || !isset($possui_denuncia)) {
             // Sem respostas
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(180, 20, "Não há registro de denúncias de descumprimento.", 0, 0, 'L');
+            $pdf->Cell(180, 20, "NÃ£o hÃ¡ registro de denÃºncias de descumprimento.", 0, 0, 'L');
             $pdf->Ln(20);
         }
 
@@ -2759,27 +2759,27 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                     $possui_denuncia = true;
 
-                    // Órgão Origem
+                    // Ã“rgÃ£o Origem
                     $pdf->SetFont('arial', 'B', 12);
-                    $pdf->Cell(180, 20, "Órgão/Entidade de Origem:", 0, 0, 'R');
+                    $pdf->Cell(180, 20, "Ã“rgÃ£o/Entidade de Origem:", 0, 0, 'R');
                     $pdf->setFont('arial', '', 12);
                     $pdf->MultiCell(0, 20, $encaminhamento['Encaminhamento']['OuvidoriaOrigem']['NomOuvidoria'], 0, 'L');
 
-                    // Órgão Destino
+                    // Ã“rgÃ£o Destino
                     $pdf->SetFont('arial', 'B', 12);
-                    $pdf->Cell(180, 20, "Órgão/Entidade Destinatária:", 0, 0, 'R');
+                    $pdf->Cell(180, 20, "Ã“rgÃ£o/Entidade DestinatÃ¡ria:", 0, 0, 'R');
                     $pdf->setFont('arial', '', 12);
                     $pdf->MultiCell(0, 20, $encaminhamento['Encaminhamento']['OuvidoriaDestino']['NomOuvidoria'], 0, 'L');
 
-                    // Mensagem ao Destinatário
+                    // Mensagem ao DestinatÃ¡rio
                     $pdf->SetFont('arial', 'B', 12);
-                    $pdf->Cell(180, 20, "Mensagem ao Destinatário:", 0, 0, 'R');
+                    $pdf->Cell(180, 20, "Mensagem ao DestinatÃ¡rio:", 0, 0, 'R');
                     $pdf->setFont('arial', '', 12);
                     $pdf->MultiCell(0, 20, $encaminhamento['Encaminhamento']['TxtNotificacaoDestinatario'], 0, 'L');
 
-                    // Mensagem ao Cidadão
+                    // Mensagem ao CidadÃ£o
                     $pdf->SetFont('arial', 'B', 12);
-                    $pdf->Cell(180, 20, "Mensagem ao Cidadão:", 0, 0, 'R');
+                    $pdf->Cell(180, 20, "Mensagem ao CidadÃ£o:", 0, 0, 'R');
                     $pdf->setFont('arial', '', 12);
                     $pdf->MultiCell(0, 20, $encaminhamento['Encaminhamento']['TxtNotificacaoSolicitante'], 0, 'L');
 
@@ -2790,17 +2790,17 @@ class MdCguEouvAgendamentoRN extends InfraRN
         if (!count($encaminhamentos) > 0 || !isset($possui_denuncia)) {
             // Sem respostas
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(180, 20, "Não há registro de encaminhamentos.", 0, 0, 'L');
+            $pdf->Cell(180, 20, "NÃ£o hÃ¡ registro de encaminhamentos.", 0, 0, 'L');
             $pdf->Ln(20);
         }
 
         /**
-         * Prorrogação
+         * ProrrogaÃ§Ã£o
          */
         $menu_count++;
         $pdf->Ln(30);
         $pdf->SetFont('arial', 'B', 14);
-        $pdf->Cell(0, 20, $menu_count . ". Dados de Prorrogação", true, 0, 'L');
+        $pdf->Cell(0, 20, $menu_count . ". Dados de ProrrogaÃ§Ã£o", true, 0, 'L');
         $pdf->Ln(30);
 
         $prorrogacoes = $retornoWsLinha['Historico'];
@@ -2822,13 +2822,13 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     $pdf->setFont('arial', '', 12);
                     $pdf->Cell(70, 20, $prorrogacao['Prorrogacao']['NovoPrazo'], 0, 1, 'L');
 
-                    // Motivo da Prorrogação
+                    // Motivo da ProrrogaÃ§Ã£o
                     $pdf->SetFont('arial', 'B', 12);
                     $pdf->Cell(180, 20, "Motivo:", 0, 0, 'R');
                     $pdf->setFont('arial', '', 12);
                     $pdf->Cell(70, 20, $prorrogacao['Prorrogacao']['MotivoProrrogacaoManifestacao']['DescMotivoProrrogacaoManifestacao'], 0, 1, 'L');
 
-                    // Justificativa da Prorrogação
+                    // Justificativa da ProrrogaÃ§Ã£o
                     $pdf->SetFont('arial', 'B', 12);
                     $pdf->Cell(180, 20, "Justificativa:", 0, 0, 'R');
                     $pdf->setFont('arial', '', 12);
@@ -2841,21 +2841,21 @@ class MdCguEouvAgendamentoRN extends InfraRN
         if (!count($prorrogacoes) > 0 || !isset($possui_prorrogacao)) {
             // Sem respostas
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(180, 20, "Não há registro de prorrogações.", 0, 0, 'L');
+            $pdf->Cell(180, 20, "NÃ£o hÃ¡ registro de prorrogaÃ§Ãµes.", 0, 0, 'L');
             $pdf->Ln(20);
         }
 
         /**
-         * Observações finais
+         * ObservaÃ§Ãµes finais
          */
         if($ocorreuErroAdicionarAnexo == true){
             $pdf->Ln(20);
             $pdf->SetFont('arial', 'B', 14);
-            $pdf->Cell(70, 20, "12. Observações:", 0, 0, 'L');
+            $pdf->Cell(70, 20, "12. ObservaÃ§Ãµes:", 0, 0, 'L');
             $pdf->Ln(20);
 
             $pdf->SetFont('arial', '', 12);
-            $pdf->MultiCell(0, 20, "Um ou mais anexos da manifestação não foram importados para o SEI devido a restrições da extensão do arquivo. Acesse a manifestação através do link abaixo para mais detalhes. ", 0, 'J');
+            $pdf->MultiCell(0, 20, "Um ou mais anexos da manifestaÃ§Ã£o nÃ£o foram importados para o SEI devido a restriÃ§Ãµes da extensÃ£o do arquivo. Acesse a manifestaÃ§Ã£o atravÃ©s do link abaixo para mais detalhes. ", 0, 'J');
         }
 
         $objAnexoRN = new AnexoRN();
@@ -2880,13 +2880,13 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $objDocumentoManifestacao->setIdProcedimento($IdProtocolo);
         }
         if ($tipo_recurso == 'R1') {
-            $nomeDocumentoArvore = 'Primeira Instância';
+            $nomeDocumentoArvore = 'Primeira InstÃ¢ncia';
         } elseif ($tipo_recurso == 'R2') {
-            $nomeDocumentoArvore = 'Segunda Instância';
+            $nomeDocumentoArvore = 'Segunda InstÃ¢ncia';
         } elseif ($tipo_recurso == 'R3' || $tipo_recurso == 'RC') {
-            $nomeDocumentoArvore = 'Terceira Instância';
+            $nomeDocumentoArvore = 'Terceira InstÃ¢ncia';
         } elseif ($tipo_recurso == 'PR') {
-            $nomeDocumentoArvore = 'Pedido Revisão';
+            $nomeDocumentoArvore = 'Pedido RevisÃ£o';
         } else {
             $nomeDocumentoArvore = 'Pedido Inicial';
         }
@@ -2922,7 +2922,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                $token;
 
         /**********************************************************************************************************************************************
-         * Início da importação de anexos de cada protocolo
+         * InÃ­cio da importaÃ§Ã£o de anexos de cada protocolo
          * Desativado momentaneamente
          */
 
@@ -2940,11 +2940,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $intTotAnexos = count($arrAnexosManifestacao);
 
         if($intTotAnexos == 0){
-            //Não encontrou anexos..
+            //NÃ£o encontrou anexos..
             return $arrAnexosAdicionados;
         }
 
-        //Trata as extensÃµes permitidas
+        //Trata as extensÃƒÂµes permitidas
         $objArquivoExtensaoDTO = new ArquivoExtensaoDTO();
         $objArquivoExtensaoDTO->retNumIdArquivoExtensao();
         $objArquivoExtensaoDTO->retStrExtensao();
@@ -2980,7 +2980,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                         $fp = fopen(DIR_SEI_TEMP . '/' . $strNomeArquivoUpload, 'w');
 
-                        //Busca o conteúdo do Anexo
+                        //Busca o conteÃºdo do Anexo
                         $arrDetalheAnexoManifestacao = $this->apiRestRequest($retornoWsAnexoLinha['Links'][0]['href'], $token, 3);
 
                         $strConteudoCodificado = $arrDetalheAnexoManifestacao['ConteudoZipadoEBase64'];
@@ -3008,7 +3008,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                         $objAnexoManifestacao->setConteudo(base64_encode(file_get_contents(DIR_SEI_TEMP . '/' . $strNomeArquivoUpload)));
 
                         if ($this->hashDuplicado(DIR_SEI_TEMP . '/' . $strNomeArquivoUpload, $numProtocoloFormatado)) {
-//                            $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Arquivo já anexado ao processo: ' . $strNomeArquivoOriginal, 'S', $tipoManifestacao);
+//                            $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Arquivo jÃ¡ anexado ao processo: ' . $strNomeArquivoOriginal, 'S', $tipoManifestacao);
                         } else {
                             if ($IdProtocolo && $IdProtocolo <> '') {
                                 $objSEIRN = new SeiRN();
@@ -3020,7 +3020,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                         }
                     } else {
                         $ocorreuErroAdicionarAnexo = true;
-                        LogSEI::getInstance()->gravar('Importação de Manifestação ' . $numProtocoloFormatado . ': Arquivo ' . $strNomeArquivoOriginal . ' possui extensão inválida.', InfraLog::$INFORMACAO);
+                        LogSEI::getInstance()->gravar('ImportaÃ§Ã£o de ManifestaÃ§Ã£o ' . $numProtocoloFormatado . ': Arquivo ' . $strNomeArquivoOriginal . ' possui extensÃ£o invÃ¡lida.', InfraLog::$INFORMACAO);
                         continue;
                     }
                 }
@@ -3031,7 +3031,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
             }
 
             if($ocorreuErroAdicionarAnexo==true){
-                $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Um ou mais documentos anexos não foram importados corretamente: ' . $strMensagemErroAnexos, 'S', $tipoManifestacao);
+                $this->gravarLogLinha($numProtocoloFormatado, $idRelatorioImportacao, 'Um ou mais documentos anexos nÃ£o foram importados corretamente: ' . $strMensagemErroAnexos, 'S', $tipoManifestacao);
             }
         }
 
@@ -3046,7 +3046,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $objProcedimentoRN = new ProcedimentoRN();
             $objProcedimentoRN->excluirRN0280($objProcedimentoExcluirDTO);
             ProcedimentoINT::removerProcedimentoVisitado($idProcedimento);
-            //PaginaSEI::getInstance()->setStrMensagem('ExclusÃ£o realizada com sucesso.');
+            //PaginaSEI::getInstance()->setStrMensagem('ExclusÃƒÂ£o realizada com sucesso.');
             //$bolFlagProcessou = true;
 
         }catch(Exception $e){
@@ -3073,7 +3073,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
     }
 
     /**
-     * Verifica se já existe um Protocolo no SEI com o número (NUP)
+     * Verifica se jÃ¡ existe um Protocolo no SEI com o nÃºmero (NUP)
      */
     public function verificarProtocoloExistente($numProtocoloFormatado)
     {
@@ -3088,7 +3088,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
     }
 
     /**
-     * Verifica se já existe o hash do arquivo na tabela anexo coluna hash
+     * Verifica se jÃ¡ existe o hash do arquivo na tabela anexo coluna hash
      *
      * @param $strArquivo
      * @return bool
@@ -3107,7 +3107,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
     }
 
     /**
-     * Função para simular login
+     * FunÃ§Ã£o para simular login
      *
      * @param $siglaSistema
      * @param $idServico
@@ -3144,15 +3144,15 @@ class MdCguEouvAgendamentoRN extends InfraRN
      * Verifica o tipo de Recuso com base na API do FalaBR
      *
      * - IdInstanciaRecurso
-     * - 1 = primeira instância
-     * - 2 = segunda instância
+     * - 1 = primeira instÃ¢ncia
+     * - 2 = segunda instÃ¢ncia
      *
      * @param null $recursos
      * @return string
      *
-     * - 'P' - Padrão, não possui recursos de primeira ou segunda instância
-     * - 'R1' - Recurso de primeira instância
-     * - 'R2' - Recurso de segunda instância
+     * - 'P' - PadrÃ£o, nÃ£o possui recursos de primeira ou segunda instÃ¢ncia
+     * - 'R1' - Recurso de primeira instÃ¢ncia
+     * - 'R2' - Recurso de segunda instÃ¢ncia
      */
     public function verificaTipo($recursos = null, $default_response = 'P')
     {
@@ -3177,22 +3177,22 @@ class MdCguEouvAgendamentoRN extends InfraRN
     public function checkTipoRecurso($recurso)
     {
         if ($recurso['instancia']['IdInstanciaRecurso'] == 6) {
-            return 'PR'; // Pedido Revisão
+            return 'PR'; // Pedido RevisÃ£o
         }
         if ($recurso['instancia']['IdInstanciaRecurso'] == 7) {
-            return 'R3'; // Recurso 3 instância
+            return 'R3'; // Recurso 3 instÃ¢ncia
         }
         if ($recurso['instancia']['IdInstanciaRecurso'] == 4) {
-            return 'RE'; // Reclamação
+            return 'RE'; // ReclamaÃ§Ã£o
         }
         if ($recurso['instancia']['IdInstanciaRecurso'] == 3) {
             return 'RC'; // Recurso CGU
         }
         if ($recurso['instancia']['IdInstanciaRecurso'] == 2) {
-            return 'R2'; // Recurso 2 instância
+            return 'R2'; // Recurso 2 instÃ¢ncia
         }
         if ($recurso['instancia']['IdInstanciaRecurso'] == 1) {
-            return 'R1'; // Recurso 1 instância
+            return 'R1'; // Recurso 1 instÃ¢ncia
         }
 
         return 'R';
@@ -3201,7 +3201,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
     /**
      * Verifica se existe recurso 'posterior' cadastrado
      *
-     * - Posterior está entre aspas pq o recurso deve seguir uma órdem cronológica para se adequar à importação dos
+     * - Posterior estÃ¡ entre aspas pq o recurso deve seguir uma Ã³rdem cronolÃ³gica para se adequar Ã  importaÃ§Ã£o dos
      * dados no SEI
      *
      * @param $idRelatorioImportacao
@@ -3215,67 +3215,67 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Verificando se existe algum recurso anterior');
 
-        // Se ja existir no log um recurso anterior verifica se o novo recurso e 'superior' ao já registrado
+        // Se ja existir no log um recurso anterior verifica se o novo recurso e 'superior' ao jÃ¡ registrado
         if ($tipoManifestacaoAtual) {
 
-            $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Existe log, validando o tipo de manifestação: ' . $tipoManifestacaoAtual . ' para o anteior existente: ' . $ultimoTipoRecursoImportado);
+            $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Existe log, validando o tipo de manifestaÃ§Ã£o: ' . $tipoManifestacaoAtual . ' para o anteior existente: ' . $ultimoTipoRecursoImportado);
 
             /**
-             * [CUIDADO] Nâo é possível utilizar o 'switch > case' aqui - não sei o por quê, mas não funciona....  @study (??)
+             * [CUIDADO] NÃ¢o Ã© possÃ­vel utilizar o 'switch > case' aqui - nÃ£o sei o por quÃª, mas nÃ£o funciona....  @study (??)
              */
 
             /**
-             * Para criar um R1 (Recurso de Primeira Instância) pode existir somente PR (Pedido de Revisão),
+             * Para criar um R1 (Recurso de Primeira InstÃ¢ncia) pode existir somente PR (Pedido de RevisÃ£o),
              * R (Pedido Inicial do e-Sic)
              */
             if ($tipoManifestacaoAtual == 'R1' && in_array($ultimoTipoRecursoImportado, ['R2', 'RC', 'R3'])) {
-                $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criação deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
+                $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criaÃ§Ã£o deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
                 return 'bloquear';
             }
 
             /**
-             * Para criar um R2 (Recurso de Segunda Instância) pode existir somente R1 (Recurso de Primeira Instância),
-             * PR (Pedido de Revisão), R (Pedido Inicial do e-Sic)
+             * Para criar um R2 (Recurso de Segunda InstÃ¢ncia) pode existir somente R1 (Recurso de Primeira InstÃ¢ncia),
+             * PR (Pedido de RevisÃ£o), R (Pedido Inicial do e-Sic)
              */
             if ($tipoManifestacaoAtual == 'R2' && in_array($ultimoTipoRecursoImportado, ['RC', 'R3'])) {
-                $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criação deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
+                $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criaÃ§Ã£o deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
                 return 'bloquear';
             }
 
             /**
-             * Se for tipo 4 - Reclamação - não importar
+             * Se for tipo 4 - ReclamaÃ§Ã£o - nÃ£o importar
              */
             if ($tipoManifestacaoAtual == 'RE') {
-                $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criação deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
+                $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criaÃ§Ã£o deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
                 return 'bloquear';
             }
 
             /**
-             * Para criar um RC ainda não existe regra interna definida
+             * Para criar um RC ainda nÃ£o existe regra interna definida
              */
 //            if ($tipoManifestacaoAtual == 'RC') {}
 
             /**
-             * Para criar um RC ainda não existe regra interna definida
+             * Para criar um RC ainda nÃ£o existe regra interna definida
              */
 //            if ($tipoManifestacaoAtual == 'R3') {}
 
             /**
-             * Para criar um PR (Pedido de Revisão) pode existir somente R (Pedido Inicial do e-Sic)
+             * Para criar um PR (Pedido de RevisÃ£o) pode existir somente R (Pedido Inicial do e-Sic)
              */
             if ($tipoManifestacaoAtual == 'PR' && in_array($ultimoTipoRecursoImportado, ['R1', 'R2', 'RC', 'R3'])) {
-                $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criação deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
+                $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criaÃ§Ã£o deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
                 return 'bloquear';
             }
         }
 
         /**
-         * Se existir algo na tabela, porém, não estiver definido na regra acima ou se não existir nenhum registro na
-         * tabela, a importação será permitida
-         * [CUIDADO] Caso haja duplicidade na importação, pode haver algum tipo de recurso não mapeado no campo
+         * Se existir algo na tabela, porÃ©m, nÃ£o estiver definido na regra acima ou se nÃ£o existir nenhum registro na
+         * tabela, a importaÃ§Ã£o serÃ¡ permitida
+         * [CUIDADO] Caso haja duplicidade na importaÃ§Ã£o, pode haver algum tipo de recurso nÃ£o mapeado no campo
          * "instancia": { "IdInstanciaRecurso": ## > na API do FalaBR
          */
-        $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Vai permitir a criação desse recurso!');
+        $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Vai permitir a criaÃ§Ã£o desse recurso!');
         return 'permitir';
     }
 }

@@ -29,7 +29,7 @@ if (isset($_GET['id_tipo_procedimento'])){
     $objTipoProcedimentoDTO = $objTipoProcedimentoRN->consultarRN0267($objTipoProcedimentoDTO);
 
     if ($objTipoProcedimentoDTO==null){
-        throw new InfraException('Tipo de processo não encontrado.');
+        throw new InfraException('Tipo de processo nÃ£o encontrado.');
     }
     $objProcedimentoDTO->setStrProtocoloProcedimentoFormatado('');
     $objProcedimentoDTO->setNumIdTipoProcedimento($objTipoProcedimentoDTO->getNumIdTipoProcedimento());
@@ -102,7 +102,7 @@ $arrInteressados[] = array('Sigla'=>'kiv', 'Nome' => 'Pedro');
 $DocumentoGerado['Interessados'] = $arrInteressados;
 
 $arrDestinatarios = array();
-$arrDestinatarios[] = array('Sigla'=>'udv', 'Nome' => 'João');
+$arrDestinatarios[] = array('Sigla'=>'udv', 'Nome' => 'JoÃ£o');
 $arrDestinatarios[] = array('Sigla'=>'prm', 'Nome' => 'Paulo');
 
 $DocumentoGerado['Destinatarios'] = $arrDestinatarios;
@@ -117,7 +117,7 @@ $DocumentoRecebido['Tipo'] = 'R';
 //se incluindo em um processo existente informar o id neste campo
 //se incluindo o documento no momento da geracao do processo passar null
 $DocumentoRecebido['IdProcedimento'] = null;
-$DocumentoRecebido['IdSerie'] = '301'; //Ofício
+$DocumentoRecebido['IdSerie'] = '301'; //OfÃ­cio
 $DocumentoRecebido['Numero'] = '1000';
 $DocumentoRecebido['Data'] = '10/09/2011';
 $DocumentoRecebido['Descricao'] = 'descricao teste documento';
@@ -137,19 +137,19 @@ $DocumentoRecebido['Conteudo'] = base64_encode('conteudo do documento oficio.txt
 //$DocumentoRecebido['ConteudoMTOM'] = file_get_contents(dirname(__FILE__).'/OFIC832014CEF.pdf');
 $DocumentoRecebido['NivelAcesso'] = null;
 //1 - gera processo
-//$ret = $objWS->gerarProcedimento('Corregedoria','Suspeição/Impedimento', $numIdUnidade, $Procedimento, array(),$ProcedimentosRelacionados, $UnidadesEnvio);
+//$ret = $objWS->gerarProcedimento('Corregedoria','SuspeiÃ§Ã£o/Impedimento', $numIdUnidade, $Procedimento, array(),$ProcedimentosRelacionados, $UnidadesEnvio);
 
 //2 - gera processo + documento gerado
-//$ret = $objWS->gerarProcedimento('Corregedoria','Suspeição/Impedimento', $numIdUnidade, $Procedimento, array($DocumentoGerado), array(),$UnidadesEnvio);
+//$ret = $objWS->gerarProcedimento('Corregedoria','SuspeiÃ§Ã£o/Impedimento', $numIdUnidade, $Procedimento, array($DocumentoGerado), array(),$UnidadesEnvio);
 
 //3 - gera processo + documento gerado + documento externo
-//$ret = $objWS->gerarProcedimento('Corregedoria','Suspeição/Impedimento', $numIdUnidade, $Procedimento, array($DocumentoGerado, $DocumentoRecebido));
+//$ret = $objWS->gerarProcedimento('Corregedoria','SuspeiÃ§Ã£o/Impedimento', $numIdUnidade, $Procedimento, array($DocumentoGerado, $DocumentoRecebido));
 
 //4 - inclui documento gerado em processo existente
 //$DocumentoGerado['IdProcedimento'] deve estar com o id preenchido
-//$ret = $objWS->incluirDocumento('Corregedoria','Suspeição/Impedimento', $numIdUnidade, $DocumentoGerado);
+//$ret = $objWS->incluirDocumento('Corregedoria','SuspeiÃ§Ã£o/Impedimento', $numIdUnidade, $DocumentoGerado);
 
 //5 -inclui documento externo em processo existente
 //$DocumentoRecebido['IdProcedimento'] deve estar com o id preenchido
-//$ret = $objWS->incluirDocumento('Corregedoria','Suspeição/Impedimento', $numIdUnidade, $DocumentoRecebido);
+//$ret = $objWS->incluirDocumento('Corregedoria','SuspeiÃ§Ã£o/Impedimento', $numIdUnidade, $DocumentoRecebido);
 ?>
