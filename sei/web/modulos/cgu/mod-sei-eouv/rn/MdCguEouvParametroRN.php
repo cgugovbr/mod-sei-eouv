@@ -1,12 +1,12 @@
 <?
 /**
- * TRIBUNAL REGIONAL FEDERAL DA 4ª REGIÃO
+ * TRIBUNAL REGIONAL FEDERAL DA 4Âª REGIÃƒO
  *
  * 12/02/2008 - criado por marcio_db
  *
- * Versão do Gerador de Código: 1.13.1
+ * VersÃ£o do Gerador de CÃ³digo: 1.13.1
  *
- * Versão no CVS: $Id$
+ * VersÃ£o no CVS: $Id$
  */
 
 require_once dirname(__FILE__).'/../../../../SEI.php';
@@ -40,7 +40,7 @@ class MdCguEouvParametroRN extends InfraRN {
             return $ret;
 
         }catch(Exception $e){
-            throw new InfraException('Erro cadastrando Paramêtro do módulo Sei x E-Ouv.',$e);
+            throw new InfraException('Erro cadastrando ParamÃªtro do mÃ³dulo Sei x E-Ouv.',$e);
         }
     }
 
@@ -54,7 +54,7 @@ class MdCguEouvParametroRN extends InfraRN {
             $objEouvParametroBD->alterar($objEouvParametroDTO);
 
         }catch(Exception $e){
-            throw new InfraException('Erro alterando parâmetro.',$e);
+            throw new InfraException('Erro alterando parÃ¢metro.',$e);
         }
     }
 
@@ -83,7 +83,7 @@ class MdCguEouvParametroRN extends InfraRN {
 
         return $ret;
       }catch(Exception $e){
-        throw new InfraException('Erro consultando Parâmetro do módulo de integração SEI x E-ouv.',$e);
+        throw new InfraException('Erro consultando ParÃ¢metro do mÃ³dulo de integraÃ§Ã£o SEI x E-ouv.',$e);
       }
     }
 
@@ -99,7 +99,7 @@ class MdCguEouvParametroRN extends InfraRN {
             return $ret;
 
         }catch(Exception $e){
-            throw new InfraException('Erro listando associações entre Protocolo e Assunto.',$e);
+            throw new InfraException('Erro listando associaÃ§Ãµes entre Protocolo e Assunto.',$e);
         }
     }
 
@@ -115,7 +115,7 @@ class MdCguEouvParametroRN extends InfraRN {
             return $ret;
 
         }catch(Exception $e){
-            throw new InfraException('Erro listando associações entre Protocolo e Assunto.',$e);
+            throw new InfraException('Erro listando associaÃ§Ãµes entre Protocolo e Assunto.',$e);
         }
     }
 

@@ -1,12 +1,12 @@
 <?
 /**
-* TRIBUNAL REGIONAL FEDERAL DA 4ª REGIÃO
+* TRIBUNAL REGIONAL FEDERAL DA 4Âª REGIÃƒO
 *
 * 17/12/2007 - criado por fbv
 *
-* Versão do Gerador de Código: 1.10.1
+* VersÃ£o do Gerador de CÃ³digo: 1.10.1
 *
-* Versão no CVS: $Id$
+* VersÃ£o no CVS: $Id$
 */
 
 try {
@@ -22,7 +22,7 @@ try {
 
   SessaoSEI::getInstance()->validarLink();
   SessaoSEI::getInstance()->validarPermissao($_GET['acao']);
-    $strTitulo = 'Parâmetros do Módulo de Integração com o FalaBR';
+    $strTitulo = 'ParÃ¢metros do MÃ³dulo de IntegraÃ§Ã£o com o FalaBR';
     $arrComandos = array();
 
     $objMdCguEouvParametroDTO = new MdCguEouvParametroDTO();
@@ -164,7 +164,7 @@ try {
             $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeRecursoPedidoRevisao);
         }
 
-        PaginaSEI::getInstance()->setStrMensagem('Parâmetros alterados com sucesso.');
+        PaginaSEI::getInstance()->setStrMensagem('ParÃ¢metros alterados com sucesso.');
         header('Location: ' . SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_listar' ));
         die();
         break;
@@ -172,7 +172,7 @@ try {
       break;
 
     default:
-      throw new InfraException("Ação '".$_GET['acao']."' não reconhecida.");
+      throw new InfraException("AÃ§Ã£o '".$_GET['acao']."' nÃ£o reconhecida.");
   }
     $strItensSelSerie = SerieINT::montarSelectNomeExternos('null','&nbsp;',$idTipoDocumentoAnexoDadosManifestacao->getStrDeValorParametro());
     $strItensSelUnidadeOuv = UnidadeINT::montarSelectSiglaDescricao('null','&nbsp;',$idUnidadeOuvidoria->getStrDeValorParametro());
@@ -212,7 +212,7 @@ PaginaSEI::getInstance()->abrirJavaScript();
 
     function ValidarCadastroParametro() {
         if (infraTrim(document.getElementById('EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES').value)=='') {
-            alert('Informe a Data Inicial de Importação.');
+            alert('Informe a Data Inicial de ImportaÃ§Ã£o.');
             document.getElementById('EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO').focus();
             return false;
         }
@@ -222,7 +222,7 @@ PaginaSEI::getInstance()->abrirJavaScript();
             return false;
         }
         if (infraTrim(document.getElementById('EOUV_USUARIO_ACESSO_WEBSERVICE').value)=='') {
-            alert('Informe o Usuário.');
+            alert('Informe o UsuÃ¡rio.');
             document.getElementById('EOUV_USUARIO_ACESSO_WEBSERVICE').focus();
             return false;
         }
@@ -252,27 +252,27 @@ PaginaSEI::getInstance()->abrirJavaScript();
             return false;
         }
         if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_PRINCIPAL').value)=='null') {
-            alert('Informe a Unidade de Acesso a Informação.');
+            alert('Informe a Unidade de Acesso a InformaÃ§Ã£o.');
             document.getElementById('ESIC_ID_UNIDADE_PRINCIPAL').focus();
             return false;
         }
         if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA').value)=='null') {
-            alert('Informe a Unidade de Recurso em 1ª Instância.');
+            alert('Informe a Unidade de Recurso em 1Âª InstÃ¢ncia.');
             document.getElementById('ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA').focus();
             return false;
         }
         if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA').value)=='null') {
-            alert('Informe a Unidade de Recurso em 2ª Instância.');
+            alert('Informe a Unidade de Recurso em 2Âª InstÃ¢ncia.');
             document.getElementById('ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA').focus();
             return false;
         }
         if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA').value)=='null') {
-            alert('Informe a Unidade de Recurso em 3ª Instância.');
+            alert('Informe a Unidade de Recurso em 3Âª InstÃ¢ncia.');
             document.getElementById('ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA').focus();
             return false;
         }
         if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO').value)=='null') {
-            alert('Informe a Unidade de Pedido de Revisão.');
+            alert('Informe a Unidade de Pedido de RevisÃ£o.');
             document.getElementById('ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO').focus();
             return false;
         }
@@ -297,7 +297,7 @@ PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
     <!-- EOUV_USUARIO_ACESSO_WEBSERVICE -->
     <div class="infraAreaDados">
         <label id="lblEOUV_USUARIO_ACESSO_WEBSERVICE for="EOUV_USUARIO_ACESSO_WEBSERVICE" accesskey="U" class="infraLabelObrigatorio">
-        <span class="infraTeclaAtalho">U</span>suário:</label>
+        <span class="infraTeclaAtalho">U</span>suÃ¡rio:</label>
         <input type="text" id="EOUV_USUARIO_ACESSO_WEBSERVICE" name="EOUV_USUARIO_ACESSO_WEBSERVICE" class="infraText"
                value="<?=PaginaSEI::tratarHTML($usuarioWebService->getStrDeValorParametro());?>" onkeypress="return infraMascaraTexto(this,event,50);"
                maxlength="50" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" />
@@ -324,7 +324,7 @@ PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
     <!-- EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES -->
     <div class="infraAreaDados">
         <label id="lblEOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES" for="EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES" accesskey="D" class="infraLabelObrigatorio">
-            <span class="infraTeclaAtalho">D</span>ata Inicial de Importação:</label>
+            <span class="infraTeclaAtalho">D</span>ata Inicial de ImportaÃ§Ã£o:</label>
         <input type="text" id="EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES" name="EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES" onkeypress="return infraMascaraData(this, event)"
                class="infraText" value="<?=PaginaSEI::tratarHTML($dataInicialImportacaoManifestacoes->getStrDeValorParametro());?>"
                tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" />
@@ -340,7 +340,7 @@ PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
 
     <!-- EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO -->
     <div class="infraAreaDados">
-        <label id="lblEOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" for="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" accesskey="T" class="infraLabelObrigatorio"><span class="infraTeclaAtalho">T</span>ipo de documento usado na importação:</label>
+        <label id="lblEOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" for="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" accesskey="T" class="infraLabelObrigatorio"><span class="infraTeclaAtalho">T</span>ipo de documento usado na importaÃ§Ã£o:</label>
         <select id="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" name="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" class="infraSelect"
                 tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
             <?=$strItensSelSerie?>
@@ -354,31 +354,31 @@ PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
         </select>
     </div> 
     <div class="infraAreaDados">
-        <label id="lblESIC_ID_UNIDADE_PRINCIPAL" for="ESIC_ID_UNIDADE_PRINCIPAL" accesskey="A" class="infraLabelObrigatorio">Unidade de <span class="infraTeclaAtalho">A</span>cesso à Informação:</label>
+        <label id="lblESIC_ID_UNIDADE_PRINCIPAL" for="ESIC_ID_UNIDADE_PRINCIPAL" accesskey="A" class="infraLabelObrigatorio">Unidade de <span class="infraTeclaAtalho">A</span>cesso Ã  InformaÃ§Ã£o:</label>
         <select id="ESIC_ID_UNIDADE_PRINCIPAL" name="ESIC_ID_UNIDADE_PRINCIPAL" class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
             <?=$strItensSelUnidadeEsic?>
         </select>
     </div>
     <div class="infraAreaDados">
-        <label id="lblESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA" for="ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA" accesskey="1" class="infraLabelObrigatorio">Unidade de Recurso em <span class="infraTeclaAtalho">1</span>ª Instância:</label>
+        <label id="lblESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA" for="ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA" accesskey="1" class="infraLabelObrigatorio">Unidade de Recurso em <span class="infraTeclaAtalho">1</span>Âª InstÃ¢ncia:</label>
         <select id="ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA" name="ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA"  class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
             <?=$strItensSelUnidadePrimeira?>
         </select>
     </div>
     <div class="infraAreaDados">
-        <label id="lblESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA" for="ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA" accesskey="2" class="infraLabelObrigatorio">Unidade de Recurso em <span class="infraTeclaAtalho">2</span>ª Instância:</label>
+        <label id="lblESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA" for="ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA" accesskey="2" class="infraLabelObrigatorio">Unidade de Recurso em <span class="infraTeclaAtalho">2</span>Âª InstÃ¢ncia:</label>
         <select id="ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA" name="ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA"  class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
             <?=$strItensSelUnidadeSegunda?>
         </select>
     </div>
     <div class="infraAreaDados">
-        <label id="lblESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" for="ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" accesskey="3" class="infraLabelObrigatorio">Unidade de Recurso em <span class="infraTeclaAtalho">3</span>ª Instância:</label>
+        <label id="lblESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" for="ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" accesskey="3" class="infraLabelObrigatorio">Unidade de Recurso em <span class="infraTeclaAtalho">3</span>Âª InstÃ¢ncia:</label>
         <select id="ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" name="ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
             <?=$strItensSelUnidadeTerceira?>
         </select>
     </div>
     <div class="infraAreaDados">
-        <label id="lblESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO" for="ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO" accesskey="R" class="infraLabelObrigatorio">Unidade de Pedido de <span class="infraTeclaAtalho">R</span>evisão:</label>
+        <label id="lblESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO" for="ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO" accesskey="R" class="infraLabelObrigatorio">Unidade de Pedido de <span class="infraTeclaAtalho">R</span>evisÃ£o:</label>
         <select id="ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO" name="ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO" class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
             <?=$strItensSelUnidadeRevisao?>
         </select>

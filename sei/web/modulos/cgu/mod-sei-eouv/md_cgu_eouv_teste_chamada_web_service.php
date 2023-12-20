@@ -28,7 +28,7 @@ if (isset($_GET['id_tipo_procedimento'])){
     $objTipoProcedimentoDTO = $objTipoProcedimentoRN->consultarRN0267($objTipoProcedimentoDTO);
 
     if ($objTipoProcedimentoDTO==null){
-        throw new InfraException('Tipo de processo não encontrado.');
+        throw new InfraException('Tipo de processo nÃ£o encontrado.');
     }
     $objProcedimentoDTO->setStrProtocoloProcedimentoFormatado('');
     $objProcedimentoDTO->setNumIdTipoProcedimento($objTipoProcedimentoDTO->getNumIdTipoProcedimento());
@@ -99,7 +99,7 @@ $arrInteressados[] = array('Sigla'=>'kiv', 'Nome' => 'Pedro');
 $DocumentoGerado['Interessados'] = $arrInteressados;
 
 $arrDestinatarios = array();
-$arrDestinatarios[] = array('Sigla'=>'udv', 'Nome' => 'João');
+$arrDestinatarios[] = array('Sigla'=>'udv', 'Nome' => 'JoÃ£o');
 $arrDestinatarios[] = array('Sigla'=>'prm', 'Nome' => 'Paulo');
 
 $DocumentoGerado['Destinatarios'] = $arrDestinatarios;
@@ -114,7 +114,7 @@ $DocumentoRecebido['Tipo'] = 'R';
 //se incluindo em um processo existente informar o id neste campo
 //se incluindo o documento no momento da geracao do processo passar null
 $DocumentoRecebido['IdProcedimento'] = null;
-$DocumentoRecebido['IdSerie'] = '301'; //Ofício
+$DocumentoRecebido['IdSerie'] = '301'; //OfÃ­cio
 $DocumentoRecebido['Numero'] = '1000';
 $DocumentoRecebido['Data'] = '10/09/2011';
 $DocumentoRecebido['Descricao'] = 'descricao teste documento';

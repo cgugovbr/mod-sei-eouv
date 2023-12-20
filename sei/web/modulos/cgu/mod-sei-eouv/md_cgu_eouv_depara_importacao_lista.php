@@ -1,6 +1,6 @@
 <?
 /**
-* CONTROLADORIA-GERAL DA UNIÃO
+* CONTROLADORIA-GERAL DA UNIÃƒO
 * Criado em 15/12/2022
 */
 
@@ -21,7 +21,7 @@ try {
 
   switch($_GET['acao']){
       case 'md_cgu_eouv_depara_importacao_listar':
-        $strTitulo = 'Tipos de Manifestação do FalaBR e Tipos de Processo Associados';
+        $strTitulo = 'Tipos de ManifestaÃ§Ã£o do FalaBR e Tipos de Processo Associados';
       break;
 
       case 'md_cgu_eouv_depara_importacao_desativar':
@@ -35,7 +35,7 @@ try {
               }
               $objMdCguEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
               $objMdCguEouvDeparaImportacaoRN->desativar($arrObjDeParaDTO);
-              PaginaSEI::getInstance()->adicionarMensagem('Operação realizada com sucesso.');
+              PaginaSEI::getInstance()->adicionarMensagem('OperaÃ§Ã£o realizada com sucesso.');
           }catch(Exception $e){
               PaginaSEI::getInstance()->processarExcecao($e);
           }
@@ -43,7 +43,7 @@ try {
           die;
 
       case 'md_cgu_eouv_depara_importacao_reativar':
-          $strTitulo = 'Reativar Tipo de manifestação';
+          $strTitulo = 'Reativar Tipo de manifestaÃ§Ã£o';
 
           if ($_GET['acao_confirmada']==='sim'){
               try{
@@ -56,7 +56,7 @@ try {
                   }
                   $objMdCguEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
                   $objMdCguEouvDeparaImportacaoRN->reativar($arrObjDeParaDTO);
-                  PaginaSEI::getInstance()->adicionarMensagem('Operação realizada com sucesso.');
+                  PaginaSEI::getInstance()->adicionarMensagem('OperaÃ§Ã£o realizada com sucesso.');
               }catch(Exception $e){
                   PaginaSEI::getInstance()->processarExcecao($e);
               }
@@ -66,7 +66,7 @@ try {
           break;
 
     default:
-      throw new InfraException("Ação '".$_GET['acao']."' não reconhecida.");
+      throw new InfraException("AÃ§Ã£o '".$_GET['acao']."' nÃ£o reconhecida.");
   }
 
   $arrComandos = array();
@@ -103,8 +103,8 @@ try {
 
       $strResultado = '';
 
-    $strSumarioTabela = 'Tabela de Tipos de Manifestação.';
-    $strCaptionTabela = 'Tipos de Manifestação';
+    $strSumarioTabela = 'Tabela de Tipos de ManifestaÃ§Ã£o.';
+    $strCaptionTabela = 'Tipos de ManifestaÃ§Ã£o';
 
     $strResultado .= '<table width="99%" class="infraTable" summary="'.$strSumarioTabela.'">'."\n";
     $strResultado .= '<caption class="infraCaption">'.PaginaSEI::getInstance()->gerarCaptionTabela($strCaptionTabela,$numRegistros).'</caption>';
@@ -112,10 +112,10 @@ try {
     if ($bolCheck) {
           $strResultado .= '<th class="infraTh" width="1%">'.PaginaSEI::getInstance()->getThCheck().'</th>'."\n";
     }
-    $strResultado .= '<th class="infraTh">'.PaginaSEI::getInstance()->getThOrdenacao($objDeParaDTO,'ID da Manifestação','IdTipoManifestacaoEouv',$arrObjDeParaDTO).'</th>'."\n";
-    $strResultado .= '<th class="infraTh">Tipo de Manifestação</th>'."\n";
+    $strResultado .= '<th class="infraTh">'.PaginaSEI::getInstance()->getThOrdenacao($objDeParaDTO,'ID da ManifestaÃ§Ã£o','IdTipoManifestacaoEouv',$arrObjDeParaDTO).'</th>'."\n";
+    $strResultado .= '<th class="infraTh">Tipo de ManifestaÃ§Ã£o</th>'."\n";
     $strResultado .= '<th class="infraTh">Tipo de Processo Associado</th>'."\n";
-    $strResultado .= '<th class="infraTh">Ações</th>'."\n";
+    $strResultado .= '<th class="infraTh">AÃ§Ãµes</th>'."\n";
     $strResultado .= '</tr>'."\n";
     $strCssTr='';
     for ($i = 0; $i < $numRegistros; $i++) {
@@ -145,7 +145,7 @@ try {
               'id_md_cgu_eouv_tipo_manifestacao='.$arrObjDeParaDTO[$i]->getNumIdTipoManifestacaoEouv()
             );
             $strResultado .= '<a href="'.$strLinkAlterar.'" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'">';
-            $strResultado .= '<img src="'.PaginaSEI::getInstance()->getIconeAlterar().'" title="Alterar Associação" alt="Alterar Associação" class="infraImg" />';
+            $strResultado .= '<img src="'.PaginaSEI::getInstance()->getIconeAlterar().'" title="Alterar AssociaÃ§Ã£o" alt="Alterar AssociaÃ§Ã£o" class="infraImg" />';
             $strResultado .= '</a>&nbsp;';
           }
         if ($bolAcaoDesativar && $arrObjDeParaDTO[$i]->getStrSinAtivo()=='S'){
@@ -214,7 +214,7 @@ PaginaSEI::getInstance()->abrirJavaScript();
 
 <? if ($bolAcaoDesativar){ ?>
     function acaoDesativar(id, desc) {
-        if (confirm("Confirma desativação do Tipo de manifestação \"" + desc + "\"?")) {
+        if (confirm("Confirma desativaÃ§Ã£o do Tipo de manifestaÃ§Ã£o \"" + desc + "\"?")) {
             document.getElementById('hdnInfraItemId').value = id;
             document.getElementById('frmMdCguEouvDeparaImportacaoLista').action = '<?=$strLinkDesativar?>';
             document.getElementById('frmMdCguEouvDeparaImportacaoLista').submit();
@@ -226,7 +226,7 @@ PaginaSEI::getInstance()->abrirJavaScript();
         alert('Nenhuma  selecionada.');
         return;
         }
-        if (confirm("Confirma desativação dos tipos de manifestação selecionados?")) {
+        if (confirm("Confirma desativaÃ§Ã£o dos tipos de manifestaÃ§Ã£o selecionados?")) {
             document.getElementById('hdnInfraItemId').value = '';
             document.getElementById('frmMdCguEouvDeparaImportacaoLista').action = '<?=$strLinkDesativar?>';
             document.getElementById('frmMdCguEouvDeparaImportacaoLista').submit();
@@ -236,7 +236,7 @@ PaginaSEI::getInstance()->abrirJavaScript();
 
 <? if ($bolAcaoReativar){ ?>
     function acaoReativar(id, desc) {
-        if (confirm("Confirma reativação do Tipo de manifestação  \"" + desc + "\"?")) {
+        if (confirm("Confirma reativaÃ§Ã£o do Tipo de manifestaÃ§Ã£o  \"" + desc + "\"?")) {
             document.getElementById('hdnInfraItemId').value = id;
             document.getElementById('frmMdCguEouvDeparaImportacaoLista').action = '<?=$strLinkReativar?>';
             document.getElementById('frmMdCguEouvDeparaImportacaoLista').submit();
@@ -245,10 +245,10 @@ PaginaSEI::getInstance()->abrirJavaScript();
 
     function acaoReativacaoMultipla() {
         if (document.getElementById('hdnInfraItensSelecionados').value=='') {
-            alert('Nenhum Tipo de manifestação selecionado.');
+            alert('Nenhum Tipo de manifestaÃ§Ã£o selecionado.');
             return;
         }
-        if (confirm("Confirma reativação dos Tipos de manifestação selecionados?")) {
+        if (confirm("Confirma reativaÃ§Ã£o dos Tipos de manifestaÃ§Ã£o selecionados?")) {
             document.getElementById('hdnInfraItemId').value = '';
             document.getElementById('frmMdCguEouvDeparaImportacaoLista').action = '<?=$strLinkReativar?>';
             document.getElementById('frmMdCguEouvDeparaImportacaoLista').submit();

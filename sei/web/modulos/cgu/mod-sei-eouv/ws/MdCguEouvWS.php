@@ -1,14 +1,14 @@
 <?
 /*
- * CONTROLADORIA GERAL DA UNIÃO - CGU
+ * CONTROLADORIA GERAL DA UNIÃƒO - CGU
  *
  * 23/06/2015 - criado por Rafael Leandro Ferreira
  *
  *
- *Este WebService tem o objetivo de atender a necessidade da CGU que não está suportada dentro dos métodos
+ *Este WebService tem o objetivo de atender a necessidade da CGU que nÃ£o estÃ¡ suportada dentro dos mÃ©todos
  *existentes em SeiWS.php.
- *Foi criado este arquivo para não fazer alterações neste arquivo. O ideal é que posteriormente estes métodos sejam incorporados
- *ao SeiWS para estar disponível como um método homologado pelo SEI.
+ *Foi criado este arquivo para nÃ£o fazer alteraÃ§Ãµes neste arquivo. O ideal Ã© que posteriormente estes mÃ©todos sejam incorporados
+ *ao SeiWS para estar disponÃ­vel como um mÃ©todo homologado pelo SEI.
  */
 
 
@@ -37,7 +37,7 @@ class MdCguEouvWS extends InfraWS {
         $curl = curl_init();
 
         /**
-         * @test - teste de opções do Curl
+         * @test - teste de opÃ§Ãµes do Curl
          */
 
         curl_setopt_array($curl, array(
@@ -58,7 +58,7 @@ class MdCguEouvWS extends InfraWS {
 
         $response = curl_exec($curl);
         $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        // Verifica erro ao fazer requisição
+        // Verifica erro ao fazer requisiÃ§Ã£o
         if ($response === false) {
             $err = curl_error($curl);
             throw new Exception($err);
@@ -68,7 +68,7 @@ class MdCguEouvWS extends InfraWS {
         switch ($httpcode) {
             case 200:
                 $response = json_decode($response, true);
-                // Verifica erro na decodificação JSON
+                // Verifica erro na decodificaÃ§Ã£o JSON
                 if ($response === null) {
                     throw new Exception('Erro ao decodificar resposta JSON da API ('. json_last_error_msg(). ')');
                 }
@@ -81,7 +81,7 @@ class MdCguEouvWS extends InfraWS {
                 $response = 'Nenhum retorno encontrado! HTTP Status: ' . $httpcode;
                 break;
             default:
-                $response = "Erro: Ocorreu algum erro não tratado. HTTP Status: " . $httpcode;
+                $response = "Erro: Ocorreu algum erro nÃ£o tratado. HTTP Status: " . $httpcode;
                 throw new Exception($response);
                 break;
         }
@@ -142,8 +142,8 @@ class MdCguEouvWS extends InfraWS {
     public static function verificaRetornoWS($retornoWsLista)
     {
         /*
-        função criada para tratar o retorno de dados do WS, pois quando existe apenas um unico resultado retorna um objeto e
-        quando tem mais de um resultado retorna um array ocasionando falhas na exibição dos dados.
+        funÃ§Ã£o criada para tratar o retorno de dados do WS, pois quando existe apenas um unico resultado retorna um objeto e
+        quando tem mais de um resultado retorna um array ocasionando falhas na exibiÃ§Ã£o dos dados.
         */
         if (isset($retornoWsLista) and key_exists(0, $retornoWsLista)) {
             $resultado = $retornoWsLista;

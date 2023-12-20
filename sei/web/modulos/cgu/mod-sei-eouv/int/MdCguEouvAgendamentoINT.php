@@ -1,12 +1,12 @@
 <?
 /**
- * TRIBUNAL REGIONAL FEDERAL DA 4™ REGI√O
+ * TRIBUNAL REGIONAL FEDERAL DA 4¬™ REGI√ÉO
  *
  * 20/12/2007 - criado por mga
  *
- * Vers„o do Gerador de CÛdigo: 1.12.0
+ * Vers√£o do Gerador de C√≥digo: 1.12.0
  *
- * Vers„o no CVS: $Id$
+ * Vers√£o no CVS: $Id$
  */
 
 require_once dirname(__FILE__).'/../../../../SEI.php';
@@ -30,10 +30,10 @@ class MdCguEouvAgendamentoINT extends InfraINT
         try{
             $resultadoObjEouvRelatorioImportacaoDTO = $objEouvRelatorioImportacaoRN->consultar($objEouvRelatorioImportacaoDTO);
         } catch(Exception $e) {
-            throw new InfraException('Erro obtendo ˙ltima execuÁ„o da Importacao SEI x EOuv ocorrida com Sucesso.',$e);
+            throw new InfraException('Erro obtendo √∫ltima execu√ß√£o da Importacao SEI x EOuv ocorrida com Sucesso.',$e);
         }
 
-        LogSEI::getInstance()->gravar('⁄ltima ExecuÁ„o com Sucesso:' . $resultadoObjEouvRelatorioImportacaoDTO);
+        LogSEI::getInstance()->gravar('√öltima Execu√ß√£o com Sucesso:' . $resultadoObjEouvRelatorioImportacaoDTO);
 
         return $resultadoObjEouvRelatorioImportacaoDTO;
     }

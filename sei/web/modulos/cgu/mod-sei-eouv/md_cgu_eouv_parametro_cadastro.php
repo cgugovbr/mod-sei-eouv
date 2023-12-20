@@ -1,12 +1,12 @@
 <?
 /**
- * TRIBUNAL REGIONAL FEDERAL DA 4™ REGI√O
+ * TRIBUNAL REGIONAL FEDERAL DA 4¬™ REGI√ÉO
  *
  * 17/12/2007 - criado por fbv
  *
- * Vers„o do Gerador de CÛdigo: 1.10.1
+ * Vers√£o do Gerador de C√≥digo: 1.10.1
  *
- * Vers„o no CVS: $Id$
+ * Vers√£o no CVS: $Id$
  */
 
 error_reporting(E_ALL); ini_set('display_errors', '1');
@@ -36,7 +36,7 @@ try {
 
   switch($_GET['acao']){
     case 'md_cgu_eouv_parametro_cadastrar':
-      $strTitulo = 'Novo Par‚metro';
+      $strTitulo = 'Novo Par√¢metro';
       $arrComandos[] = '<button type="submit" accesskey="S" name="sbmCadastrarMdCguEouvParametro" value="Salvar" class="infraButton"><span class="infraTeclaAtalho">S</span>alvar</button>';
       $arrComandos[] = '<button type="button" accesskey="C" name="btnCancelar" value="Cancelar" onclick="location.href=\''.SessaoSEI::getInstance()->assinarLink('controlador.php?acao='.PaginaSEI::getInstance()->getAcaoRetorno().'&acao_origem='.$_GET['acao']).'\';" class="infraButton"><span class="infraTeclaAtalho">C</span>ancelar</button>';
 
@@ -79,7 +79,7 @@ try {
         try{
           $objMdCguEouvParametroRN = new MdCguEouvParametroRN();
           $objMdCguEouvParametroDTO = $objMdCguEouvParametroRN->cadastrarRN0334($objMdCguEouvParametroDTO);
-          PaginaSEI::getInstance()->setStrMensagem('Par‚metro "'.$objMdCguEouvParametroDTO->getStrNoParametro().'" cadastrado com sucesso.');
+          PaginaSEI::getInstance()->setStrMensagem('Par√¢metro "'.$objMdCguEouvParametroDTO->getStrNoParametro().'" cadastrado com sucesso.');
           header('Location: '.SessaoSEI::getInstance()->assinarLink('controlador.php?acao='.PaginaSEI::getInstance()->getAcaoRetorno().'&acao_origem='.$_GET['acao'].'&id_md_cgu_eouv_parametro='.$objMdCguEouvParametroDTO->getNumIdParametro().'#ID-'.$objMdCguEouvParametroDTO->getNumIdParametro()));
           die;
         }catch(Exception $e){
@@ -89,7 +89,7 @@ try {
       break;
 
     case 'md_cgu_eouv_parametro_alterar':
-      $strTitulo = 'Alterar Par‚metro';
+      $strTitulo = 'Alterar Par√¢metro';
       $arrComandos[] = '<button type="submit" accesskey="S" name="sbmAlterarMdCguEouvParametro" value="Salvar" class="infraButton"><span class="infraTeclaAtalho">S</span>alvar</button>';
       $strDesabilitar = 'disabled="disabled"';
 
@@ -100,7 +100,7 @@ try {
         $objMdCguEouvParametroRN = new MdCguEouvParametroRN();
         $objMdCguEouvParametroDTO = $objMdCguEouvParametroRN->consultarParametro($objMdCguEouvParametroDTO);
         if ($objMdCguEouvParametroDTO==null){
-          throw new InfraException("Registro n„o encontrado.");
+          throw new InfraException("Registro n√£o encontrado.");
         }
       } else {
 
@@ -116,7 +116,7 @@ try {
         try{
           $objMdCguEouvParametroRN = new MdCguEouvParametroRN();
           $objMdCguEouvParametroRN->alterarParametro($objMdCguEouvParametroDTO);
-          PaginaSEI::getInstance()->setStrMensagem('Par‚metro "'.$objMdCguEouvParametroDTO->getStrNoParametro().'" alterado com sucesso.');
+          PaginaSEI::getInstance()->setStrMensagem('Par√¢metro "'.$objMdCguEouvParametroDTO->getStrNoParametro().'" alterado com sucesso.');
           header('Location: '.SessaoSEI::getInstance()->assinarLink('controlador.php?acao='.PaginaSEI::getInstance()->getAcaoRetorno().'&acao_origem='.$_GET['acao'].'#ID-'.$objMdCguEouvParametroDTO->getNumIdParametro()));
           die;
         }catch(Exception $e){
@@ -126,19 +126,19 @@ try {
       break;
 
     case 'md_cgu_eouv_parametro_consultar':
-      $strTitulo = "Consultar Par‚metro";
+      $strTitulo = "Consultar Par√¢metro";
       $arrComandos[] = '<button type="button" accesskey="F" name="btnFechar" value="Fechar" onclick="location.href=\''.SessaoSEI::getInstance()->assinarLink('controlador.php?acao='.PaginaSEI::getInstance()->getAcaoRetorno().'&acao_origem='.$_GET['acao']).'#ID-'.$_GET['id_md_cgu_eouv_parametro'].'\';" class="infraButton"><span class="infraTeclaAtalho">F</span>echar</button>';
       $objMdCguEouvParametroDTO->setNumIdParametro($_GET['id_md_cgu_eouv_parametro']);
       $objMdCguEouvParametroDTO->retTodos();
       $objMdCguEouvParametroRN = new MdCguEouvParametroRN();
       $objMdCguEouvParametroDTO = $objMdCguEouvParametroRN->consultarRN0336($objMdCguEouvParametroDTO);
       if ($objMdCguEouvParametroDTO===null){
-        throw new InfraException("Registro n„o encontrado.");
+        throw new InfraException("Registro n√£o encontrado.");
       }
       break;
 
     default:
-      throw new InfraException("AÁ„o '".$_GET['acao']."' n„o reconhecida.");
+      throw new InfraException("A√ß√£o '".$_GET['acao']."' n√£o reconhecida.");
   }
 
 }catch(Exception $e){
@@ -209,7 +209,7 @@ PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
       <label id="lblNome" for="txtNome" accesskey="N" class="infraLabelObrigatorio"><span class="infraTeclaAtalho">N</span>ome:</label>
       <input type="text" id="txtNome" name="txtNome" class="infraText" value="<?=PaginaSEI::tratarHTML($objMdCguEouvParametroDTO->getStrNoParametro());?>" onkeypress="return infraMascaraTexto(this,event,50);" maxlength="50" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" />
 
-      <label id="lblDescricao" for="txaDescricao" accesskey="V" class="infraLabelObrigatorio"><span class="infraTeclaAtalho">V</span>alor Par‚metro:</label>
+      <label id="lblDescricao" for="txaDescricao" accesskey="V" class="infraLabelObrigatorio"><span class="infraTeclaAtalho">V</span>alor Par√¢metro:</label>
       <textarea id="txaDescricao" name="txaDescricao" onkeypress="return infraLimitarTexto(this,event,250);" rows='2' class="infraTextarea" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>"><?=PaginaSEI::tratarHTML($objMdCguEouvParametroDTO->getStrDeValorParametro());?></textarea>
 
     </div>

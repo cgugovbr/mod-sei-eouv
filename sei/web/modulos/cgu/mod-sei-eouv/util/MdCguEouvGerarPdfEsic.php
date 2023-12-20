@@ -1,7 +1,7 @@
 <?php
 
 /**
- * CONTROLADORIA GERAL DA UNI√O- CGU
+ * CONTROLADORIA GERAL DA UNI√ÉO- CGU
  *
  * 09/10/2015 - criado por Rafael Leandro
  *
@@ -21,33 +21,33 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
         $pdf->AddPage();
 
         /**
-         * Arquivo PDF - manifestaÁ„o e-Sic
+         * Arquivo PDF - manifesta√ß√£o e-Sic
          */
 
-        // CabeÁalho
+        // Cabe√ßalho
         $pdf->SetFont('arial', 'B', 18);
-        $pdf->Cell(0, 5, "Plataforma Integrada de Ouvidoria e Acesso ‡ InformaÁ„o", 0, 1, 'C');
+        $pdf->Cell(0, 5, "Plataforma Integrada de Ouvidoria e Acesso √† Informa√ß√£o", 0, 1, 'C');
         $pdf->Ln(20);
-        $pdf->Cell(0, 5, "Detalhes da ManifestaÁ„o", 0, 1, 'C');
+        $pdf->Cell(0, 5, "Detalhes da Manifesta√ß√£o", 0, 1, 'C');
         $pdf->Ln(30);
 
         /**
-         * Dados b·sicos da manifestaÁ„o
+         * Dados b√°sicos da manifesta√ß√£o
          */
         $menu_count = 1;
         $pdf->SetFont('arial', 'B', 14);
-        $pdf->Cell(0, 20, $menu_count . ". Dados B·sicos da ManifestaÁ„o", 1, 0, 'L');
+        $pdf->Cell(0, 20, $menu_count . ". Dados B√°sicos da Manifesta√ß√£o", 1, 0, 'L');
         $pdf->Ln(30);
 
-        // Tipo de ManifestaÁ„o
+        // Tipo de Manifesta√ß√£o
         $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(180, 20, "Tipo da ManifestaÁ„o:", 0, 0, 'R');
+        $pdf->Cell(180, 20, "Tipo da Manifesta√ß√£o:", 0, 0, 'R');
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(0, 20, $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'] . " - " . $retornoWsLinha['TipoManifestacao']['DescTipoManifestacao'], 0, 1, 'L');
 
         // Tipo de formulario
         $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(180, 20, "Tipo de Formul·rio:", 0, 0, 'R');
+        $pdf->Cell(180, 20, "Tipo de Formul√°rio:", 0, 0, 'R');
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(0, 20, $retornoWsLinha['TipoFormulario']['DescTipoFormulario'], 0, 1, 'L');
 
@@ -63,16 +63,16 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(0, 20, $retornoWsLinha['OuvidoriaDestino']['Esfera']['DescEsfera'], 0, 1, 'L');
 
-        // ”rg„o Destinat·rio - NomeOuvidoria
+        // √ìrg√£o Destinat√°rio - NomeOuvidoria
         $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(180, 20, "”rg„o Destinat·rio:", 0, 0, 'R');
+        $pdf->Cell(180, 20, "√ìrg√£o Destinat√°rio:", 0, 0, 'R');
         $pdf->setFont('arial', '', 12);
         $pdf->MultiCell(0, 20, $retornoWsLinha['OuvidoriaDestino']['NomOuvidoria'], 0, 'L');
 
-        // ”rg„o de Interesse
+        // √ìrg√£o de Interesse
         if ($retornoWsLinha['OrgaoInteresse'] && $retornoWsLinha['OrgaoInteresse']['NomeOrgao']) {
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(180, 20, "”rg„o de Interesse:", 0, 0, 'R');
+            $pdf->Cell(180, 20, "√ìrg√£o de Interesse:", 0, 0, 'R');
             $pdf->setFont('arial', '', 12);
             $pdf->Cell(0, 20, $retornoWsLinha['OrgaoInteresse']['NomeOrgao'], 0, 1, 'L');
         }
@@ -100,9 +100,9 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(0, 20, $retornoWsLinha['DataCadastro'], 0, 1, 'L');
 
-        // SituaÁ„o
+        // Situa√ß√£o
         $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(180, 20, "SituaÁ„o:", 0, 0, 'R');
+        $pdf->Cell(180, 20, "Situa√ß√£o:", 0, 0, 'R');
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(0, 20, $retornoWsLinha['Situacao']['DescSituacaoManifestacao'], 0, 1, 'L');
 
@@ -130,19 +130,19 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(70, 20, $retornoWsLinha['ModoResposta']['DescModoResposta'], 0, 1, 'L');
 
-        // ServiÁo
+        // Servi√ßo
         $pdf->SetFont('arial', 'B', 12);
-        $pdf->Cell(180, 20, "ServiÁo:", 0, 0, 'R');
+        $pdf->Cell(180, 20, "Servi√ßo:", 0, 0, 'R');
         $pdf->setFont('arial', '', 12);
         $pdf->Cell(70, 20, $retornoWsLinha['Servico'], 0, 1, 'L');
 
         /**
-         * Dados b·sicos da manifestaÁ„o
+         * Dados b√°sicos da manifesta√ß√£o
          */
         $menu_count++;
         $pdf->Ln(30);
         $pdf->SetFont('arial', 'B', 14);
-        $pdf->Cell(0, 20, $menu_count . ". Teor da ManifestaÁ„o", 1, 0, 'L');
+        $pdf->Cell(0, 20, $menu_count . ". Teor da Manifesta√ß√£o", 1, 0, 'L');
         $pdf->Ln(30);
 
         // Resumo
@@ -161,7 +161,7 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
          * Anexos
          *
          * - IdTipoAnexoManifestacao : DescTipoAnexoManifestacao
-         * - 1 : "Anexo ManifestaÁ„o"
+         * - 1 : "Anexo Manifesta√ß√£o"
          * - 2 : "Anexo Resposta"
          */
         // Anexos
@@ -202,7 +202,7 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
                     $pdf->SetFont('arial', 'B', 12);
                     $pdf->Cell(180, 20, "Anexo Complementar:", 0, 0, 'R');
                     $pdf->setFont('arial', '', 12);
-                    $pdf->Cell(70, 20, $anexo['IndComplementar'] ? 'sim' : 'n„o', 0, 1, 'L');
+                    $pdf->Cell(70, 20, $anexo['IndComplementar'] ? 'sim' : 'n√£o', 0, 1, 'L');
 
                     $pdf->Ln(20);
                 }
@@ -211,13 +211,13 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
         if ($anexo_tipo_original == 0) {
             // Sem anexo original
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(180, 20, "N„o h· anexos originais da manifestaÁ„o.", 0, 0, 'L');
+            $pdf->Cell(180, 20, "N√£o h√° anexos originais da manifesta√ß√£o.", 0, 0, 'L');
             $pdf->Ln(20);
         }
         if ($anexo_tipo_complementar == 0) {
             // Sem anexo complementar
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(180, 20, "N„o h· anexos complementares.", 0, 0, 'L');
+            $pdf->Cell(180, 20, "N√£o h√° anexos complementares.", 0, 0, 'L');
             $pdf->Ln(20);
         }
 
@@ -245,7 +245,7 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
         } else {
             // Sem envolvidos
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(180, 20, "N„o h· campos adicionais.", 0, 0, 'L');
+            $pdf->Cell(180, 20, "N√£o h√° campos adicionais.", 0, 0, 'L');
             $pdf->Ln(20);
         }
 
@@ -279,9 +279,9 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
                     $pdf->setFont('arial', '', 12);
                     $pdf->Cell(70, 20, $historico['HistoricoAcao']['DataHoraAcao'], 0, 1, 'L');
 
-                    // Decis„o
+                    // Decis√£o
                     $pdf->SetFont('arial', 'B', 12);
-                    $pdf->Cell(180, 20, "Decis„o:", 0, 0, 'R');
+                    $pdf->Cell(180, 20, "Decis√£o:", 0, 0, 'R');
                     $pdf->setFont('arial', '', 12);
                     $pdf->Cell(70, 20, $historico['Resposta']['Decisao']['descricaoDecisao'], 0, 1, 'L');
 
@@ -301,7 +301,7 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
         if (!count($historicos) > 0 || (isset($i) && $i == 1)) {
             // Sem respostas
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(180, 20, "N„o h· registro de respostas.", 0, 0, 'L');
+            $pdf->Cell(180, 20, "N√£o h√° registro de respostas.", 0, 0, 'L');
             $pdf->Ln(20);
         }
 
@@ -339,7 +339,7 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
                     $pdf->SetFont('arial', 'B', 12);
                     $pdf->Cell(180, 20, "Anexo Complementar:", 0, 0, 'R');
                     $pdf->setFont('arial', '', 12);
-                    $pdf->Cell(70, 20, $anexo['IndComplementar'] ? 'sim' : 'n„o', 0, 1, 'L');
+                    $pdf->Cell(70, 20, $anexo['IndComplementar'] ? 'sim' : 'n√£o', 0, 1, 'L');
 
                     $pdf->Ln(20);
                 }
@@ -348,17 +348,17 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
         if (!isset($possui_anexo_resposta)) {
             // Sem anexo resposta
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(180, 20, "N„o h· anexos de respostas.", 0, 0, 'L');
+            $pdf->Cell(180, 20, "N√£o h√° anexos de respostas.", 0, 0, 'L');
             $pdf->Ln(20);
         }
 
         /**
          * Recursos
          *
-         * Neste item importamos as seguintes opÁıes de recursos:
-         * - Pedido de Revis„o
-         * - Recurso de Primeira Inst‚ncia
-         * - Recurso de Segunda Inst„ncia
+         * Neste item importamos as seguintes op√ß√µes de recursos:
+         * - Pedido de Revis√£o
+         * - Recurso de Primeira Inst√¢ncia
+         * - Recurso de Segunda Inst√£ncia
          */
         if ($retornoWsRecursos && $retornoWsRecursos <> '' && !is_string($retornoWsRecursos)) {
             $menu_count++;
@@ -376,7 +376,7 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
                 foreach ($reversedRecursos as $recurso) {
 
                     /**
-                     * Somente gerar· documento caso seja recursos 1™ ou 2™ instancia ou pedido de revis„o,
+                     * Somente gerar√° documento caso seja recursos 1¬™ ou 2¬™ instancia ou pedido de revis√£o,
                      * IdInstanciaRecurso = [1, 2, 6] conforme API FalaBR consultado dia 01/12/2020
                      * url: https://falabr.cgu.gov.br/Help
                      */
@@ -384,9 +384,9 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
                         $pdf->SetFont('arial', 'B', 12);
                         $pdf->Cell(0, 20, "Dados do Recurso -  " . $recurso['instancia']['DescInstanciaRecurso'], true, 1, 'L');
 
-                        // Destinat·rio
+                        // Destinat√°rio
                         $pdf->SetFont('arial', 'B', 12);
-                        $pdf->Cell(180, 20, "Destinat·rio:", 0, 0, 'R');
+                        $pdf->Cell(180, 20, "Destinat√°rio:", 0, 0, 'R');
                         $pdf->setFont('arial', '', 12);
                         $pdf->Cell(70, 20, $retornoWsLinha['OuvidoriaDestino']['NomOuvidoria'], 0, 1, 'L');
 
@@ -426,7 +426,7 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
                                 $pdf->Cell(70, 20, $anexoRecurso['nomeArquivo'], 0, 1, 'L');
                             }
                         } else {
-                            $pdf->Cell(70, 20, 'N„o possui anexos', 0, 1, 'L');
+                            $pdf->Cell(70, 20, 'N√£o possui anexos', 0, 1, 'L');
                         }
 
                         $pdf->Ln(20);
@@ -436,12 +436,12 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
         }
 
         /**
-         * Den˙ncia de Descumprimento
+         * Den√∫ncia de Descumprimento
          */
         $menu_count++;
         $pdf->Ln(30);
         $pdf->SetFont('arial', 'B', 14);
-        $pdf->Cell(0, 20, $menu_count . " Den˙ncia de Descumprimento", true, 0, 'L');
+        $pdf->Cell(0, 20, $menu_count . " Den√∫ncia de Descumprimento", true, 0, 'L');
         $pdf->Ln(30);
 
         $denuncias = $retornoWsLinha['Historico'];
@@ -451,7 +451,7 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
 
                     $possui_denuncia = true;
 
-                    // Den˙ncia
+                    // Den√∫ncia
                     $pdf->setFont('arial', '', 12);
                     $pdf->MultiCell(0, 20, $denuncia['HistoricoAcao']['Denuncia']['TxtFato'], 0, 'L');
 
@@ -462,7 +462,7 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
         if (!count($denuncias) > 0 || !isset($possui_denuncia)) {
             // Sem respostas
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(180, 20, "N„o h· registro de den˙ncias de descumprimento.", 0, 0, 'L');
+            $pdf->Cell(180, 20, "N√£o h√° registro de den√∫ncias de descumprimento.", 0, 0, 'L');
             $pdf->Ln(20);
         }
 
@@ -482,27 +482,27 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
 
                     $possui_denuncia = true;
 
-                    // ”rg„o Origem
+                    // √ìrg√£o Origem
                     $pdf->SetFont('arial', 'B', 12);
-                    $pdf->Cell(180, 20, "”rg„o/Entidade de Origem:", 0, 0, 'R');
+                    $pdf->Cell(180, 20, "√ìrg√£o/Entidade de Origem:", 0, 0, 'R');
                     $pdf->setFont('arial', '', 12);
                     $pdf->MultiCell(0, 20, $encaminhamento['Encaminhamento']['OuvidoriaOrigem']['NomOuvidoria'], 0, 'L');
 
-                    // ”rg„o Destino
+                    // √ìrg√£o Destino
                     $pdf->SetFont('arial', 'B', 12);
-                    $pdf->Cell(180, 20, "”rg„o/Entidade Destinat·ria:", 0, 0, 'R');
+                    $pdf->Cell(180, 20, "√ìrg√£o/Entidade Destinat√°ria:", 0, 0, 'R');
                     $pdf->setFont('arial', '', 12);
                     $pdf->MultiCell(0, 20, $encaminhamento['Encaminhamento']['OuvidoriaDestino']['NomOuvidoria'], 0, 'L');
 
-                    // Mensagem ao Destinat·rio
+                    // Mensagem ao Destinat√°rio
                     $pdf->SetFont('arial', 'B', 12);
-                    $pdf->Cell(180, 20, "Mensagem ao Destinat·rio:", 0, 0, 'R');
+                    $pdf->Cell(180, 20, "Mensagem ao Destinat√°rio:", 0, 0, 'R');
                     $pdf->setFont('arial', '', 12);
                     $pdf->MultiCell(0, 20, $encaminhamento['Encaminhamento']['TxtNotificacaoDestinatario'], 0, 'L');
 
-                    // Mensagem ao Cidad„o
+                    // Mensagem ao Cidad√£o
                     $pdf->SetFont('arial', 'B', 12);
-                    $pdf->Cell(180, 20, "Mensagem ao Cidad„o:", 0, 0, 'R');
+                    $pdf->Cell(180, 20, "Mensagem ao Cidad√£o:", 0, 0, 'R');
                     $pdf->setFont('arial', '', 12);
                     $pdf->MultiCell(0, 20, $encaminhamento['Encaminhamento']['TxtNotificacaoSolicitante'], 0, 'L');
 
@@ -513,17 +513,17 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
         if (!count($encaminhamentos) > 0 || !isset($possui_denuncia)) {
             // Sem respostas
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(180, 20, "N„o h· registro de encaminhamentos.", 0, 0, 'L');
+            $pdf->Cell(180, 20, "N√£o h√° registro de encaminhamentos.", 0, 0, 'L');
             $pdf->Ln(20);
         }
 
         /**
-         * ProrrogaÁ„o
+         * Prorroga√ß√£o
          */
         $menu_count++;
         $pdf->Ln(30);
         $pdf->SetFont('arial', 'B', 14);
-        $pdf->Cell(0, 20, $menu_count . ". Dados de ProrrogaÁ„o", true, 0, 'L');
+        $pdf->Cell(0, 20, $menu_count . ". Dados de Prorroga√ß√£o", true, 0, 'L');
         $pdf->Ln(30);
 
         $prorrogacoes = $retornoWsLinha['Historico'];
@@ -545,13 +545,13 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
                     $pdf->setFont('arial', '', 12);
                     $pdf->Cell(70, 20, $prorrogacao['Prorrogacao']['NovoPrazo'], 0, 1, 'L');
 
-                    // Motivo da ProrrogaÁ„o
+                    // Motivo da Prorroga√ß√£o
                     $pdf->SetFont('arial', 'B', 12);
                     $pdf->Cell(180, 20, "Motivo:", 0, 0, 'R');
                     $pdf->setFont('arial', '', 12);
                     $pdf->Cell(70, 20, $prorrogacao['Prorrogacao']['MotivoProrrogacaoManifestacao']['DescMotivoProrrogacaoManifestacao'], 0, 1, 'L');
 
-                    // Justificativa da ProrrogaÁ„o
+                    // Justificativa da Prorroga√ß√£o
                     $pdf->SetFont('arial', 'B', 12);
                     $pdf->Cell(180, 20, "Justificativa:", 0, 0, 'R');
                     $pdf->setFont('arial', '', 12);
@@ -564,21 +564,21 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
         if (!count($prorrogacoes) > 0 || !isset($possui_prorrogacao)) {
             // Sem respostas
             $pdf->SetFont('arial', 'B', 12);
-            $pdf->Cell(180, 20, "N„o h· registro de prorrogaÁıes.", 0, 0, 'L');
+            $pdf->Cell(180, 20, "N√£o h√° registro de prorroga√ß√µes.", 0, 0, 'L');
             $pdf->Ln(20);
         }
 
         /**
-         * ObservaÁıes finais
+         * Observa√ß√µes finais
          */
         if ($ocorreuErroAdicionarAnexo == true) {
             $pdf->Ln(20);
             $pdf->SetFont('arial', 'B', 14);
-            $pdf->Cell(70, 20, "12. ObservaÁıes:", 0, 0, 'L');
+            $pdf->Cell(70, 20, "12. Observa√ß√µes:", 0, 0, 'L');
             $pdf->Ln(20);
 
             $pdf->SetFont('arial', '', 12);
-            $pdf->MultiCell(0, 20, "Um ou mais anexos da manifestaÁ„o n„o foram importados para o SEI devido a restriÁıes da extens„o do arquivo. Acesse a manifestaÁ„o atravÈs do link abaixo para mais detalhes. ", 0, 'J');
+            $pdf->MultiCell(0, 20, "Um ou mais anexos da manifesta√ß√£o n√£o foram importados para o SEI devido a restri√ß√µes da extens√£o do arquivo. Acesse a manifesta√ß√£o atrav√©s do link abaixo para mais detalhes. ", 0, 'J');
         }
         return $pdf;
     }
