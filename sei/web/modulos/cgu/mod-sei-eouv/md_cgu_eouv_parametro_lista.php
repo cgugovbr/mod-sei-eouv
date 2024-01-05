@@ -1,12 +1,12 @@
 <?
 /**
-* TRIBUNAL REGIONAL FEDERAL DA 4ª REGIÃO
+* TRIBUNAL REGIONAL FEDERAL DA 4Âª REGIÃƒO
 *
 * 17/12/2007 - criado por fbv
 *
-* Versão do Gerador de Código: 1.10.1
+* VersÃ£o do Gerador de CÃ³digo: 1.10.1
 *
-* Versão no CVS: $Id$
+* VersÃ£o no CVS: $Id$
 */
 
 try {
@@ -38,7 +38,7 @@ try {
         }
         $objMdCguEouvParametroRN = new MdCguEouvParametroRN();
         $objMdCguEouvParametroRN->excluirParametro($arrObjMdCguEouvParametroDTO);
-        PaginaSEI::getInstance()->setStrMensagem('Operação realizada com sucesso.');
+        PaginaSEI::getInstance()->setStrMensagem('OperaÃ§Ã£o realizada com sucesso.');
       }catch(Exception $e){
         PaginaSEI::getInstance()->processarExcecao($e);
       } 
@@ -46,7 +46,7 @@ try {
       die;
 
     case 'md_cgu_eouv_parametro_selecionar':
-      $strTitulo = PaginaSEI::getInstance()->getTituloSelecao('Selecionar Paramêtro','Selecionar Paramêtros');
+      $strTitulo = PaginaSEI::getInstance()->getTituloSelecao('Selecionar ParamÃªtro','Selecionar ParamÃªtros');
 
       //Se cadastrou alguem
       if ($_GET['acao_origem']=='md_cgu_eouv_parametro_cadastrar'){
@@ -57,11 +57,11 @@ try {
       break;
 
     case 'md_cgu_eouv_parametro_listar':
-      $strTitulo = 'Parâmetros do Módulo de Integração SEI x FalaBR (e-Ouv)';
+      $strTitulo = 'ParÃ¢metros do MÃ³dulo de IntegraÃ§Ã£o SEI x FalaBR (e-Ouv)';
       break;
 
     default:
-      throw new InfraException("Ação '".$_GET['acao']."' não reconhecida.");
+      throw new InfraException("AÃ§Ã£o '".$_GET['acao']."' nÃ£o reconhecida.");
   }
 
   $arrComandos = array();
@@ -129,11 +129,11 @@ try {
     $strResultado = '';
 
     if ($_GET['acao']!='md_cgu_eouv_parametro_reativar'){
-      $strSumarioTabela = 'Tabela de Paramêtros.';
-      $strCaptionTabela = 'Paramêtros';
+      $strSumarioTabela = 'Tabela de ParamÃªtros.';
+      $strCaptionTabela = 'ParamÃªtros';
     }else{
-      $strSumarioTabela = 'Tabela de Paramêtros Inativos.';
-      $strCaptionTabela = 'Paramêtros Inativos';
+      $strSumarioTabela = 'Tabela de ParamÃªtros Inativos.';
+      $strCaptionTabela = 'ParamÃªtros Inativos';
     }
 
     $strResultado .= '<table width="99%" class="infraTable" summary="'.$strSumarioTabela.'">'."\n";
@@ -144,8 +144,8 @@ try {
     }
     $strResultado .= '<th class="infraTh">'.PaginaSEI::getInstance()->getThOrdenacao($objMdCguEouvParametroDTO,'ID','IdParametro',$arrObjMdCguEouvParametroDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh">'.PaginaSEI::getInstance()->getThOrdenacao($objMdCguEouvParametroDTO,'Nome','NoParametro',$arrObjMdCguEouvParametroDTO).'</th>'."\n";
-    $strResultado .= '<th class="infraTh">Descrição</th>'."\n";
-    $strResultado .= '<th class="infraTh">Ações</th>'."\n";
+    $strResultado .= '<th class="infraTh">DescriÃ§Ã£o</th>'."\n";
+    $strResultado .= '<th class="infraTh">AÃ§Ãµes</th>'."\n";
     $strResultado .= '</tr>'."\n";
     $strCssTr='';
     for($i = 0;$i < $numRegistros; $i++){
@@ -164,25 +164,25 @@ try {
       $strResultado .= PaginaSEI::getInstance()->getAcaoTransportarItem($i,$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro());
       
       if ($bolAcaoConsultar){
-        $strResultado .= '<a href="'.SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_consultar&acao_origem='.$_GET['acao'].'&acao_retorno='.$_GET['acao'].'&id_md_cgu_eouv_parametro='.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro()).'" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeConsultar().'" title="Consultar Paramêtro" alt="Consultar Paramêtro" class="infraImg" /></a>&nbsp;';
+        $strResultado .= '<a href="'.SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_consultar&acao_origem='.$_GET['acao'].'&acao_retorno='.$_GET['acao'].'&id_md_cgu_eouv_parametro='.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro()).'" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeConsultar().'" title="Consultar ParamÃªtro" alt="Consultar ParamÃªtro" class="infraImg" /></a>&nbsp;';
       }
 
       if ($bolAcaoAlterar){
-        $strResultado .= '<a href="'.SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_alterar&acao_origem='.$_GET['acao'].'&acao_retorno='.$_GET['acao'].'&id_md_cgu_eouv_parametro='.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro()).'" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeAlterar().'" title="Alterar Paramêtro" alt="Alterar Paramêtro" class="infraImg" /></a>&nbsp;';
+        $strResultado .= '<a href="'.SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_parametro_alterar&acao_origem='.$_GET['acao'].'&acao_retorno='.$_GET['acao'].'&id_md_cgu_eouv_parametro='.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro()).'" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeAlterar().'" title="Alterar ParamÃªtro" alt="Alterar ParamÃªtro" class="infraImg" /></a>&nbsp;';
       }
 
 
       if ($bolAcaoDesativar){
-        $strResultado .= '<a href="#ID-'.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'"  onclick="acaoDesativar(\''.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'\',\''.$arrObjMdCguEouvParametroDTO[$i]->getStrNoParametro().'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeDesativar().'" title="Desativar Paramêtro" alt="Desativar Paramêtro" class="infraImg" /></a>&nbsp;';
+        $strResultado .= '<a href="#ID-'.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'"  onclick="acaoDesativar(\''.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'\',\''.$arrObjMdCguEouvParametroDTO[$i]->getStrNoParametro().'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeDesativar().'" title="Desativar ParamÃªtro" alt="Desativar ParamÃªtro" class="infraImg" /></a>&nbsp;';
       }
 
       if ($bolAcaoReativar){
-        $strResultado .= '<a href="#ID-'.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'"  onclick="acaoReativar(\''.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'\',\''.$arrObjMdCguEouvParametroDTO[$i]->getStrNoParametro().'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeReativar().'" title="Reativar Paramêtro" alt="Reativar Paramêtro" class="infraImg" /></a>&nbsp;';
+        $strResultado .= '<a href="#ID-'.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'"  onclick="acaoReativar(\''.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'\',\''.$arrObjMdCguEouvParametroDTO[$i]->getStrNoParametro().'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeReativar().'" title="Reativar ParamÃªtro" alt="Reativar ParamÃªtro" class="infraImg" /></a>&nbsp;';
       }
 
 
       if ($bolAcaoExcluir){
-        $strResultado .= '<a href="#ID-'.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'"  onclick="acaoExcluir(\''.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'\',\''.$arrObjMdCguEouvParametroDTO[$i]->getStrNoParametro().'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeExcluir().'" title="Excluir Paramêtro" alt="Excluir Paramêtro" class="infraImg" /></a>&nbsp;';
+        $strResultado .= '<a href="#ID-'.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'"  onclick="acaoExcluir(\''.$arrObjMdCguEouvParametroDTO[$i]->getNumIdParametro().'\',\''.$arrObjMdCguEouvParametroDTO[$i]->getStrNoParametro().'\');" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeExcluir().'" title="Excluir ParamÃªtro" alt="Excluir ParamÃªtro" class="infraImg" /></a>&nbsp;';
       }
 
       $strResultado .= '</td></tr>'."\n";
@@ -225,7 +225,7 @@ function inicializar(){
 
 <? if ($bolAcaoDesativar){ ?>
 function acaoDesativar(id,desc){
-  if (confirm("Confirma desativação do Paramêtro \""+desc+"\"?")){
+  if (confirm("Confirma desativaÃ§Ã£o do ParamÃªtro \""+desc+"\"?")){
     document.getElementById('hdnInfraItemId').value=id;
     document.getElementById('frmMdCguEouvParametroLista').action='<?=$strLinkDesativar?>';
     document.getElementById('frmMdCguEouvParametroLista').submit();
@@ -234,10 +234,10 @@ function acaoDesativar(id,desc){
 
 function acaoDesativacaoMultipla(){
   if (document.getElementById('hdnInfraItensSelecionados').value==''){
-    alert('Nenhum Paramêtro selecionado.');
+    alert('Nenhum ParamÃªtro selecionado.');
     return;
   }
-  if (confirm("Confirma desativação dos Paramêtros selecionados?")){
+  if (confirm("Confirma desativaÃ§Ã£o dos ParamÃªtros selecionados?")){
     document.getElementById('hdnInfraItemId').value='';
     document.getElementById('frmMdCguEouvParametroLista').action='<?=$strLinkDesativar?>';
     document.getElementById('frmMdCguEouvParametroLista').submit();
@@ -247,7 +247,7 @@ function acaoDesativacaoMultipla(){
 
 <? if ($bolAcaoReativar){ ?>
 function acaoReativar(id,desc){
-  if (confirm("Confirma reativação do Paramêtro \""+desc+"\"?")){
+  if (confirm("Confirma reativaÃ§Ã£o do ParamÃªtro \""+desc+"\"?")){
     document.getElementById('hdnInfraItemId').value=id;
     document.getElementById('frmMdCguEouvParametroLista').action='<?=$strLinkReativar?>';
     document.getElementById('frmMdCguEouvParametroLista').submit();
@@ -256,10 +256,10 @@ function acaoReativar(id,desc){
 
 function acaoReativacaoMultipla(){
   if (document.getElementById('hdnInfraItensSelecionados').value==''){
-    alert('Nenhum Paramêtro selecionado.');
+    alert('Nenhum ParamÃªtro selecionado.');
     return;
   }
-  if (confirm("Confirma reativação dos Paramêtros selecionados?")){
+  if (confirm("Confirma reativaÃ§Ã£o dos ParamÃªtros selecionados?")){
     document.getElementById('hdnInfraItemId').value='';
     document.getElementById('frmMdCguEouvParametroLista').action='<?=$strLinkReativar?>';
     document.getElementById('frmMdCguEouvParametroLista').submit();
@@ -269,7 +269,7 @@ function acaoReativacaoMultipla(){
 
 <? if ($bolAcaoExcluir){ ?>
 function acaoExcluir(id,desc){
-  if (confirm("Confirma exclusão do Paramêtro \""+desc+"\"?")){
+  if (confirm("Confirma exclusÃ£o do ParamÃªtro \""+desc+"\"?")){
     document.getElementById('hdnInfraItemId').value=id;
     document.getElementById('frmMdCguEouvParametroLista').action='<?=$strLinkExcluir?>';
     document.getElementById('frmMdCguEouvParametroLista').submit();
@@ -278,10 +278,10 @@ function acaoExcluir(id,desc){
 
 function acaoExclusaoMultipla(){
   if (document.getElementById('hdnInfraItensSelecionados').value==''){
-    alert('Nenhum Paramêtro selecionado.');
+    alert('Nenhum ParamÃªtro selecionado.');
     return;
   }
-  if (confirm("Confirma exclusão dos Paramêtros selecionados?")){
+  if (confirm("Confirma exclusÃ£o dos ParamÃªtros selecionados?")){
     document.getElementById('hdnInfraItemId').value='';
     document.getElementById('frmMdCguEouvParametroLista').action='<?=$strLinkExcluir?>';
     document.getElementById('frmMdCguEouvParametroLista').submit();

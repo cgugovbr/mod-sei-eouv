@@ -1,6 +1,6 @@
 <?
 /**
-* CONTROLADORIA-GERAL DA UNI√O
+* CONTROLADORIA-GERAL DA UNI√ÉO
 */
 
 require_once dirname(__FILE__).'/../../../../SEI.php';
@@ -39,7 +39,7 @@ class MdCguEouvDeparaImportacaoRN extends InfraRN
       //Auditoria
 
     } catch (Exception $e) {
-      throw new InfraException('Erro cadastrando DePara Eouv ImportaÁ„o.',$e);
+      throw new InfraException('Erro cadastrando DePara Eouv Importa√ß√£o.',$e);
     }
   }
 
@@ -68,7 +68,7 @@ class MdCguEouvDeparaImportacaoRN extends InfraRN
       //Auditoria
 
     } catch (Exception $e) {
-      throw new InfraException('Erro alterando DePara Eouv ImportaÁ„o.',$e);
+      throw new InfraException('Erro alterando DePara Eouv Importa√ß√£o.',$e);
     }
   }
 
@@ -84,7 +84,7 @@ class MdCguEouvDeparaImportacaoRN extends InfraRN
       return $ret;
 
     } catch (Exception $e) {
-      throw new InfraException('Erro listando DePara Eouv ImportaÁ„o.',$e);
+      throw new InfraException('Erro listando DePara Eouv Importa√ß√£o.',$e);
     }
   }
 
@@ -107,19 +107,19 @@ class MdCguEouvDeparaImportacaoRN extends InfraRN
 
       return $ret;
     } catch (Exception $e) {
-      throw new InfraException('Erro consultando DePara Eouv ImportaÁ„o.',$e);
+      throw new InfraException('Erro consultando DePara Eouv Importa√ß√£o.',$e);
     }
   }
 
   private function validarNumIdTipoManifestacaoEouv(MdCguEouvDeparaImportacaoDTO $objEouvDeparaImportacaoDTO, InfraException $objInfraException){
     if (InfraString::isBolVazia($objEouvDeparaImportacaoDTO->getNumIdTipoManifestacaoEouv())){
-      $objInfraException->adicionarValidacao('ID do Tipo da ManifestaÁ„o n„o informado.');
+      $objInfraException->adicionarValidacao('ID do Tipo da Manifesta√ß√£o n√£o informado.');
     }
   }
   
   private function validarNumIdTipoProcedimento(MdCguEouvDeparaImportacaoDTO $objEouvDeparaImportacaoDTO, InfraException $objInfraException){
     if (InfraString::isBolVazia($objEouvDeparaImportacaoDTO->getNumIdTipoProcedimento())){
-      $objInfraException->adicionarValidacao('ID do Tipo de Processo n„o informado.');
+      $objInfraException->adicionarValidacao('ID do Tipo de Processo n√£o informado.');
     }
   }
   

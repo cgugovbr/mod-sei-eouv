@@ -1,6 +1,6 @@
 <?
 /**
-* CONTROLADORIA-GERAL DA UNIÃO
+* CONTROLADORIA-GERAL DA UNIÃƒO
 * Criado em 15/12/2022
 */
 
@@ -21,11 +21,11 @@ try {
 
   switch($_GET['acao']){
     case 'md_cgu_eouv_depara_importacao_listar':
-      $strTitulo = 'Tipos de Manifestação do FalaBR e Tipos de Processo Associados';
+      $strTitulo = 'Tipos de ManifestaÃ§Ã£o do FalaBR e Tipos de Processo Associados';
       break;
 
     default:
-      throw new InfraException("Ação '".$_GET['acao']."' não reconhecida.");
+      throw new InfraException("AÃ§Ã£o '".$_GET['acao']."' nÃ£o reconhecida.");
   }
 
   $arrComandos = array();
@@ -46,16 +46,16 @@ try {
 
     $strResultado = '';
 
-    $strSumarioTabela = 'Tabela de Tipos de Manifestação.';
-    $strCaptionTabela = 'Tipos de Manifestação';
+    $strSumarioTabela = 'Tabela de Tipos de ManifestaÃ§Ã£o.';
+    $strCaptionTabela = 'Tipos de ManifestaÃ§Ã£o';
 
     $strResultado .= '<table width="99%" class="infraTable" summary="'.$strSumarioTabela.'">'."\n";
     $strResultado .= '<caption class="infraCaption">'.PaginaSEI::getInstance()->gerarCaptionTabela($strCaptionTabela,$numRegistros).'</caption>';
     $strResultado .= '<tr>';
-    $strResultado .= '<th class="infraTh">'.PaginaSEI::getInstance()->getThOrdenacao($objDeParaDTO,'ID da Manifestação','IdTipoManifestacaoEouv',$arrObjDeParaDTO).'</th>'."\n";
-    $strResultado .= '<th class="infraTh">Tipo de Manifestação</th>'."\n";
+    $strResultado .= '<th class="infraTh">'.PaginaSEI::getInstance()->getThOrdenacao($objDeParaDTO,'ID da ManifestaÃ§Ã£o','IdTipoManifestacaoEouv',$arrObjDeParaDTO).'</th>'."\n";
+    $strResultado .= '<th class="infraTh">Tipo de ManifestaÃ§Ã£o</th>'."\n";
     $strResultado .= '<th class="infraTh">Tipo de Processo Associado</th>'."\n";
-    $strResultado .= '<th class="infraTh">Ações</th>'."\n";
+    $strResultado .= '<th class="infraTh">AÃ§Ãµes</th>'."\n";
     $strResultado .= '</tr>'."\n";
     $strCssTr='';
     for ($i = 0; $i < $numRegistros; $i++) {
@@ -75,7 +75,7 @@ try {
           'id_md_cgu_eouv_tipo_manifestacao='.$arrObjDeParaDTO[$i]->getNumIdTipoManifestacaoEouv()
         );
         $strResultado .= '<a href="'.$strLinkAlterar.'" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'">';
-        $strResultado .= '<img src="'.PaginaSEI::getInstance()->getIconeAlterar().'" title="Alterar Associação" alt="Alterar Associação" class="infraImg" />';
+        $strResultado .= '<img src="'.PaginaSEI::getInstance()->getIconeAlterar().'" title="Alterar AssociaÃ§Ã£o" alt="Alterar AssociaÃ§Ã£o" class="infraImg" />';
         $strResultado .= '</a>&nbsp;';
       }
 

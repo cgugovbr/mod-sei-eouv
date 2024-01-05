@@ -1,12 +1,12 @@
 <?
 /**
-* TRIBUNAL REGIONAL FEDERAL DA 4ª REGIÃO
+* TRIBUNAL REGIONAL FEDERAL DA 4Âª REGIÃƒO
 *
 * 15/12/2011 - criado por tamir_db
 *
-* Versão do Gerador de Código: 1.32.1
+* VersÃ£o do Gerador de CÃ³digo: 1.32.1
 *
-* Versão no CVS: $Id$
+* VersÃ£o no CVS: $Id$
 */
 
 //try {
@@ -44,7 +44,7 @@
             }
             $objEouvRelatorioImportacaoDetalheRN = new MdCguEouvRelatorioImportacaoDetalheRN();
             $objEouvRelatorioImportacaoDetalheRN->excluir($arrObjEouvRelatorioImportacaoDetalheDTO);
-            PaginaSEI::getInstance()->setStrMensagem('Operação realizada com sucesso.');
+            PaginaSEI::getInstance()->setStrMensagem('OperaÃ§Ã£o realizada com sucesso.');
           }catch(Exception $e){
             PaginaSEI::getInstance()->processarExcecao($e);
           }
@@ -52,11 +52,11 @@
           die;
 
         case 'md_cgu_eouv_relatorio_importacao_detalhar':
-          $strTitulo = 'Detalhamento de Importações Realizadas';
+          $strTitulo = 'Detalhamento de ImportaÃ§Ãµes Realizadas';
           break;
 
     default:
-      throw new InfraException("Ação '".$_GET['acao']."' não reconhecida.");
+      throw new InfraException("AÃ§Ã£o '".$_GET['acao']."' nÃ£o reconhecida.");
   }
 
   $arrComandos = array();
@@ -115,9 +115,9 @@
 
     $strResultado = '';
 
-    $strCaptionTabela = 'Manifestações';
+    $strCaptionTabela = 'ManifestaÃ§Ãµes';
 
-    $strResultado .= '<table width="99%" class="infraTable" summary="' . ($strSumarioTabela ?? '$strSumarioTabela não definido') . '">'."\n";
+    $strResultado .= '<table width="99%" class="infraTable" summary="' . ($strSumarioTabela ?? '$strSumarioTabela nÃ£o definido') . '">'."\n";
     $strResultado .= '<caption class="infraCaption">'.PaginaSEI::getInstance()->gerarCaptionTabela($strCaptionTabela,$numRegistros).'</caption>';
     $strResultado .= '<tr>';
     if ($bolCheck) {
@@ -129,7 +129,7 @@
     $strResultado .= '<th class="infraTh" width="7%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDetalheDTO,'Sucesso','SinSucesso',$arrObjEouvRelatorioImportacaoDetalheDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh" width="10%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDetalheDTO,'Data Importacao','DthImportacao',$arrObjEouvRelatorioImportacaoDetalheDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDetalheDTO,'Detalhe','DescricaoLog',$arrObjEouvRelatorioImportacaoDetalheDTO).'</th>'."\n";
-    $strResultado .= '<th class="infraTh" width="25%">Ações</th>'."\n";
+    $strResultado .= '<th class="infraTh" width="25%">AÃ§Ãµes</th>'."\n";
 
     $strResultado .= '</tr>'."\n";
     $strCssTr='';
@@ -209,7 +209,7 @@ function inicializar(){
 
 
 function executarAgendamento(comando, link){
-  if (confirm('Confirma execução do comando ' + comando + '?')){
+  if (confirm('Confirma execuÃ§Ã£o do comando ' + comando + '?')){
     document.getElementById('frmInfraAgendamentoTarefaLista').action=link;
     document.getElementById('frmInfraAgendamentoTarefaLista').submit();
     infraExibirAviso(false);
@@ -218,7 +218,7 @@ function executarAgendamento(comando, link){
 
 <? if ($bolAcaoExcluir){ ?>
   function acaoExcluir(id,desc){
-  if (confirm("Confirma exclusão do Registro \""+desc+"\"?")){
+  if (confirm("Confirma exclusÃ£o do Registro \""+desc+"\"?")){
   document.getElementById('hdnInfraItemId').value=id;
   document.getElementById('frmEouvRelatorioImportacaoLista').action='<?=$strLinkExcluir?>';
   document.getElementById('frmEouvRelatorioImportacaoLista').submit();
@@ -230,7 +230,7 @@ function executarAgendamento(comando, link){
   alert('Nenhum Processo selecionado.');
   return;
   }
-  if (confirm("Confirma exclusão dos Processos selecionados?")){
+  if (confirm("Confirma exclusÃ£o dos Processos selecionados?")){
   document.getElementById('hdnInfraItemId').value='';
   document.getElementById('frmEouvRelatorioImportacaoLista').action='<?=$strLinkExcluir?>';
   document.getElementById('frmEouvRelatorioImportacaoLista').submit();

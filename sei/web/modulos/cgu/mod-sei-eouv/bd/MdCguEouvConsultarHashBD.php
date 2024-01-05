@@ -1,6 +1,6 @@
 <?
 /**
- * CONTROLADORIA GERAL DA UNIÃO
+ * CONTROLADORIA GERAL DA UNIÃƒO
  *
  * 08/12/2020 - criado por Evert Ramos <evert.ramos@cgu.gov.br>
  */

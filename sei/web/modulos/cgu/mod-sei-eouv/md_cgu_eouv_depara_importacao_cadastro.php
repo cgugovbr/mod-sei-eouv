@@ -1,6 +1,6 @@
 <?
 /**
-* CONTROLADORIA-GERAL DA UNIÃO
+* CONTROLADORIA-GERAL DA UNIÃƒO
 * 16/12/2022 - criado por Daniel Coelho
 */
 
@@ -25,9 +25,9 @@ try {
 
   switch ($_GET['acao']) {
     case 'md_cgu_eouv_depara_importacao_alterar':
-      $strTitulo = 'Alterar Tipo de Processo Associado ao Tipo de Manifestação';
+      $strTitulo = 'Alterar Tipo de Processo Associado ao Tipo de ManifestaÃ§Ã£o';
 
-      // Lista as opções de tipos de processo disponíveis
+      // Lista as opÃ§Ãµes de tipos de processo disponÃ­veis
       $objSeiRN = new SeiRN();
       $arrTipoProcAPI = $objSeiRN->listarTiposProcedimento();
 
@@ -46,12 +46,12 @@ try {
         $objMdCguEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
         $objDeParaDTO = $objMdCguEouvDeparaImportacaoRN->consultar($objDeParaDTO);
         if ($objDeParaDTO == null) {
-          throw new InfraException("Registro não encontrado.");
+          throw new InfraException("Registro nÃ£o encontrado.");
         }
       } else if (isset($_POST['sbmAlterarMdCguEouvDeparaImportacao'])) {
-        // Verifica parâmetros necessários
+        // Verifica parÃ¢metros necessÃ¡rios
         if (!isset($_POST['hdnIdEouv']) || !isset($_POST['selTipoProc'])) {
-          throw new InfraException('Faltando parâmetros para concluir ação');
+          throw new InfraException('Faltando parÃ¢metros para concluir aÃ§Ã£o');
         }
 
         // Localiza o registro no banco
@@ -60,7 +60,7 @@ try {
         $objMdCguEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
         $objDeParaDTO = $objMdCguEouvDeparaImportacaoRN->consultar($objDeParaDTO);
         if ($objDeParaDTO == null) {
-          throw new InfraException("Registro não encontrado.");
+          throw new InfraException("Registro nÃ£o encontrado.");
         }
 
         // Atualiza o tipo de processo
@@ -68,7 +68,7 @@ try {
         $objMdCguEouvDeparaImportacaoRN->alterar($objDeParaDTO);
 
         // Registra mensagem e redireciona
-        PaginaSEI::getInstance()->setStrMensagem('Associação com Tipo de Manifestação "'.$objDeParaDTO->getStrDeTipoManifestacaoEouv().'" alterada com sucesso.');
+        PaginaSEI::getInstance()->setStrMensagem('AssociaÃ§Ã£o com Tipo de ManifestaÃ§Ã£o "'.$objDeParaDTO->getStrDeTipoManifestacaoEouv().'" alterada com sucesso.');
         $strLinkRedirect = SessaoSEI::getInstance()->assinarLink('controlador.php?'.
           'acao='.PaginaSEI::getInstance()->getAcaoRetorno().'&'.
           'acao_origem='.$_GET['acao'].
@@ -77,13 +77,13 @@ try {
         header('Location: '.$strLinkRedirect);
         die;
       } else {
-        throw new InfraException("Parâmetros inválidos");
+        throw new InfraException("ParÃ¢metros invÃ¡lidos");
       }
 
       break;
 
     default:
-      throw new InfraException("Ação '".$_GET['acao']."' não reconhecida.");
+      throw new InfraException("AÃ§Ã£o '".$_GET['acao']."' nÃ£o reconhecida.");
   }
 
 } catch(Exception $e) {
@@ -131,14 +131,14 @@ PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
     <div id="divGeral" class="infraAreaDados">
       <input type="hidden" id="hdnIdEouv" name="hdnIdEouv" class="infraText" value="<?=$objDeParaDTO->getNumIdTipoManifestacaoEouv()?>">
 
-      <label id="lblTipoEouv" for="txtTipoEouv" class="infraLabelObrigatorio">Tipo de Manifestação:</label>
+      <label id="lblTipoEouv" for="txtTipoEouv" class="infraLabelObrigatorio">Tipo de ManifestaÃ§Ã£o:</label>
       <input type="text" id="txtTipoEouv" name="txtTipoEouv" class="infraText" disabled="disabled" value="<?=$objDeParaDTO->getStrDeTipoManifestacaoEouv()?>">
 
       <label id="lblTipoProc" for="selTipoProc" accesskey="T" class="infraLabelObrigatorio"><span class="infraTeclaAtalho">T</span>ipo de Processo:</label>
       <select id="selTipoProc" name="selTipoProc" class="infraSelect">
         <option value=""></option>
         <?
-        // Gera as opções
+        // Gera as opÃ§Ãµes
         $numIdTipoProcAtual = $objDeParaDTO->getNumIdTipoProcedimento();
         foreach ($arrTipoProcAPI as $objTipo) {
           $numId = $objTipo->getIdTipoProcedimento();
