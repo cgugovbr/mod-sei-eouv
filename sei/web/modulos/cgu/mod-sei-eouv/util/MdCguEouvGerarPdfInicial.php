@@ -123,7 +123,7 @@ class MdCguEouvGerarPdfInicial extends InfraPDF
         $envolvidos = array();
         if (is_array($retornoWsLinha['Teor']['EnvolvidosManifestacao']) && isset($retornoWsLinha['Teor']['EnvolvidosManifestacao'])) {
             $iEnvolvido = 0;
-            foreach (MdCguEouvWS::verificaRetornoWS($retornoWsLinha['Teor']['EnvolvidosManifestacao']) as $envolvidosFatoManifestacao) {
+            foreach ($retornoWsLinha['Teor']['EnvolvidosManifestacao'] as $envolvidosFatoManifestacao) {
                 $envolvidos[$iEnvolvido][0] = $envolvidosFatoManifestacao['IdFuncaoEnvolvidoManifestacao'] . " - " . $envolvidosFatoManifestacao['Funcao'];
                 $envolvidos[$iEnvolvido][1] = $envolvidosFatoManifestacao['Nome'];
                 $envolvidos[$iEnvolvido][2] = $envolvidosFatoManifestacao['Orgao'];
@@ -136,7 +136,7 @@ class MdCguEouvGerarPdfInicial extends InfraPDF
 
         if (is_array($retornoWsLinha['Teor']['CamposAdicionaisManifestacao']) && isset($retornoWsLinha['Teor']['CamposAdicionaisManifestacao'])) {
             $iCamposAdicionais = 0;
-            foreach (MdCguEouvWS::verificaRetornoWS($retornoWsLinha['Teor']['CamposAdicionaisManifestacao']) as $camposAdicionais) {
+            foreach ($retornoWsLinha['Teor']['CamposAdicionaisManifestacao'] as $camposAdicionais) {
                 $campos_adicionais[$iCamposAdicionais][0] = $camposAdicionais['NomeExibido'];
                 $campos_adicionais[$iCamposAdicionais][1] = $camposAdicionais['Valor'];
                 $iCamposAdicionais++;

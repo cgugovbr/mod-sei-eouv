@@ -360,14 +360,14 @@ class MdCguEouvGerarPdfEsic extends InfraPDF
          * - Recurso de Primeira Instância
          * - Recurso de Segunda Instãncia
          */
-        if ($retornoWsRecursos && $retornoWsRecursos <> '' && !is_string($retornoWsRecursos)) {
+        if (count($retornoWsRecursos) > 0) {
             $menu_count++;
             $pdf->Ln(30);
             $pdf->SetFont('arial', 'B', 14);
             $pdf->Cell(0, 20, $menu_count . ". Recursos", true, 0, 'L');
             $pdf->Ln(30);
 
-            $recursos = isset($retornoWsRecursos['Recursos']) ? $retornoWsRecursos['Recursos'] : [$retornoWsRecursos];
+            $recursos = $retornoWsRecursos;
 
             if (count($recursos) > 0) {
 
