@@ -3,8 +3,6 @@
 * CONTROLADORIA-GERAL DA UNIÃO
 */
 
-require_once dirname(__FILE__).'/../../../../SEI.php';
-
 class MdCguEouvDeparaImportacaoRN extends InfraRN
 {
 

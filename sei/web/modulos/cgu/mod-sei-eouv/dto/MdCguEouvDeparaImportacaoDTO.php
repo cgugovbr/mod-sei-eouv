@@ -9,8 +9,6 @@
  * Versão no CVS: $Id$
  */
 
-require_once dirname(__FILE__) . '/../../../../SEI.php';
-
 class MdCguEouvDeparaImportacaoDTO extends InfraDTO {
 
   public function getStrNomeTabela() {
