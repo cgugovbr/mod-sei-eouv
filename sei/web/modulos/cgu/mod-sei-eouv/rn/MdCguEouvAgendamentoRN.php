@@ -52,7 +52,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
      * @param MdCguEouvRelatorioImportacaoRN $objEouvRelatorioImportacaoRN
      * @return void
      */
-    public function gravarRelatorioImportacaoSucesso(MdCguEouvRelatorioImportacaoDTO $objEouvRelatorioImportacaoDTO, string $SinSucessoExecucao, string $textoMensagemFinal, MdCguEouvRelatorioImportacaoRN $objEouvRelatorioImportacaoRN)
+    private function gravarRelatorioImportacaoSucesso(MdCguEouvRelatorioImportacaoDTO $objEouvRelatorioImportacaoDTO, string $SinSucessoExecucao, string $textoMensagemFinal, MdCguEouvRelatorioImportacaoRN $objEouvRelatorioImportacaoRN)
     {
         $objEouvRelatorioImportacaoDTO2 = new MdCguEouvRelatorioImportacaoDTO();
 
@@ -68,7 +68,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
      * @param MdCguEouvRelatorioImportacaoRN $objEouvRelatorioImportacaoRN
      * @return void
      */
-    public function gravarRelatorioImportacaoErro(MdCguEouvRelatorioImportacaoDTO $objEouvRelatorioImportacaoDTO, Exception $e, MdCguEouvRelatorioImportacaoRN $objEouvRelatorioImportacaoRN)
+    private function gravarRelatorioImportacaoErro(MdCguEouvRelatorioImportacaoDTO $objEouvRelatorioImportacaoDTO, Exception $e, MdCguEouvRelatorioImportacaoRN $objEouvRelatorioImportacaoRN)
     {
         $objEouvRelatorioImportacaoDTO3 = new MdCguEouvRelatorioImportacaoDTO();
         $objEouvRelatorioImportacaoDTO3->setNumIdRelatorioImportacao($objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao());
@@ -84,7 +84,13 @@ class MdCguEouvAgendamentoRN extends InfraRN
         return BancoSEI::getInstance();
     }
 
-    public static function tiposValidos(){
+    /**
+     * Retorna array com IDs de manifestações do FalaBR que estão habilitados
+     * para importação pelo usuário
+     * @return array[int]
+     */
+    private function tiposValidos()
+    {
         $objMdCguEouvDeparaImportacaoDTO = new MdCguEouvDeparaImportacaoDTO();
         $objMdCguEouvDeparaImportacaoDTO->retTodos();
         $objMdCguEouvDeparaImportacaoDTO->setStrSinAtivo('S');
@@ -101,11 +107,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
     }
 
     /**
-     * Função para importar as manifestações do FalaBr
+     * Função para agendamento que importa as manifestações do FalaBR
      */
     public function executarImportacaoManifestacaoFalaBr()
     {
-
         $debugLocal = false;
 
         // Log
@@ -121,7 +126,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $numRegistros = count($arrObjEouvParametroDTO);
 
         $this->preencheVariaveis($numRegistros, $arrObjEouvParametroDTO);
-        $tiposValidos = self::tiposValidos();
+        $tiposValidos = $this->tiposValidos();
 
         // Busca parâmetros do banco de dados da tabela infra_parametros
         $objInfraParametro = new InfraParametro(BancoSEI::getInstance());
@@ -131,7 +136,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         SessaoSEI::getInstance()->setBolHabilitada(false);
 
         // Simula login inicial
-        self::simulaLogin($this->siglaSistema, $this->identificacaoServico, $this->idUnidadeEsicPrincipal);
+        $this->simulaLogin($this->siglaSistema, $this->identificacaoServico, $this->idUnidadeEsicPrincipal);
 
         // Executa a importação dos dados
         try {
@@ -1307,7 +1312,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
      * @param $idServico
      * @param $idUnidade
      */
-    public static function simulaLogin($siglaSistema, $idServico, $idUnidade)
+    private function simulaLogin($siglaSistema, $idServico, $idUnidade)
     {
         try {
 
