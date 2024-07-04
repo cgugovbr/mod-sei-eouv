@@ -28,6 +28,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
     protected $siglaSistema = 'EOUV';
 
     private $apiClient;
+    private $tiposDeManifestacaoAtivos;
+    private $tipoAcessoAInformacaoAtivo;
 
     public function __construct()
     {
@@ -75,11 +77,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
     }
 
     /**
-     * Retorna array com IDs de manifestações do FalaBR que estão habilitados
-     * para importação pelo usuário
-     * @return array[int]
+     * Carrega nos parâmetros do objeto os tipos de manifestação atualmente
+     * ativados nas configurações do módulos
+     * @return void
      */
-    private function tiposValidos()
+    private function carregarTiposDeManifestacao()
     {
         $objMdCguEouvDeparaImportacaoDTO = new MdCguEouvDeparaImportacaoDTO();
         $objMdCguEouvDeparaImportacaoDTO->retTodos();
@@ -87,13 +89,28 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         $objMdCguEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
         $arrObjMdCguEouvDeparaImportacaoDTO = $objMdCguEouvDeparaImportacaoRN->listar($objMdCguEouvDeparaImportacaoDTO);
-        $numRegistrosMdCguEouvDeparaImportacaoDTO = count($arrObjMdCguEouvDeparaImportacaoDTO);
-        $tiposValidos = array();
-        for ($i = 0; $i < $numRegistrosMdCguEouvDeparaImportacaoDTO; $i++) {
-            $idTipoManifestacaoEouv = $arrObjMdCguEouvDeparaImportacaoDTO[$i]->getNumIdTipoManifestacaoEouv();
-            $tiposValidos[] = $idTipoManifestacaoEouv;
+        $this->tiposDeManifestacaoAtivos = array();
+        $this->tipoAcessoAInformacaoAtivo = false;
+        foreach ($arrObjMdCguEouvDeparaImportacaoDTO as $objMdCguEouvDeparaImportacaoDTO) {
+            $idTipoManifestacao = $objMdCguEouvDeparaImportacaoDTO->getNumIdTipoManifestacaoEouv();
+            if ($idTipoManifestacao == 8) {
+                $this->tipoAcessoAInformacaoAtivo = true;
+            }
+            $this->tiposDeManifestacaoAtivos[] = $idTipoManifestacao;
         }
-        return $tiposValidos;
+    }
+
+    /**
+     * Filtra um array de manifestações para deixar passar apenas os tipos
+     * que estão atualmente ativos na configuração
+     * @param array $manifestacoes Array de estruturas DadosBasicosManifestacaoDTO ou ManifestacaoDTO
+     * @return array Array filtrado
+     */
+    private function filtrarTiposDeManifestacaoAtivos($manifestacoes) {
+        $tiposAtivos = $this->tiposDeManifestacaoAtivos;
+        return array_filter($manifestacoes, function($manifestacao) use ($tiposAtivos) {
+            return in_array($manifestacao['TipoManifestacao']['IdTipoManifestacao'], $tiposAtivos);
+        });
     }
 
     /**
@@ -116,7 +133,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $numRegistros = count($arrObjEouvParametroDTO);
 
         $this->preencheVariaveis($numRegistros, $arrObjEouvParametroDTO);
-        $tiposValidos = $this->tiposValidos();
+
+        // Carrega dados dos tipos de manifestação configurados
+        $this->carregarTiposDeManifestacao();
 
         $dataAtual = InfraData::getStrDataHoraAtual();
 
@@ -151,53 +170,39 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $semRecursosEncontrados = true;
             $qtdRecursosNovos = 0;
 
-            /**
-             * A função abaixo gravarLogImportacao recebe o tipo de manifestação 'R' (Recursos) para as manifestações do e-Sic
-             */
-
+            // Cria item de relatório da importação
             $objEouvRelatorioImportacaoDTO = $this->gravarLogImportacao($ultimaDataExecucao, $dataAtual);
             $this->idRelatorioImportacao = $objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao();
             $objEouvRelatorioImportacaoRN = new MdCguEouvRelatorioImportacaoRN();
             $SinSucessoExecucao = 'N';
 
-            /**
-             * As funções abaixo fazem a busca no webservice dos dados a serem trabalhados na rotina de importação
-             */
-            $debugLocal && LogSEI::getInstance()->gravar('Iniciando a consulta inicial');
-            $retornoWs = $this->apiClient->consultaManifestacoesNoIntervalo($ultimaDataExecucao, $dataAtual);
-            $retornoWsRecursos = $this->apiClient->consultaRecursosNoIntervalo($ultimaDataExecucao, $dataAtual);
-
-            /**
-             * @todo - criar rotina para buscar recursos das manifestções com erro caso exista alguma na tabela de log
-             */
+            // Consulta novas manifestações
+            $debugLocal && LogSEI::getInstance()->gravar('Consulta novas manifestações');
+            $arrManifestacoes = $this->apiClient->consultaManifestacoesNoIntervalo($ultimaDataExecucao, $dataAtual);
+            $arrManifestacoes = $this->filtrarTiposDeManifestacaoAtivos($arrManifestacoes);
+            $qtdManifestacoesNovas = count($arrManifestacoes);
+            $debugLocal && LogSEI::getInstance()->gravar('Possui novas manifestações qtd: ' . $qtdManifestacoesNovas);
 
             // Consulta manifestações com erro
-            $debugLocal && LogSEI::getInstance()->gravar('Inicia busca manifestação com erros');
+            $debugLocal && LogSEI::getInstance()->gravar('Consulta manifestação anteriores com erros');
             $arrComErro = $this->obterManifestacoesComErro();
+            $arrComErro = $this->filtrarTiposDeManifestacaoAtivos($arrComErro);
+            $qtdManifestacoesAntigas = count($arrComErro);
+            $debugLocal && LogSEI::getInstance()->gravar('Possui manifestações com erros - qtd: ' . $qtdManifestacoesAntigas);
+            $arrManifestacoes = array_merge($arrManifestacoes, $arrComErro);
 
-            $arrManifestacoes = array();
-            if (is_array($retornoWs)) {
-                // Filtra as manifestações cujos tipos estão ativos nos parâmetros do módulos
-                $arrManifestacoes = array_filter($retornoWs, function($manifestacao) use ($tiposValidos ) {
-                    return in_array($manifestacao['TipoManifestacao']['IdTipoManifestacao'], $tiposValidos);
-                });
-                $qtdManifestacoesNovas = count($arrManifestacoes);
-                $debugLocal && LogSEI::getInstance()->gravar('Possui novas manifestações qtd: ' . $qtdManifestacoesNovas);
-            }
-
-            $arrRecursos = array();
-            if (isset($retornoWsRecursos) && is_array($retornoWsRecursos)) {
-                $debugLocal && LogSEI::getInstance()->gravar('Possui recursos qtd: ' . count($retornoWsRecursos));
-                $arrRecursos = $retornoWsRecursos;
+            // Consulta novos recursos, caso a importação de manifestações de acesso à informação esteja ativa
+            if ($this->tipoAcessoAInformacaoAtivo) {
+                $debugLocal && LogSEI::getInstance()->gravar('Consulta novos recursos');
+                $arrRecursos = $this->apiClient->consultaRecursosNoIntervalo($ultimaDataExecucao, $dataAtual);
                 $qtdRecursosNovos = count($arrRecursos);
+                $debugLocal && LogSEI::getInstance()->gravar('Possui recursos qtd: ' . $qtdRecursosNovos);
+            } else {
+                $debugLocal && LogSEI::getInstance()->gravar('Importação de solicitações de acesso à informação desabilitada');
+                $arrRecursos = [];
             }
 
-            if (is_array($arrComErro)) {
-                $debugLocal && LogSEI::getInstance()->gravar('Possui manifestações com erros - qtd: ' . count($arrComErro));
-                $qtdManifestacoesAntigas = count($arrComErro);
-                $arrManifestacoes = array_merge($arrManifestacoes, $arrComErro);
-            }
-
+            // Importa manifestações
             if (count($arrManifestacoes) > 0) {
                 $semManifestacoesEncontradas = false;
                 foreach ($arrManifestacoes as $retornoWsLinha) {
@@ -205,6 +210,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     $this->executarImportacaoLinha($retornoWsLinha);
                 }
             }
+
             // Importa recursos
             if (count($arrRecursos) > 0) {
                 $semRecursosEncontrados = false;
@@ -220,7 +226,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
             if ($semManifestacoesEncontradas) {
                 $textoMensagemFinal = $textoMensagemFinal . ' Não foram encontradas manifestações para o período.';
             } else {
-                $textoMensagemFinal = $textoMensagemFinal . '<br>Quantidade de Manifestações novas encontradas (FalaBr): ' . $qtdManifestacoesNovas . '<br>Quantidade de Manifestações encontadas que ocorreram erro em outras importações: ' . $qtdManifestacoesAntigas;
+                $textoMensagemFinal = $textoMensagemFinal . '<br>Quantidade de Manifestações novas encontradas (FalaBr): ' . $qtdManifestacoesNovas .
+                    '<br>Quantidade de Manifestações encontadas que ocorreram erro em outras importações: ' . $qtdManifestacoesAntigas;
             }
 
             if ($semRecursosEncontrados) {
