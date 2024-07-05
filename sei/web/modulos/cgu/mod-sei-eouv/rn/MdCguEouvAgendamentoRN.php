@@ -893,7 +893,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
     public function gerarPDFPedidoInicial($retornoWsLinha)
     {
-        $mdCguEouvGerarPdfInicial = new MdCguEouvGerarPdfInicial($retornoWsLinha);
+        $mdCguEouvGerarPdfInicial = new MdCguEouvGerarPdfInicial($retornoWsLinha, $this->importar_dados_manifestante);
         $pdf = $mdCguEouvGerarPdfInicial->gerarPdfInicial();
 
         $objAnexoRN = new AnexoRN();

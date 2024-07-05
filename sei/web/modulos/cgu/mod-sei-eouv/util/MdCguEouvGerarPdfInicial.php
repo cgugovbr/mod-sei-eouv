@@ -44,7 +44,7 @@ class MdCguEouvGerarPdfInicial extends InfraPDF
      protected $campos_adicionais;
      protected $ocorreuErroAdicionarAnexo;
 
-    public function __construct($retornoWsLinha)
+    public function __construct($retornoWsLinha, $importarDadosDoManifestante)
     {
         $this->nup = $retornoWsLinha['NumerosProtocolo'][0];
         $this->dt_cadastro = $retornoWsLinha['DataCadastro'];
@@ -142,6 +142,7 @@ class MdCguEouvGerarPdfInicial extends InfraPDF
         }
         $this->campos_adicionais = $campos_adicionais;
 
+        $this->importar_dados_manifestante = $importarDadosDoManifestante;
     }
 
     public function gerarPdfInicial()
