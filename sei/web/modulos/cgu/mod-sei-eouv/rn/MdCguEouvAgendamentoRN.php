@@ -364,20 +364,20 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
             $objSeiRN = new SeiRN();
 
-            $arrDocumentos = $this->gerarAnexosProtocolo($arrDetalheManifestacao['Teor']['Anexos'], $numProtocoloFormatado, $tipoManifestacao);
+            $anexosGerados = $this->gerarAnexosProtocolo($arrDetalheManifestacao['Teor']['Anexos'], $numProtocoloFormatado, $tipoManifestacao);
 
             /**
              * Verificar o tipo de documento a ser importado para gerar o PDF conforme tipo de documento
              */
             if ($manifestacaoESic) {
-                $documentoManifestacao = $this->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacao);
+                $documentoManifestacao = $this->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacao, '', $anexosGerados['erro']);
             } else {
-                $documentoManifestacao = $this->gerarPDFPedidoInicial($arrDetalheManifestacao);
+                $documentoManifestacao = $this->gerarPDFPedidoInicial($arrDetalheManifestacao, $anexosGerados['erro']);
             }
 
-            LogSEI::getInstance()->gravar('Importação de Manifestação ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . count($arrDocumentos), InfraLog::$INFORMACAO);
+            LogSEI::getInstance()->gravar('Importação de Manifestação ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . count($anexosGerados['documentos']), InfraLog::$INFORMACAO);
 
-            array_unshift($arrDocumentos, $documentoManifestacao);
+            $arrDocumentos = array_merge([$documentoManifestacao], $anexosGerados['documentos']);
             $objEntradaGerarProcedimentoAPI->setDocumentos($arrDocumentos);
             $objSaidaGerarProcedimentoAPI = $objSeiRN->gerarProcedimento($objEntradaGerarProcedimentoAPI);
             $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Protocolo ' . $arrDetalheManifestacao['numProtocolo'] . ' gravado com sucesso.', 'S', $tipoManifestacao);
@@ -672,7 +672,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                     // Importar anexos do novo recurso
                     try {
-                        $anexoCount = 0;
                         if (isset($arrRecursosManifestacao) && is_array($arrRecursosManifestacao)) {
 
                             // Verifica Tipo de Recurso
@@ -680,19 +679,30 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                             $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinha] Importando o recurso do protocolo: ' . $numProtocoloFormatado);
 
-                            // Carregar documento recurso
-                            $this->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacao, $objProtocoloDTOExistente->getDblIdProtocolo(), $tipo_recurso);
-                            LogSEI::getInstance()->gravar('Módulo Integração FalaBR - Importação de Recurso ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . $anexoCount, InfraLog::$INFORMACAO);
-                            $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Recurso com protocolo ' . $numProtocoloFormatado . ' importado com sucesso com ' . $anexoCount . ' anexos incluidos no protocolo.', 'S', $tipoManifestacao, $dataPrazoAtendimento);
-
-                            // Carregar anexos
+                            // Processar anexos
+                            $arrAnexos = [];
+                            $ocorreuErroAdicionarAnexo = false;
                             foreach ($arrRecursosManifestacao as $recurso) {
                                 if (count($recurso['anexos']) > 0) {
-                                    $anexosAdicionados = $this->gerarAnexosProtocolo($recurso['anexos'], $numProtocoloFormatado, $tipoManifestacao, $objProtocoloDTOExistente->getDblIdProtocolo());
-                                    if (count($anexosAdicionados) > 0) {
-                                        $anexoCount++;
+                                    $anexosGerados = $this->gerarAnexosProtocolo($recurso['anexos'], $numProtocoloFormatado, $tipoManifestacao);
+                                    $arrAnexos = array_merge($arrAnexos, $anexosGerados['documentos']);
+                                    if ($anexosGerados['erro']) {
+                                        $ocorreuErroAdicionarAnexo = true;
                                     }
                                 }
+                            }
+
+                            // Gerar documento recurso
+                            $objDocumentoRecurso = $this->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacao, $tipo_recurso, $ocorreuErroAdicionarAnexo);
+                            LogSEI::getInstance()->gravar('Módulo Integração FalaBR - Importação de Recurso ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . count($arrAnexos), InfraLog::$INFORMACAO);
+                            $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Recurso com protocolo ' . $numProtocoloFormatado . ' importado com sucesso com ' . count($arrAnexos) . ' anexos incluidos no protocolo.', 'S', $tipoManifestacao, $dataPrazoAtendimento);
+
+                            // Inserir documentos no processo
+                            $arrDocumentos = array_merge([$objDocumentoRecurso], $arrAnexos);
+                            $objSeiRN = new SeiRN();
+                            foreach($arrDocumentos as $objDocumentoAPI) {
+                                $objDocumentoAPI->setIdProcedimento($objProtocoloDTOExistente->getDblIdProtocolo());
+                                $objSeiRN->incluirDocumento($objDocumentoAPI);
                             }
 
                             // Vincular Recursos com as unidades corretas conforme o tipo de recurso
@@ -808,8 +818,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     // Importar anexos do novo recurso
                     try {
                         if (isset($arrRecursosManifestacao)) {
-                            $anexoCount = isset($arrRecursosManifestacao['qtdAnexos']) ? $arrRecursosManifestacao['qtdAnexos'] : 0;
-
                             // Verifica Tipo de Recurso
                             $tipo_recurso = $this->verificaTipo($arrRecursosManifestacao);
                             $unidadeDestino = $this->getUnidadeDestino($tipo_recurso);
@@ -823,25 +831,36 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                             $debugLocal && LogSEI::getInstance()->gravar('Importando Recurso processo: ' . $numProtocoloFormatado . ' | tipo: ' . $tipo_recurso);
 
+                            // Processa anexos
+                            $ocorreuErroAdicionarAnexo = false;
+                            $arrAnexos = [];
+                            if (count($arrRecursosManifestacao['anexos']) > 0) {
+                                $anexosGerados = $this->gerarAnexosProtocolo($arrRecursosManifestacao['anexos'], $numProtocoloFormatado, $tipoManifestacao);
+                                $ocorreuErroAdicionarAnexo = $anexosGerados['erro'];
+                                $arrAnexos = $anexosGerados['documentos'];
+                            }
 
                             /**
                              * Verificar o tipo de recurso de for diferente de segunda instãncia, trazer todos os recursos para o documento pdf
                              */
                             if ($tipo_recurso <> 'R1') {
                                 $arrRecursosManifestacaoComAnteriores = $this->apiClient->consultaRecursosDaManifestacao($numProtocoloSemFormatacao);
-                                $this->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacaoComAnteriores, $objProtocoloDTOExistente->getDblIdProtocolo(), $tipo_recurso);
+                                $objDocumentoRecurso = $this->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacaoComAnteriores, $tipo_recurso, $ocorreuErroAdicionarAnexo);
                             } else {
-                                $this->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacao, $objProtocoloDTOExistente->getDblIdProtocolo(), $tipo_recurso);
+                                $objDocumentoRecurso = $this->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacao, $tipo_recurso, $ocorreuErroAdicionarAnexo);
                             }
 
-                            $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Recurso tipo ' . $tipo_recurso . ' com protocolo ' . $numProtocoloFormatado . ' importado com sucesso com ' . $anexoCount . ' anexos incluidos no protocolo.', 'S', $tipo_recurso, $dataPrazoAtendimento);
+                            // Insere documentos no processo
+                            $arrDocumentos = array_merge([$objDocumentoRecurso], $arrAnexos);
+                            $objSeiRN = new SeiRN();
+                            foreach($arrDocumentos as $objDocumentoAPI) {
+                                $objDocumentoAPI->setIdProcedimento($objProtocoloDTOExistente->getDblIdProtocolo());
+                                $objSeiRN->incluirDocumento($objDocumentoAPI);
+                            }
+
+                            $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Recurso tipo ' . $tipo_recurso . ' com protocolo ' . $numProtocoloFormatado . ' importado com sucesso com ' . count($arrAnexos) . ' anexos incluidos no protocolo.', 'S', $tipo_recurso, $dataPrazoAtendimento);
                             $debugLocal && LogSEI::getInstance()->gravar('Importando Recurso processo: ' . $numProtocoloFormatado . ' | tipo: ' . $tipo_recurso . 'depois de gravar log ?!');
-                            LogSEI::getInstance()->gravar('Módulo Integração FalaBR - Importação de Recurso ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . $anexoCount, InfraLog::$INFORMACAO);
-
-                            // Carregar anexos
-                            if (count($arrRecursosManifestacao['anexos']) > 0) {
-                                $this->gerarAnexosProtocolo($arrRecursosManifestacao['anexos'], $numProtocoloFormatado, $tipoManifestacao, $objProtocoloDTOExistente->getDblIdProtocolo());
-                            }
+                            LogSEI::getInstance()->gravar('Módulo Integração FalaBR - Importação de Recurso ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . count($arrAnexos), InfraLog::$INFORMACAO);
 
                             try {
                                 $objEntradaEnviarProcesso = new EntradaEnviarProcessoAPI();
@@ -891,9 +910,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
     }
 
-    private function gerarPDFPedidoInicial($retornoWsLinha)
+    private function gerarPDFPedidoInicial($retornoWsLinha, $ocorreuErroAdicionarAnexo)
     {
-        $mdCguEouvGerarPdfInicial = new MdCguEouvGerarPdfInicial($retornoWsLinha, $this->importar_dados_manifestante, false);
+        $mdCguEouvGerarPdfInicial = new MdCguEouvGerarPdfInicial($retornoWsLinha, $this->importar_dados_manifestante, $ocorreuErroAdicionarAnexo);
         $pdf = $mdCguEouvGerarPdfInicial->obterPDF();
 
         $objAnexoRN = new AnexoRN();
@@ -914,9 +933,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
         return $objDocumentoManifestacao;
     }
 
-    private function gerarPDFDocumentoESic($retornoWsLinha, $retornoWsRecursos = [], $IdProtocolo = false, $tipo_recurso = '')
+    private function gerarPDFDocumentoESic($retornoWsLinha, $retornoWsRecursos = [], $tipo_recurso = '', $ocorreuErroAdicionarAnexo = false)
     {
-        $objGerarPdf = new MdCguEouvGerarPdfEsic($retornoWsLinha, $retornoWsRecursos, false);
+        $objGerarPdf = new MdCguEouvGerarPdfEsic($retornoWsLinha, $retornoWsRecursos, $ocorreuErroAdicionarAnexo);
         $pdf = $objGerarPdf->obterPDF();
         $objAnexoRN = new AnexoRN();
         $strNomeArquivoInicialUpload = $objAnexoRN->gerarNomeArquivoTemporario();
@@ -928,9 +947,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         $objDocumentoManifestacao = new DocumentoAPI();
         $objDocumentoManifestacao->setTipo('R');
-        if ($IdProtocolo && $IdProtocolo <> '') {
-            $objDocumentoManifestacao->setIdProcedimento($IdProtocolo);
-        }
         if ($tipo_recurso == 'R1') {
             $nomeDocumentoArvore = 'Primeira Instância';
         } elseif ($tipo_recurso == 'R2') {
@@ -949,31 +965,36 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $objDocumentoManifestacao->setNomeArquivo('RelatorioDadosManifestacao.pdf');
         $objDocumentoManifestacao->setConteudo(base64_encode(file_get_contents(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload)));
 
-        if ($IdProtocolo && $IdProtocolo <> '') {
-            $objSEIRN = new SeiRN();
-            $objSEIRN->incluirDocumento($objDocumentoManifestacao);
-        }
-
         return $objDocumentoManifestacao;
     }
 
-    public function gerarAnexosProtocolo($arrAnexosManifestacao, $numProtocoloFormatado, $tipoManifestacao = 'P', $IdProtocolo = false)
+    /**
+     * Gera objetos DocumentoAPI do SEI para os anexos da manifestação ou recurso, mas não
+     * os adiciona ao processo.
+     * @param array $arrAnexosManifestacao Lista de estruturas DadosBasicosAnexoDTO
+     * (https://falabr.cgu.gov.br/Help/ResourceModel?modelName=DadosBasicosAnexoDTO) ou
+     * DadosBasicosAnexoRecursoDTO
+     * (https://falabr.cgu.gov.br/Help/ResourceModel?modelName=DadosBasicosAnexoRecursoDTO)
+     * @param string $numProtocoloFormatado Número do protocolo da manifestação formatado
+     * @param string $tipoManifestacao 'P' se for manifestação de ouvidoria e 'R' se for de acesso à informação
+     * @return array Array associativo cuja chave 'documentos' é um array de objetos
+     * DocumentoAPI do SEI e achave 'erro' é um bool que indica se algum anexo tem extensão inválida
+     */
+    private function gerarAnexosProtocolo($arrAnexosManifestacao, $numProtocoloFormatado, $tipoManifestacao = 'P')
     {
-        /**********************************************************************************************************************************************
-         * Início da importação de anexos de cada protocolo
-         * Desativado momentaneamente
-         */
-
-
         $arrAnexosAdicionados = array();
         $intTotAnexos = count($arrAnexosManifestacao);
+        $arrExtensoesInvalidas = [];
 
         if($intTotAnexos == 0){
             //Não encontrou anexos..
-            return $arrAnexosAdicionados;
+            return [
+                'documentos' => [],
+                'erro' => false,
+            ];
         }
 
-        //Trata as extensÃµes permitidas
+        //Trata as extensões permitidas
         $objArquivoExtensaoDTO = new ArquivoExtensaoDTO();
         $objArquivoExtensaoDTO->retNumIdArquivoExtensao();
         $objArquivoExtensaoDTO->retStrExtensao();
@@ -988,64 +1009,57 @@ class MdCguEouvAgendamentoRN extends InfraRN
         }
 
         foreach ($arrAnexosManifestacao as $retornoWsAnexoLinha) {
+            $strNomeArquivoOriginal = $retornoWsAnexoLinha['NomeArquivo']; // Para DadosBasicosAnexoDTO é NomeArquivo
+            if ($strNomeArquivoOriginal == null) {
+                $strNomeArquivoOriginal = $retornoWsAnexoLinha['nomeArquivo']; // Para DadosBasicosAnexoRecursoDTO é nomeArquivo
+            }
 
-                try {
+            // Ajustamos aqui o nome do arquivo limitado a 50 caracteres
+            $strNomeArquivoOriginal = substr($strNomeArquivoOriginal, -50, 50);
 
-                    $strNomeArquivoOriginal = $retornoWsAnexoLinha['NomeArquivo'];
-                    if ($strNomeArquivoOriginal == null) {
-                        $strNomeArquivoOriginal = $retornoWsAnexoLinha['nomeArquivo'];
-                    }
+            $ext = strtoupper(pathinfo($strNomeArquivoOriginal, PATHINFO_EXTENSION));
+            $intIndexExtensao = array_search($ext, $arrExtensoesPermitidas);
 
-                    // Ajustamos aqui o nome do arquivo limitado a 50 caracteres
-                    $strNomeArquivoOriginal = substr($strNomeArquivoOriginal, -50, 50);
+            if (is_numeric($intIndexExtensao)) {
+                $objAnexoRN = new AnexoRN();
+                $strNomeArquivoUpload = $objAnexoRN->gerarNomeArquivoTemporario();
 
-                    $ext = strtoupper(pathinfo($strNomeArquivoOriginal, PATHINFO_EXTENSION));
-                    $intIndexExtensao = array_search($ext, $arrExtensoesPermitidas);
+                // Faz download do anexo
+                $strCaminhoArquivoUpload = DIR_SEI_TEMP . '/' . $strNomeArquivoUpload;
+                $this->apiClient->downloadAnexo($retornoWsAnexoLinha, $strCaminhoArquivoUpload);
 
-                    if (is_numeric($intIndexExtensao)) {
-                        $objAnexoRN = new AnexoRN();
-                        $strNomeArquivoUpload = $objAnexoRN->gerarNomeArquivoTemporario();
+                $objAnexoManifestacao = new DocumentoAPI();
 
-                        // Faz download do anexo
-                        $strCaminhoArquivoUpload = DIR_SEI_TEMP . '/' . $strNomeArquivoUpload;
-                        $this->apiClient->downloadAnexo($retornoWsAnexoLinha, $strCaminhoArquivoUpload);
+                $objAnexoManifestacao->setTipo('R');
+                $objAnexoManifestacao->setIdSerie($this->idTipoDocumentoAnexoDadosManifestacao);
+                $objAnexoManifestacao->setData(InfraData::getStrDataHoraAtual());
+                $objAnexoManifestacao->setNomeArquivo($strNomeArquivoOriginal);
+                $objAnexoManifestacao->setNumero($strNomeArquivoOriginal);
+                $objAnexoManifestacao->setConteudo(base64_encode(file_get_contents($strCaminhoArquivoUpload)));
 
-                        $objAnexoManifestacao = new DocumentoAPI();
-
-                        if ($IdProtocolo && $IdProtocolo <> '') {
-                            $objAnexoManifestacao->setIdProcedimento($IdProtocolo);
-                        }
-                        $objAnexoManifestacao->setTipo('R');
-                        $objAnexoManifestacao->setIdSerie($this->idTipoDocumentoAnexoDadosManifestacao);
-                        $objAnexoManifestacao->setData(InfraData::getStrDataHoraAtual());
-                        $objAnexoManifestacao->setNomeArquivo($strNomeArquivoOriginal);
-                        $objAnexoManifestacao->setNumero($strNomeArquivoOriginal);
-                        $objAnexoManifestacao->setConteudo(base64_encode(file_get_contents($strCaminhoArquivoUpload)));
-
-                        if (!$this->hashDuplicado($strCaminhoArquivoUpload, $numProtocoloFormatado)) {
-                            if ($IdProtocolo && $IdProtocolo <> '') {
-                                $objSEIRN = new SeiRN();
-                                $objSEIRN->incluirDocumento($objAnexoManifestacao);
-                            }
-                            array_push($arrAnexosAdicionados, $objAnexoManifestacao);
-                        }
-                    } else {
-                        $ocorreuErroAdicionarAnexo = true;
-                        LogSEI::getInstance()->gravar('Importação de Manifestação ' . $numProtocoloFormatado . ': Arquivo ' . $strNomeArquivoOriginal . ' possui extensão inválida.', InfraLog::$INFORMACAO);
-                        continue;
-                    }
+                if (!$this->hashDuplicado($strCaminhoArquivoUpload, $numProtocoloFormatado)) {
+                    array_push($arrAnexosAdicionados, $objAnexoManifestacao);
                 }
-                catch(Exception $e){
-                    $ocorreuErroAdicionarAnexo = true;
-                    $strMensagemErroAnexos = $strMensagemErroAnexos . " " . $e;
+            } else {
+                if (!in_array($ext, $arrExtensoesInvalidas)) {
+                    $arrExtensoesInvalidas[] = $ext;
                 }
-
-            if($ocorreuErroAdicionarAnexo==true){
-                $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Um ou mais documentos anexos não foram importados corretamente: ' . $strMensagemErroAnexos, 'S', $tipoManifestacao);
+                LogSEI::getInstance()->gravar('Importação de Manifestação ' . $numProtocoloFormatado . ': Arquivo ' . $strNomeArquivoOriginal . ' possui extensão inválida.', InfraLog::$INFORMACAO);
             }
         }
 
-        return $arrAnexosAdicionados;
+        if (count($arrExtensoesInvalidas) > 0) {
+            $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao,
+                'Um ou mais documentos anexos não foram importados corretamente '.
+                    'pois o SEI não está habilitado a receber arquivos dos seguintes tipos: '.
+                    implode(',', $arrExtensoesInvalidas),
+                'S', $tipoManifestacao);
+        }
+
+        return [
+            'documentos' => $arrAnexosAdicionados,
+            'erro' => count($arrExtensoesInvalidas) > 0,
+        ];
     }
 
     public function excluirProcessoComErro($idProcedimento){
