@@ -891,17 +891,17 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
     }
 
-    public function gerarPDFPedidoInicial($retornoWsLinha)
+    private function gerarPDFPedidoInicial($retornoWsLinha)
     {
-        $mdCguEouvGerarPdfInicial = new MdCguEouvGerarPdfInicial($retornoWsLinha, $this->importar_dados_manifestante);
-        $pdf = $mdCguEouvGerarPdfInicial->gerarPdfInicial();
+        $mdCguEouvGerarPdfInicial = new MdCguEouvGerarPdfInicial($retornoWsLinha, $this->importar_dados_manifestante, false);
+        $pdf = $mdCguEouvGerarPdfInicial->obterPDF();
 
         $objAnexoRN = new AnexoRN();
         $strNomeArquivoInicialUpload = $objAnexoRN->gerarNomeArquivoTemporario();
 
         $pdf->Output(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", "F");
 
-        //Renomeia tirando a extensï¿½o para o SEI trabalhar o Arquivo
+        //Renomeia tirando a extensão para o SEI trabalhar o Arquivo
         rename(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload);
 
         $objDocumentoManifestacao = new DocumentoAPI();
@@ -914,25 +914,16 @@ class MdCguEouvAgendamentoRN extends InfraRN
         return $objDocumentoManifestacao;
     }
 
-    public function gerarPDFDocumentoESic($retornoWsLinha, $retornoWsRecursos = null, $IdProtocolo = false, $tipo_recurso = '')
+    private function gerarPDFDocumentoESic($retornoWsLinha, $retornoWsRecursos = [], $IdProtocolo = false, $tipo_recurso = '')
     {
-        /**
-         * Testa acessar dado da manifestação se não conseguir salva log
-         */
-        try {
-            $IdTipoManifestacao = $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'];
-        } catch (Exception $e) {
-            $this->gravarLogLinha($IdProtocolo ? $IdProtocolo : 'n/a', $this->idRelatorioImportacao, substr('ERRO-esic|' . $retornoWsLinha . '|' . $e, 0, 500), 'N');
-            return;
-        }
-
-        $pdf = MdCguEouvGerarPdfEsic::gerarPdf($retornoWsLinha, $retornoWsRecursos, $this->ocorreuErroAdicionarAnexo);
+        $objGerarPdf = new MdCguEouvGerarPdfEsic($retornoWsLinha, $retornoWsRecursos, false);
+        $pdf = $objGerarPdf->obterPDF();
         $objAnexoRN = new AnexoRN();
         $strNomeArquivoInicialUpload = $objAnexoRN->gerarNomeArquivoTemporario();
 
         $pdf->Output(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", "F");
 
-        //Renomeuia tirando a extencaoo para o SEI trabalhar o Arquivo
+        //Renomeia tirando a extensão para o SEI trabalhar o Arquivo
         rename(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload);
 
         $objDocumentoManifestacao = new DocumentoAPI();
