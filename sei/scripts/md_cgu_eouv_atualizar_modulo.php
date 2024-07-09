@@ -146,7 +146,6 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
       $objUsuarioDTO->setNumIdContato(null);
       $objUsuarioDTO->setStrStaTipo(UsuarioRN::$TU_SISTEMA);
       $objUsuarioDTO->setStrSenha(null);
-      $objUsuarioDTO->setStrSinAcessibilidade('N');
       $objUsuarioDTO->setStrSinAtivo('S');
       $objUsuarioDTO = $objUsuarioRN->cadastrarRN0487($objUsuarioDTO);
     }
