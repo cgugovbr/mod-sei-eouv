@@ -9,9 +9,9 @@
 
  require_once __DIR__ . '/MdCguEouvGerarPdf.php';
 
-class MdCguEouvGerarPdfEsic extends MdCguEouvGerarPdf
+class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
 {
-    public function __construct($manifestacao, $recursos, $ocorreuErroAdicionarAnexo)
+    public function __construct($manifestacao, $recursos, $importarDadosDoManifestante, $ocorreuErroAdicionarAnexo)
     {
         $this->criarPDF();
 
@@ -24,6 +24,11 @@ class MdCguEouvGerarPdfEsic extends MdCguEouvGerarPdf
          * Seção dados básicos
          */
         $this->secaoDadosBasicos($manifestacao);
+
+        /**
+         * Seção dados do manifestante
+         */
+        $this->secaoDadosManifestante($manifestacao, $importarDadosDoManifestante);
 
         /**
          * Seção teor da manifestação
@@ -242,7 +247,7 @@ class MdCguEouvGerarPdfEsic extends MdCguEouvGerarPdf
         }
 
         if (!$possuiProrrogacao) {
-            $this->texto('Não há registro de prorrogações.');
+            $this->texto('Não há registro de prorrogações.', true);
         }
 
         /**

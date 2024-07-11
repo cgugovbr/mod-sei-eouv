@@ -7,8 +7,8 @@
  *
  */
 
-require_once dirname(__FILE__) . '/../util/MdCguEouvGerarPdfEsic.php';
-require_once dirname(__FILE__) . '/../util/MdCguEouvGerarPdfInicial.php';
+require_once dirname(__FILE__) . '/../util/MdCguEouvGerarPdfLai.php';
+require_once dirname(__FILE__) . '/../util/MdCguEouvGerarPdfOuv.php';
 require_once __DIR__ . '/../util/MdCguEouvClient.php';
 
 class MdCguEouvAgendamentoRN extends InfraRN
@@ -370,9 +370,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
              * Verificar o tipo de documento a ser importado para gerar o PDF conforme tipo de documento
              */
             if ($manifestacaoESic) {
-                $documentoManifestacao = $this->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacao, '', $anexosGerados['erro']);
+                $documentoManifestacao = $this->gerarPDFLai($arrDetalheManifestacao, $arrRecursosManifestacao, '', $anexosGerados['erro']);
             } else {
-                $documentoManifestacao = $this->gerarPDFPedidoInicial($arrDetalheManifestacao, $anexosGerados['erro']);
+                $documentoManifestacao = $this->gerarPDFOuvidoria($arrDetalheManifestacao, $anexosGerados['erro']);
             }
 
             LogSEI::getInstance()->gravar('Importação de Manifestação ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . count($anexosGerados['documentos']), InfraLog::$INFORMACAO);
@@ -693,7 +693,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                             }
 
                             // Gerar documento recurso
-                            $objDocumentoRecurso = $this->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacao, $tipo_recurso, $ocorreuErroAdicionarAnexo);
+                            $objDocumentoRecurso = $this->gerarPDFLai($arrDetalheManifestacao, $arrRecursosManifestacao, $tipo_recurso, $ocorreuErroAdicionarAnexo);
                             LogSEI::getInstance()->gravar('Módulo Integração FalaBR - Importação de Recurso ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . count($arrAnexos), InfraLog::$INFORMACAO);
                             $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Recurso com protocolo ' . $numProtocoloFormatado . ' importado com sucesso com ' . count($arrAnexos) . ' anexos incluidos no protocolo.', 'S', $tipoManifestacao, $dataPrazoAtendimento);
 
@@ -845,9 +845,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
                              */
                             if ($tipo_recurso <> 'R1') {
                                 $arrRecursosManifestacaoComAnteriores = $this->apiClient->consultaRecursosDaManifestacao($numProtocoloSemFormatacao);
-                                $objDocumentoRecurso = $this->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacaoComAnteriores, $tipo_recurso, $ocorreuErroAdicionarAnexo);
+                                $objDocumentoRecurso = $this->gerarPDFLai($arrDetalheManifestacao, $arrRecursosManifestacaoComAnteriores, $tipo_recurso, $ocorreuErroAdicionarAnexo);
                             } else {
-                                $objDocumentoRecurso = $this->gerarPDFDocumentoESic($arrDetalheManifestacao, $arrRecursosManifestacao, $tipo_recurso, $ocorreuErroAdicionarAnexo);
+                                $objDocumentoRecurso = $this->gerarPDFLai($arrDetalheManifestacao, $arrRecursosManifestacao, $tipo_recurso, $ocorreuErroAdicionarAnexo);
                             }
 
                             // Insere documentos no processo
@@ -910,10 +910,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
     }
 
-    private function gerarPDFPedidoInicial($retornoWsLinha, $ocorreuErroAdicionarAnexo)
+    private function gerarPDFOuvidoria($retornoWsLinha, $ocorreuErroAdicionarAnexo)
     {
-        $mdCguEouvGerarPdfInicial = new MdCguEouvGerarPdfInicial($retornoWsLinha, $this->importar_dados_manifestante, $ocorreuErroAdicionarAnexo);
-        $pdf = $mdCguEouvGerarPdfInicial->obterPDF();
+        $mdCguEouvGerarPdf = new MdCguEouvGerarPdfOuv($retornoWsLinha, $this->importar_dados_manifestante, $ocorreuErroAdicionarAnexo);
+        $pdf = $mdCguEouvGerarPdf->obterPDF();
 
         $objAnexoRN = new AnexoRN();
         $strNomeArquivoInicialUpload = $objAnexoRN->gerarNomeArquivoTemporario();
@@ -933,9 +933,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
         return $objDocumentoManifestacao;
     }
 
-    private function gerarPDFDocumentoESic($retornoWsLinha, $retornoWsRecursos = [], $tipo_recurso = '', $ocorreuErroAdicionarAnexo = false)
+    private function gerarPDFLai($retornoWsLinha, $retornoWsRecursos = [], $tipo_recurso = '', $ocorreuErroAdicionarAnexo = false)
     {
-        $objGerarPdf = new MdCguEouvGerarPdfEsic($retornoWsLinha, $retornoWsRecursos, $ocorreuErroAdicionarAnexo);
+        $objGerarPdf = new MdCguEouvGerarPdfLai($retornoWsLinha, $retornoWsRecursos, $this->importar_dados_manifestante, $ocorreuErroAdicionarAnexo);
         $pdf = $objGerarPdf->obterPDF();
         $objAnexoRN = new AnexoRN();
         $strNomeArquivoInicialUpload = $objAnexoRN->gerarNomeArquivoTemporario();
