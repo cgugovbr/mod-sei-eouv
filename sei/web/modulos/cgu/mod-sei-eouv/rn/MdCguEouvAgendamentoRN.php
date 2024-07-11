@@ -450,7 +450,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $objEouvRelatorioImportacaoDetalheDTO->setStrSinSucesso($sinSucesso);
         $objEouvRelatorioImportacaoDetalheDTO->setStrTipManifestacao($tipoManifestacao);
         $objEouvRelatorioImportacaoDetalheDTO->setStrDescricaoLog(substr($mensagem,0,254));
-        $objEouvRelatorioImportacaoDetalheDTO->setDthDthImportacao(InfraData::getStrDataHoraAtual());
         $objEouvRelatorioImportacaoDetalheDTO->setDthDthPrazoAtendimento($dataPrazoAtendimento);
 
         if ($objExisteDetalheDTO==null) {
