@@ -153,6 +153,16 @@ try {
             $pdf->Output($arquivo, 'F');
             echoln("PDF gerado");
             break;
+        case 'importar_manifestacao':
+            $nup = verificaArgumentoNUP(2);
+            $manifestacao = $client->consultaManifestacao($nup);
+            $agendamento = new MdCguEouvAgendamentoRN();
+            $agendamento->inicializar();
+            echoln('Importando manifestação');
+            $agendamento->executarImportacaoLinha($manifestacao);
+            $agendamento->gravarLogImportacao(null, null, 'T', 'Teste');
+            echoln('Fim');
+            break;
         default:
             echoln('Comando não econtrado', true);
             break;
