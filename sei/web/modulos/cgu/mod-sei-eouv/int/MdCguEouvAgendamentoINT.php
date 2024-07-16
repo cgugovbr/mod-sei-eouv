@@ -90,5 +90,26 @@ class MdCguEouvAgendamentoINT extends InfraINT
 
         return $resultadoObjEouvRelatorioImportacaoDetalheDTO;
     }
+
+    public static function retornarUltimoTipoManifestacao($protocoloFormatado)
+    {
+        $objEouvRelatorioImportacaoDetalheDTO = new MdCguEouvRelatorioImportacaoDetalheDTO();
+        $objEouvRelatorioImportacaoDetalheDTO->retStrProtocoloFormatado();
+        $objEouvRelatorioImportacaoDetalheDTO->retStrTipManifestacao();
+        $objEouvRelatorioImportacaoDetalheDTO->setStrProtocoloFormatado($protocoloFormatado);
+        $objEouvRelatorioImportacaoDetalheDTO->setStrSinSucesso('S');
+        $objEouvRelatorioImportacaoDetalheDTO->setOrdNumIdRelatorioImportacao(InfraDTO::$TIPO_ORDENACAO_DESC);
+        $objEouvRelatorioImportacaoDetalheDTO->setNumMaxRegistrosRetorno(1);
+
+        $objEouvRelatorioImportacaoDetalheRN = new MdCguEouvRelatorioImportacaoDetalheRN();
+
+        $resultadoObjEouvRelatorioImportacaoDetalheDTO = $objEouvRelatorioImportacaoDetalheRN->consultar($objEouvRelatorioImportacaoDetalheDTO);
+
+        if ($resultadoObjEouvRelatorioImportacaoDetalheDTO == null) {
+            return null;
+        } else {
+            return $resultadoObjEouvRelatorioImportacaoDetalheDTO->getStrTipManifestacao();
+        }
+    }
 }
 ?>

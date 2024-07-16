@@ -41,10 +41,6 @@ class MdCguEouvRelatorioImportacaoDetalheDTO extends InfraDTO
             'DescricaoLog',
             'des_log_processamento');
 
-        $this->adicionarAtributoTabela(InfraDTO::$PREFIXO_DTH,
-            'DthPrazoAtendimento',
-            'dth_prazo_atendimento');
-
         $this->adicionarAtributoTabelaRelacionada(InfraDTO::$PREFIXO_DTH,
             'DthImportacao',
             'dth_importacao',

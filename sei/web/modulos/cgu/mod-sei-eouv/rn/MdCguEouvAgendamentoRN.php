@@ -23,52 +23,38 @@ class MdCguEouvAgendamentoRN extends InfraRN
     protected $ocorreuErroEmProtocolo;
     protected $importar_dados_manifestante;
     protected $dataInicialImportacaoManifestacoes;
-    protected $idRelatorioImportacao;
     protected $identificacaoServico = 'CadastrarManifestacao';
     protected $siglaSistema = 'EOUV';
 
     private $apiClient;
     private $tiposDeManifestacaoAtivos;
     private $tipoAcessoAInformacaoAtivo;
+    private $protocolosProcessados;
 
     public function __construct()
     {
         parent::__construct();
+    }
+
+    public function inicializar()
+    {
+        // Cria objeto cliente da API FalaBR
         $this->apiClient = new MdCguEouvClient();
-    }
 
-    /**
-     * @param MdCguEouvRelatorioImportacaoDTO $objEouvRelatorioImportacaoDTO
-     * @param string $SinSucessoExecucao
-     * @param string $textoMensagemFinal
-     * @param MdCguEouvRelatorioImportacaoRN $objEouvRelatorioImportacaoRN
-     * @return void
-     */
-    private function gravarRelatorioImportacaoSucesso(MdCguEouvRelatorioImportacaoDTO $objEouvRelatorioImportacaoDTO, string $SinSucessoExecucao, string $textoMensagemFinal, MdCguEouvRelatorioImportacaoRN $objEouvRelatorioImportacaoRN)
-    {
-        $objEouvRelatorioImportacaoDTO2 = new MdCguEouvRelatorioImportacaoDTO();
+        // Carrega parâmetros
+        $objEouvParametroDTO = new MdCguEouvParametroDTO();
+        $objEouvParametroDTO->retTodos();
+        $objEouvParametroRN = new MdCguEouvParametroRN();
+        $arrObjEouvParametroDTO = $objEouvParametroRN->listarParametro($objEouvParametroDTO);
+        $numRegistros = count($arrObjEouvParametroDTO);
 
-        $objEouvRelatorioImportacaoDTO2->setNumIdRelatorioImportacao($objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao());
-        $objEouvRelatorioImportacaoDTO2->setStrSinSucesso($SinSucessoExecucao);
-        $objEouvRelatorioImportacaoDTO2->setStrDeLogProcessamento($textoMensagemFinal);
-        $objEouvRelatorioImportacaoRN->alterar($objEouvRelatorioImportacaoDTO2);
-    }
+        $this->preencheVariaveis($numRegistros, $arrObjEouvParametroDTO);
 
-    /**
-     * @param MdCguEouvRelatorioImportacaoDTO $objEouvRelatorioImportacaoDTO
-     * @param Exception $e
-     * @param MdCguEouvRelatorioImportacaoRN $objEouvRelatorioImportacaoRN
-     * @return void
-     */
-    private function gravarRelatorioImportacaoErro(MdCguEouvRelatorioImportacaoDTO $objEouvRelatorioImportacaoDTO, Exception $e, MdCguEouvRelatorioImportacaoRN $objEouvRelatorioImportacaoRN)
-    {
-        $objEouvRelatorioImportacaoDTO3 = new MdCguEouvRelatorioImportacaoDTO();
-        $objEouvRelatorioImportacaoDTO3->setNumIdRelatorioImportacao($objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao());
-        $strMensagem = 'Ocorreu um erro no processamento:' . $e;
-        $strMensagem = substr($strMensagem, 0, 500);
-        $objEouvRelatorioImportacaoDTO3->setStrDeLogProcessamento($strMensagem);
+        // Carrega dados dos tipos de manifestação configurados
+        $this->carregarTiposDeManifestacao();
 
-        $objEouvRelatorioImportacaoRN->alterar($objEouvRelatorioImportacaoDTO3);
+        // Inicializa lista de protocolos processados
+        $this->protocolosProcessados = [];
     }
 
     protected function inicializarObjInfraIBanco()
@@ -123,27 +109,13 @@ class MdCguEouvAgendamentoRN extends InfraRN
         // Log
         LogSEI::getInstance()->gravar('Rotina de Importação de Manifestações do FalaBR (e-Sic)', InfraLog::$INFORMACAO);
 
-        // Lista parâmetros
-        $objEouvParametroDTO = new MdCguEouvParametroDTO();
-        $objEouvParametroDTO->retTodos();
-
-        // Busca parâmetros do banco de dados da tabela md_eouv_parametros
-        $objEouvParametroRN = new MdCguEouvParametroRN();
-        $arrObjEouvParametroDTO = $objEouvParametroRN->listarParametro($objEouvParametroDTO);
-        $numRegistros = count($arrObjEouvParametroDTO);
-
-        $this->preencheVariaveis($numRegistros, $arrObjEouvParametroDTO);
-
-        // Carrega dados dos tipos de manifestação configurados
-        $this->carregarTiposDeManifestacao();
+        // Inicializa objeto para executar importação
+        $this->inicializar();
 
         $dataAtual = InfraData::getStrDataHoraAtual();
 
         $isBolHabilitada = SessaoSEI::getInstance(false)->isBolHabilitada();
         SessaoSEI::getInstance()->setBolHabilitada(false);
-
-        // Simula login inicial
-        $this->simulaLogin($this->siglaSistema, $this->identificacaoServico, $this->idUnidadeEsicPrincipal);
 
         // Executa a importação dos dados
         try {
@@ -169,12 +141,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $qtdManifestacoesAntigas = 0;
             $semRecursosEncontrados = true;
             $qtdRecursosNovos = 0;
-
-            // Cria item de relatório da importação
-            $objEouvRelatorioImportacaoDTO = $this->gravarLogImportacao($ultimaDataExecucao, $dataAtual);
-            $this->idRelatorioImportacao = $objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao();
-            $objEouvRelatorioImportacaoRN = new MdCguEouvRelatorioImportacaoRN();
-            $SinSucessoExecucao = 'N';
 
             // Consulta novas manifestações
             $debugLocal && LogSEI::getInstance()->gravar('Consulta novas manifestações');
@@ -221,7 +187,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
             }
 
             $textoMensagemFinal = 'Execução Finalizada com Sucesso!';
-            $SinSucessoExecucao = 'S';
 
             if ($semManifestacoesEncontradas) {
                 $textoMensagemFinal = $textoMensagemFinal . ' Não foram encontradas manifestações para o período.';
@@ -240,16 +205,15 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $textoMensagemFinal = $textoMensagemFinal . '<br> Ocorreram erros em 1 ou mais protocolos.';
             }
 
-            //Grava a execução com sucesso se tiver corrido tudo bem
-            $this->gravarRelatorioImportacaoSucesso($objEouvRelatorioImportacaoDTO, $SinSucessoExecucao, $textoMensagemFinal, $objEouvRelatorioImportacaoRN);
+            // Grava log de sucesso da importação
+            $this->gravarLogImportacao($ultimaDataExecucao, $dataAtual, 'S', $textoMensagemFinal);
 
             LogSEI::getInstance()->gravar('Finalizada a importação dos processos - FalaBR');
 
-        } catch(Exception $e) {
-            $this->gravarRelatorioImportacaoErro($objEouvRelatorioImportacaoDTO, $e, $objEouvRelatorioImportacaoRN);
-
-            PaginaSEI::getInstance()->processarExcecao($e);
-
+        } catch (Exception $e) {
+            $this->gravarLogImportacao($ultimaDataExecucao, $dataAtual, 'N',
+                'Ocorreu um erro na importação: ' . strval($e));
+            throw $e;
         } finally {
             //Restaura a Sessão
             SessaoSEI::getInstance()->setBolHabilitada($isBolHabilitada);
@@ -307,11 +271,19 @@ class MdCguEouvAgendamentoRN extends InfraRN
         }
     }
 
-    public function criarNovoProcesso($idTipoManifestacaoSei, $idTipoManifestacao, bool $manifestacaoESic, $arrDetalheManifestacao, $idUnidadeDestino, string $numProtocoloFormatado, $tipoManifestacao, $arrRecursosManifestacao)
+    /**
+     * Criar novo processo SEI para uma nova importação de protocolo do FalaBR
+     * @param int $idTipoProcessoSei ID do tipo de processo a ser criado
+     * @param array $manifestacao Estrutura ManifestacaoDTO
+     * (https://falabr.cgu.gov.br/Help/ResourceModel?modelName=ManifestacaoDTO)
+     * @param int $idUnidadeDestino ID da unidade SEI onde o processo será criado
+     * @param string $numProtocoloFormatado Protocolo do processo formatado
+     * @param array $arrDocumentos Lista de objetos DocumentoAPI que serão incluídos
+     * no processo
+     * @return void
+     */
+    public function criarNovoProcesso($idTipoProcessoSei, $manifestacao, $idUnidadeDestino, $numProtocoloFormatado, $arrDocumentos)
     {
-        /**
-         * Inicia criação do Procedimento de criação de novo Processo
-         */
         try {
             $objTipoProcedimentoDTO = new TipoProcedimentoDTO();
             $objTipoProcedimentoDTO->retNumIdTipoProcedimento();
@@ -320,20 +292,13 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $objTipoProcedimentoDTO->retStrStaGrauSigiloSugestao();
             $objTipoProcedimentoDTO->retStrSinIndividual();
             $objTipoProcedimentoDTO->retNumIdHipoteseLegalSugestao();
-            $objTipoProcedimentoDTO->setNumIdTipoProcedimento($idTipoManifestacaoSei);
+            $objTipoProcedimentoDTO->setNumIdTipoProcedimento($idTipoProcessoSei);
 
             $objTipoProcedimentoRN = new TipoProcedimentoRN();
             $objTipoProcedimentoDTO = $objTipoProcedimentoRN->consultarRN0267($objTipoProcedimentoDTO);
 
             if ($objTipoProcedimentoDTO == null) {
-                throw new Exception('Tipo de processo não encontrado: ' . $idTipoManifestacaoSei);
-            }
-
-            /*
-             * Verifica se deve importar documentos tipo 8 (e-Sic)
-             */
-            if ($idTipoManifestacao == 8 && !$manifestacaoESic) {
-                return;
+                throw new Exception('Tipo de processo não encontrado: ' . $idTipoProcessoSei);
             }
 
             $objProcedimentoAPI = new ProcedimentoAPI();
@@ -341,18 +306,18 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
             $varEspecificacaoAssunto = "";
 
-            if (is_array($arrDetalheManifestacao['Assunto'])) {
-                $varEspecificacaoAssunto = $arrDetalheManifestacao['Assunto']['DescAssunto'];
+            if (is_array($manifestacao['Assunto'])) {
+                $varEspecificacaoAssunto = $manifestacao['Assunto']['DescAssunto'];
             }
-            if (is_array($arrDetalheManifestacao['SubAssunto'])) {
-                $varEspecificacaoAssunto = $varEspecificacaoAssunto . " / " . $arrDetalheManifestacao['SubAssunto']['DescSubAssunto'];
+            if (is_array($manifestacao['SubAssunto'])) {
+                $varEspecificacaoAssunto = $varEspecificacaoAssunto . " / " . $manifestacao['SubAssunto']['DescSubAssunto'];
             }
 
             $objProcedimentoAPI->setEspecificacao($varEspecificacaoAssunto);
             $objProcedimentoAPI->setIdUnidadeGeradora($idUnidadeDestino);
             $objProcedimentoAPI->setNumeroProtocolo($numProtocoloFormatado);
-            $objProcedimentoAPI->setDataAutuacao($arrDetalheManifestacao['DataCadastro']);
-            $objProcedimentoAPI->setNivelAcesso($objTipoProcedimentoDTO->getStrStaNivelAcessoSugestao());
+            $objProcedimentoAPI->setDataAutuacao($manifestacao['DataCadastro']);
+            $objProcedimentoAPI->setNivelAcesso($objTipoProcedimentoDTO->getStrStaNivelAcessoSugestao()); // TODO garantir que não seja público
             $objProcedimentoAPI->setGrauSigilo($objTipoProcedimentoDTO->getStrStaGrauSigiloSugestao());
             $objProcedimentoAPI->setIdHipoteseLegal($objTipoProcedimentoDTO->getNumIdHipoteseLegalSugestao());
             $objProcedimentoAPI->setObservacao("Processo Gerado Automaticamente pela Integração SEI x FalaBR");
@@ -360,103 +325,101 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $objEntradaGerarProcedimentoAPI = new EntradaGerarProcedimentoAPI();
             $objEntradaGerarProcedimentoAPI->setProcedimento($objProcedimentoAPI);
 
-            $objSaidaGerarProcedimentoAPI = new SaidaGerarProcedimentoAPI();
+            LogSEI::getInstance()->gravar('Importação de Manifestação ' . $numProtocoloFormatado . ': total de documentos: ' . count($arrDocumentos), InfraLog::$INFORMACAO);
 
-            $objSeiRN = new SeiRN();
-
-            $anexosGerados = $this->gerarAnexosProtocolo($arrDetalheManifestacao['Teor']['Anexos'], $numProtocoloFormatado, $tipoManifestacao);
-
-            /**
-             * Verificar o tipo de documento a ser importado para gerar o PDF conforme tipo de documento
-             */
-            if ($manifestacaoESic) {
-                $documentoManifestacao = $this->gerarPDFLai($arrDetalheManifestacao, $arrRecursosManifestacao, '', $anexosGerados['erro']);
-            } else {
-                $documentoManifestacao = $this->gerarPDFOuvidoria($arrDetalheManifestacao, $anexosGerados['erro']);
-            }
-
-            LogSEI::getInstance()->gravar('Importação de Manifestação ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . count($anexosGerados['documentos']), InfraLog::$INFORMACAO);
-
-            $arrDocumentos = array_merge([$documentoManifestacao], $anexosGerados['documentos']);
             $objEntradaGerarProcedimentoAPI->setDocumentos($arrDocumentos);
+            $objSeiRN = new SeiRN();
             $objSaidaGerarProcedimentoAPI = $objSeiRN->gerarProcedimento($objEntradaGerarProcedimentoAPI);
-            $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Protocolo ' . $arrDetalheManifestacao['numProtocolo'] . ' gravado com sucesso.', 'S', $tipoManifestacao);
-
         } catch (Exception $e) {
 
-            if ($objSaidaGerarProcedimentoAPI != null and $objSaidaGerarProcedimentoAPI->getIdProcedimento() > 0) {
+            if (isset($objSaidaGerarProcedimentoAPI) && $objSaidaGerarProcedimentoAPI->getIdProcedimento() > 0) {
                 $this->excluirProcessoComErro($objSaidaGerarProcedimentoAPI->getIdProcedimento());
             }
-            $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Erro na gravação: ' . $e, 'N', $tipoManifestacao);
+
+            throw $e;
         }
-        return $arrDocumentos;
     }
 
-    public function getUnidadeDestino(string $tipo_recurso)
+    public function obterUnidadeDestino(string $tipoImportacao)
     {
-        // Vincular Recursos com as unidades corretas conforme o tipo de recurso
-        // Se for 1 instância envia processo para ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA
-        if ($tipo_recurso == 'R1') {
-            $unidadeDestino = $this->idUnidadeRecursoPrimeiraInstancia;
-        } elseif ($tipo_recurso == 'R2') {
-            $unidadeDestino = $this->idUnidadeRecursoSegundaInstancia;
-        } elseif ($tipo_recurso == 'R3' || $tipo_recurso == 'RC') {
-            $unidadeDestino = $this->idUnidadeRecursoTerceiraInstancia;
-        } elseif ($tipo_recurso == 'PR') {
-            $unidadeDestino = $this->idUnidadeRecursoPedidoRevisao;
-        } else {
-            $unidadeDestino = $this->idUnidadeOuvidoria;
+        switch ($tipoImportacao) {
+            case 'P':
+                return $this->idUnidadeOuvidoria;
+            case 'R':
+                return $this->idUnidadeEsicPrincipal;
+            case 'R1':
+                return $this->idUnidadeRecursoPrimeiraInstancia;
+            case 'R2':
+                return $this->idUnidadeRecursoSegundaInstancia;
+            case 'R3':
+            case 'RC':
+                return $this->idUnidadeRecursoTerceiraInstancia;
+            case 'PR':
+                return $this->idUnidadeRecursoPedidoRevisao;
+            default:
+                throw new InfraException('Tipo de importação desconhecido: ' . $tipoImportacao);
         }
-        return $unidadeDestino;
-    }
-
-    public function gravarLogImportacao($ultimaDataExecucao, $dataAtual){
-
-        try {
-            $objEouvRelatorioImportacaoDTO = new MdCguEouvRelatorioImportacaoDTO();
-
-            $objEouvRelatorioImportacaoDTO->retNumIdRelatorioImportacao();
-            $objEouvRelatorioImportacaoDTO->setNumIdRelatorioImportacao(null);
-            $objEouvRelatorioImportacaoDTO->setDthDthImportacao(InfraData::getStrDataHoraAtual());
-            $objEouvRelatorioImportacaoDTO->setDthDthPeriodoInicial($ultimaDataExecucao);
-            $objEouvRelatorioImportacaoDTO->setDthDthPeriodoFinal($dataAtual);
-            $objEouvRelatorioImportacaoDTO->setStrDeLogProcessamento('Passo 1 - Iniciando processamento.');
-            $objEouvRelatorioImportacaoDTO->setStrSinSucesso('N');
-
-            $objEouvRelatorioImportacaoRN = new MdCguEouvRelatorioImportacaoRN();
-            $objEouvRelatorioImportacaoRN->cadastrar($objEouvRelatorioImportacaoDTO);
-
-            return $objEouvRelatorioImportacaoDTO;
-
-        }catch (Exception $e) {
-            PaginaInfra::getInstance()->processarExcecao($e);
-        }
-
     }
 
     /**
-     * Grava log detalhado
+     * Grava os logs da importação no banco de dados, tanto o log principal
+     * quanto os logs detalhados de cada protocolo (que estão em $this->protocolosProcessados)
+     * @param string $dthInicial Data e hora inicial de manifestações buscadas
+     * no formato DD/MM/YYYY HH:MM:SS
+     * @param string $dthFinal Data e hora final de manifestações buscadas
+     * no formato DD/MM/YYYY HH:MM:SS
+     * @param string $sinSucesso 'S' se a importação foi bem sucedida ou 'N' se
+     * aconteceram erros
+     * @param string $mensagem Mensagem de log da importação
+     * @return void
      */
-    public function gravarLogLinha($numProtocolo, $idRelatorioImportacao, $mensagem, $sinSucesso, $tipoManifestacao = 'P', $dataPrazoAtendimento = null)
+    public function gravarLogImportacao($dthInicial, $dthFinal, $sinSucesso, $mensagem) {
+        $objEouvRelatorioImportacaoDTO = new MdCguEouvRelatorioImportacaoDTO();
+
+        $objEouvRelatorioImportacaoDTO->retNumIdRelatorioImportacao();
+        $objEouvRelatorioImportacaoDTO->setDthDthImportacao(InfraData::getStrDataHoraAtual());
+        $objEouvRelatorioImportacaoDTO->setDthDthPeriodoInicial($dthInicial);
+        $objEouvRelatorioImportacaoDTO->setDthDthPeriodoFinal($dthFinal);
+        $objEouvRelatorioImportacaoDTO->setStrDeLogProcessamento(substr($mensagem, 0, 500));
+        $objEouvRelatorioImportacaoDTO->setStrSinSucesso($sinSucesso);
+
+        $objEouvRelatorioImportacaoRN = new MdCguEouvRelatorioImportacaoRN();
+        $objEouvRelatorioImportacaoRN->cadastrar($objEouvRelatorioImportacaoDTO);
+
+        $idRelatorioImportacao = $objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao();
+
+        // Grava logs detalhados de cada protocolo processado
+        $objRelatorioImportacaoDetalheRN = new MdCguEouvRelatorioImportacaoDetalheRN();
+        foreach ($this->protocolosProcessados as $numProtocoloFormatado => $dados) {
+            $objRelatorioImportacaoDetalheDTO = $dados['dto'];
+            $objRelatorioImportacaoDetalheDTO->setNumIdRelatorioImportacao($idRelatorioImportacao);
+            $objRelatorioImportacaoDetalheRN->cadastrar($objRelatorioImportacaoDetalheDTO);
+        }
+    }
+
+    /**
+     * Grava log detalhado da importação de um determinado protocolo
+     * na variável $this->protocolosProcessados. Não grava no banco de dados.
+     * @param string $numProtocoloFormatado NUP formatado
+     * @param string $mensagem Mensagem de log
+     * @param string $sinSucesso 'S' se a importação foi bem sucedida, 'N'
+     * se ocorreram erros na importação
+     * @param string $tipoManifestacao 'P' para manifestação de Ouvidoria, 'R'
+     * para manifestação de LAI, 'R1' para recurso @TODO melhorar
+     * @return void
+     */
+    private function gravarLogProtocolo($numProtocoloFormatado, $mensagem, $sinSucesso, $tipoManifestacao)
     {
         $objEouvRelatorioImportacaoDetalheDTO = new MdCguEouvRelatorioImportacaoDetalheDTO();
-        $objEouvRelatorioImportacaoDetalheDTO->retStrProtocoloFormatado();
-        $objEouvRelatorioImportacaoDetalheDTO->setNumIdRelatorioImportacao($idRelatorioImportacao);
-        $objEouvRelatorioImportacaoDetalheDTO->setStrProtocoloFormatado($numProtocolo);
-
-        $objEouvRelatorioImportacaoDetalheRN = new MdCguEouvRelatorioImportacaoDetalheRN();
-        $objExisteDetalheDTO = $objEouvRelatorioImportacaoDetalheRN->consultar($objEouvRelatorioImportacaoDetalheDTO);
-
+        $objEouvRelatorioImportacaoDetalheDTO->setStrProtocoloFormatado($numProtocoloFormatado);
         $objEouvRelatorioImportacaoDetalheDTO->setStrSinSucesso($sinSucesso);
         $objEouvRelatorioImportacaoDetalheDTO->setStrTipManifestacao($tipoManifestacao);
         $objEouvRelatorioImportacaoDetalheDTO->setStrDescricaoLog(substr($mensagem,0,254));
-        $objEouvRelatorioImportacaoDetalheDTO->setDthDthPrazoAtendimento($dataPrazoAtendimento);
 
-        if ($objExisteDetalheDTO==null) {
-            $objEouvRelatorioImportacaoDetalheRN->cadastrar($objEouvRelatorioImportacaoDetalheDTO);
-        } else {
-            $objEouvRelatorioImportacaoDetalheRN->alterar($objEouvRelatorioImportacaoDetalheDTO);
-        }
+        $this->protocolosProcessados[$numProtocoloFormatado] = [
+            'dto' => $objEouvRelatorioImportacaoDetalheDTO,
+            'sucesso' => $sinSucesso == 'S',
+        ];
     }
 
     private function obterManifestacoesComErro()
@@ -487,7 +450,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     $arrResult[] = $retornoWsErro;
                 } else {
                     // Marca protocolo como bem sucedido para não tentar de novo na próxima execução
-                    $this->gravarLogLinha($this->formatarProcesso($numProtocolo), $this->idRelatorioImportacao, 'Protocolo não encontrado!', 'S');
+                    $this->gravarLogProtocolo($this->formatarProcesso($numProtocolo), 'Protocolo não encontrado!', 'S', $erro->getStrTipManifestacao());
                 }
             }
         }
@@ -558,340 +521,222 @@ class MdCguEouvAgendamentoRN extends InfraRN
     {
         $debugLocal = false;
 
-        $objProcedimentoDTO = new ProcedimentoDTO();
-        $objProcedimentoDTO->setDblIdProcedimento(null);
+        $numProtocolo = $retornoWsLinha['NumerosProtocolo'][0];
+        $numProtocoloFormatado =  $this->formatarProcesso($numProtocolo);
 
-        $arrDetalheManifestacao = $this->apiClient->consultaDetalhadaManifestacao($retornoWsLinha);
-
-        /**
-         * Verifica Tipo de Manifestação e-Ouv ou e-Sic
-         */
-        if ($retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'] <> 8) {
-            $debugLocal && LogSEI::getInstance()->gravar('Importação tipo "P" - tipoManifestação <> "8"');
-            $tipoManifestacao = 'P';
-            $manifestacaoESic = false;
-            $idUnidadeDestino = $this->idUnidadeOuvidoria;
-        } elseif ($retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'] == 8) {
-            $debugLocal && LogSEI::getInstance()->gravar('Importação tipo "R" - tipoManifestação == "8"');
-            $tipoManifestacao = 'R';
-            $manifestacaoESic = true;
-            $idUnidadeDestino = $this->idUnidadeEsicPrincipal;
-
-            /**
-             * Importar Recursos caso seja manifestação e-Sic (Tipo 8)
-             */
-            $arrRecursosManifestacao = $this->apiClient->consultaRecursosDaManifestacao($arrDetalheManifestacao['NumerosProtocolo'][0]);
+        if (array_key_exists($numProtocolo, $this->protocolosProcessados)) {
+            return; // Protocolo já processado nessa execução
         }
-
-        $numProtocoloFormatado =  $this->formatarProcesso($arrDetalheManifestacao['NumerosProtocolo'][0]);
+        
+        /**
+         * Limpa os registros de detalhe de importação com erro para este NUP.
+         * Caso ocorra um novo, será criado novo registro de erro para o NUP no tratamento desta function.
+         */
+        $this->limparErrosParaNup($numProtocoloFormatado);
 
         // Verifica se o tipo de manifestação é suportado
-        $numIdTipoManifestacao = $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'];
-        if ($numIdTipoManifestacao > 8) {
-            // Se não for marca como sucesso para evitar reimportação na próxima execução.
-            $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao,
-                'Tipo de manifestação não suportado (ID = '.$numIdTipoManifestacao.'). Não será importada.', 'S');
+        if (is_array($retornoWsLinha['TipoManifestacao'])) {
+            $numIdTipoManifestacao = $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'];
+        } else {
+            $numIdTipoManifestacao = null;
+        }
+        if (is_null($numIdTipoManifestacao) || $numIdTipoManifestacao > 8) {
+            // Se não for suportado marca como sucesso para evitar reimportação na próxima execução.
+            $this->gravarLogProtocolo($numProtocoloFormatado,
+                'Tipo de manifestação não suportado (ID = '.$numIdTipoManifestacao.'). Não será importada.',
+                'S', 'P');
             return;
         }
 
-
-        /**
-         * Esta data é gravada na tabela de log detalhada
-         * Em caso de alteração no prazo do atendimento será feita nova importação dos dados do recurso
-         * Verifica se o retorno dos recursos não é uma string
-         */
-        if (isset($arrRecursosManifestacao) && count($arrRecursosManifestacao) > 0) {
-            $debugLocal && LogSEI::getInstance()->gravar('Possui $arrRecursosManifestacao - qtd: ' . count($arrRecursosManifestacao));
-            $dataPrazoAtendimento = $arrRecursosManifestacao[(count($arrRecursosManifestacao) - 1)]['prazoAtendimento'];
+        // Verifica Tipo de Manifestação: Ouvidoria ou LAI
+        if ($numIdTipoManifestacao != 8) {
+            $debugLocal && LogSEI::getInstance()->gravar('Importação tipo "P" - tipoManifestação <> "8"');
+            $tipoImportacaoAtual = 'P';
         } else {
-            $debugLocal && LogSEI::getInstance()->gravar('NÃO possui $arrRecursosManifestacao');
-            $dataPrazoAtendimento = $retornoWsLinha['PrazoAtendimento'];
+            $debugLocal && LogSEI::getInstance()->gravar('Importação tipo "R" - tipoManifestação == "8"');
+            $tipoImportacaoAtual = 'R';
         }
 
-        /**
-         * Limpa os registros de detalhe de importação com erro para este NUP.
-         * Caso ocorra um novo, será criado novo registro de erro para o NUP no tratamento desta function.
-         */
-        $this->limparErrosParaNup($numProtocoloFormatado);
-
-        if (!isset($arrDetalheManifestacao['TipoManifestacao']['IdTipoManifestacao'])) {
-            $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Tipo de processo não foi informado.', 'N');
-            /**
-             * @todo - não deveria parara aqui? se não tiver um tipo de processo não informado?
-             */
-        } else {
+        try {
+            // Verifica o tipo de processo SEI correspondente
             $objEouvDeparaImportacaoDTO = new MdCguEouvDeparaImportacaoDTO();
             $objEouvDeparaImportacaoDTO->retNumIdTipoProcedimento();
-            $objEouvDeparaImportacaoDTO->setNumIdTipoManifestacaoEouv($arrDetalheManifestacao['TipoManifestacao']['IdTipoManifestacao']);
-
+            $objEouvDeparaImportacaoDTO->setNumIdTipoManifestacaoEouv($numIdTipoManifestacao);
+            
             $objEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
             $objEouvDeparaImportacaoDTO = $objEouvDeparaImportacaoRN->consultar($objEouvDeparaImportacaoDTO);
-
-            if (!$objEouvDeparaImportacaoDTO == null) {
-                $idTipoManifestacaoSei = $objEouvDeparaImportacaoDTO->getNumIdTipoProcedimento();
+            
+            if ($objEouvDeparaImportacaoDTO == null) {
+                $this->gravarLogProtocolo($numProtocoloFormatado,
+                'Não existe mapeamento desse tipo de manifestação do FalaBR para o tipo de processo do SEI.',
+                'N', $tipoImportacaoAtual);
+                return;
             } else {
-                $this->gravarLogLinha($numProtocoloFormatado, $this->objEouvRelatorioImportacaoDTO->getNumIdRelatorioImportacao(), 'Não existe mapeamento DePara do Tipo de Manifestação do FalaBR (E-Ouv|E-Sic) para o tipo de procedimento do SEI.', 'N');
-                //continue;
+                $idTipoManifestacaoSei = $objEouvDeparaImportacaoDTO->getNumIdTipoProcedimento();
             }
-        }
+            
+            // Consulta detalhes da manifestação
+            $manifestacao = $this->apiClient->consultaDetalhadaManifestacao($retornoWsLinha);
 
-        /**
-         * Se for Manifestação do e-Sic verificar:houve alteração na data 'PrazoAtendimento' e
-         * gera novo arquivo PDF com as alterações para inserção no mesmo protocolo (NUP) e
-         * importa anexos comparando o hash do arquivo para não duplicidade no processo
-         */
-        // Vefificar se o NUP já existe
-        $objProtocoloDTOExistente = $this->verificarProtocoloExistente($this->formatarProcesso($numProtocoloFormatado));
+            // Vefificar se o NUP já existe
+            $objProtocoloDTOExistente = $this->verificarProtocoloExistente($numProtocoloFormatado);
+            $tipoUltimaImportacao = null;
+            
+            // Caso já exista um Protocolo no SEI com o mesmo NUP
+            if (!is_null($objProtocoloDTOExistente)) {
+                // Buscar importação anterior, caso tenha existido
+                $tipoUltimaImportacao = MdCguEouvAgendamentoINT::retornarUltimoTipoManifestacao($numProtocoloFormatado);
 
-        // 1. Caso já exista um Protocolo no SEI com o mesmo NUP
-        if (! is_null($objProtocoloDTOExistente)) {
-            // 2. Se existir e for e-Ouv
-            if ($tipoManifestacao == 'P') {
-                $debugLocal && LogSEI::getInstance()->gravar('Importando Linha Manifestação e-ouv - protocolo: ' . $this->formatarProcesso($numProtocoloFormatado));
-                // 2.1 Importar anexos novos se existirem... e retornar log
-                // @todo - melhoria próxima versão e-Ouv
-                $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Erro na gravação: ' . 'Já existe um processo (e-Ouv) utilizando o número de protocolo.', 'N', $tipoManifestacao);
-            }
-
-            // 3. Se existir e for e-Sic
-            if ($tipoManifestacao == 'R') {
-
-                $debugLocal && LogSEI::getInstance()->gravar('Importando Linha Manifestação e-SIC - protocolo: ' . $this->formatarProcesso($numProtocoloFormatado));
-
-                /**
-                 * @todo - @teste
-                 * Teste aqui pra validar se o prazo sendo 'maior' na petição inicial já não deve importar os recursos..... (??)
-                 */
-                // Data do último prazo de atendimento para este protocolo
-                $objUltimaDataPrazoAtendimento = MdCguEouvAgendamentoINT::retornarUltimaDataPrazoAtendimento($numProtocoloFormatado);
-
-
-                // 4. Verificar se houve alteração na data 'PrazoAtendimento'
-                if (isset($objUltimaDataPrazoAtendimento) && $objUltimaDataPrazoAtendimento->getDthDthPrazoAtendimento() > $dataPrazoAtendimento) {
-
-                    // Importar anexos do novo recurso
-                    try {
-                        if (isset($arrRecursosManifestacao) && is_array($arrRecursosManifestacao)) {
-
-                            // Verifica Tipo de Recurso
-                            $tipo_recurso = $this->verificaTipo($arrRecursosManifestacao);
-
-                            $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinha] Importando o recurso do protocolo: ' . $numProtocoloFormatado);
-
-                            // Processar anexos
-                            $arrAnexos = [];
-                            $ocorreuErroAdicionarAnexo = false;
-                            foreach ($arrRecursosManifestacao as $recurso) {
-                                if (count($recurso['anexos']) > 0) {
-                                    $anexosGerados = $this->gerarAnexosProtocolo($recurso['anexos'], $numProtocoloFormatado, $tipoManifestacao);
-                                    $arrAnexos = array_merge($arrAnexos, $anexosGerados['documentos']);
-                                    if ($anexosGerados['erro']) {
-                                        $ocorreuErroAdicionarAnexo = true;
-                                    }
-                                }
-                            }
-
-                            // Gerar documento recurso
-                            $objDocumentoRecurso = $this->gerarPDFLai($arrDetalheManifestacao, $arrRecursosManifestacao, $tipo_recurso, $ocorreuErroAdicionarAnexo);
-                            LogSEI::getInstance()->gravar('Módulo Integração FalaBR - Importação de Recurso ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . count($arrAnexos), InfraLog::$INFORMACAO);
-                            $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Recurso com protocolo ' . $numProtocoloFormatado . ' importado com sucesso com ' . count($arrAnexos) . ' anexos incluidos no protocolo.', 'S', $tipoManifestacao, $dataPrazoAtendimento);
-
-                            // Inserir documentos no processo
-                            $arrDocumentos = array_merge([$objDocumentoRecurso], $arrAnexos);
-                            $objSeiRN = new SeiRN();
-                            foreach($arrDocumentos as $objDocumentoAPI) {
-                                $objDocumentoAPI->setIdProcedimento($objProtocoloDTOExistente->getDblIdProtocolo());
-                                $objSeiRN->incluirDocumento($objDocumentoAPI);
-                            }
-
-                            // Vincular Recursos com as unidades corretas conforme o tipo de recurso
-                            // Se for 1 instância envia processo para ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA
-                            if ($tipo_recurso == 'R1') {
-                                $unidadeDestino = $this->idUnidadeRecursoPrimeiraInstancia;
-                            } elseif ($tipo_recurso == 'R2') {
-                                $unidadeDestino = $this->idUnidadeRecursoSegundaInstancia;
-                            } elseif ($tipo_recurso == 'R3' || $tipo_recurso == 'RC') {
-                                $unidadeDestino = $this->idUnidadeRecursoTerceiraInstancia;
-                            } elseif ($tipo_recurso == 'PR') {
-                                $unidadeDestino = $this->idUnidadeRecursoPedidoRevisao;
-                            } else {
-                                $unidadeDestino = $this->idUnidadeOuvidoria;
-                            }
-
-                            try {
-                                $objEntradaEnviarProcesso = new EntradaEnviarProcessoAPI();
-                                $objEntradaEnviarProcesso->setIdProcedimento($objProtocoloDTOExistente->getDblIdProtocolo());
-                                $objEntradaEnviarProcesso->setUnidadesDestino([$unidadeDestino]);
-                                $objEntradaEnviarProcesso->setSinManterAbertoUnidade('S');
-                                $objEntradaEnviarProcesso->setSinEnviarEmailNotificacao('S');
-                                $objEntradaEnviarProcesso->setSinReabrir('S');
-
-                                $objSeiRN = new SeiRN();
-                                $objSeiRN->enviarProcesso($objEntradaEnviarProcesso);
-                                LogSEI::getInstance()->gravar('Módulo Integração FalaBR - (Recurso tipo ' . $tipo_recurso . ') Processo ' . $numProtocoloFormatado . ' enviado para unidade ' . $this->idUnidadeRecursoPrimeiraInstancia, InfraLog::$INFORMACAO);
-
-                            } catch (Exception $e) {
-                                LogSEI::getInstance()->gravar('Módulo Integração FalaBR - (Recurso tipo ' . $tipo_recurso . ') Não foi possivel abrir o Processo ' . $numProtocoloFormatado . ' na unidade ' . $this->idUnidadeRecursoPrimeiraInstancia . ' - erro: ' . $e, InfraLog::$INFORMACAO);
-                            }
-                        } else {
-                            /**
-                             * @todo - confirmar - aqui deve ficar como 'N' ou 'S'? Se fircar como 'N' entra como erro... ?? e é preciso gravar que não houve recurso mas teve alteração na data de prazo de atencimento,
-                             * esta data precisa ser salva no banco de dados... comentar/documentar aqui!
-                             */
-                            $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Sem recursos novos.', 'S', $tipoManifestacao, $dataPrazoAtendimento);
-                        }
-                    } catch (Exception $e) {
-                        $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Erro na gravação recurso: ' . $e, 'N', $tipoManifestacao);
-                    }
-                } else {
-                    // 4.2 Se não houve alteração na data 'PrazoAtendimento' retornar log
-                    $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Já existe um processo (e-Sic) utilizando o número de protocolo e não há alteração para nova importação.', 'S', $tipoManifestacao, $dataPrazoAtendimento);
-                }
-            }
-        } else {
-            $this->criarNovoProcesso($idTipoManifestacaoSei, $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'], $manifestacaoESic, $arrDetalheManifestacao, $idUnidadeDestino, $numProtocoloFormatado, $tipoManifestacao, $arrRecursosManifestacao);
-        }
-    }
-
-    public function executarImportacaoLinhaRecursos ($arrRecursosManifestacao, $tipoManifestacao = 'R')
-    {
-        $debugLocal = false;
-
-        $objProcedimentoDTO = new ProcedimentoDTO();
-        $objProcedimentoDTO->setDblIdProcedimento(null);
-
-        $numProtocoloFormatado =  $this->formatarProcesso($arrRecursosManifestacao['numProtocolo']);
-        $dataPrazoAtendimento = $arrRecursosManifestacao['prazoAtendimento'];
-
-        /**
-         * Limpa os registros de detalhe de importação com erro para este NUP.
-         * Caso ocorra um novo, será criado novo registro de erro para o NUP no tratamento desta function.
-         */
-        $this->limparErrosParaNup($numProtocoloFormatado);
-
-        /**
-         * Se for Manifestação do e-Sic verificar:houve alteração na data 'PrazoAtendimento' e
-         * gera novo arquivo PDF com as alterações para inserção no mesmo protocolo (NUP) e
-         * importa anexos comparando o hash do arquivo para não duplicidade no processo
-         */
-        // Vefificar se o NUP já existe
-        $objProtocoloDTOExistente = $this->verificarProtocoloExistente($numProtocoloFormatado);
-
-        // Caso já exista um Protocolo no SEI continua, caso contrário apenas registra o log
-        if (! is_null($objProtocoloDTOExistente)) {
-
-            $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] Existe o protocolo: ' . $numProtocoloFormatado);
-
-            // Se existir e for e-Sic
-            if ($tipoManifestacao == 'R') {
-
-                $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] É do tipo: ' . $tipoManifestacao . ' > ' . $this->verificaTipo($arrRecursosManifestacao, 'R'));
-
-                // Data do último prazo de atendimento para este protocolo sem o tipo de recurso para buscar qualquer um recurso anterior
-                $objUltimaDataPrazoAtendimento = MdCguEouvAgendamentoINT::retornarUltimaDataPrazoAtendimento($numProtocoloFormatado);
-                $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] Último prazo de atendimento: ' . $objUltimaDataPrazoAtendimento);
-
-                /**
-                 * Regra de bloqueio na criação de novos recursos caso já exista um recurso superior ao atualmente listado
-                 * - regra implementada devido à duplicidade na importação dos processos
-                 */
-                $ultimoTipoRecursoImportado = MdCguEouvAgendamentoINT::retornarTipoManifestacao($this->idRelatorioImportacao, $numProtocoloFormatado);
-                $ultimoTipoRecursoImportado = $ultimoTipoRecursoImportado ? $ultimoTipoRecursoImportado->getStrTipManifestacao() : $this->verificaTipo($arrRecursosManifestacao, 'R1');
-                $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] Ultimo tipo de recurso importado: ' . $ultimoTipoRecursoImportado . ' - Tipo recurso atual: ' . $this->verificaTipo($arrRecursosManifestacao, 'R1'));
-
-                $permiteImportacaoRecursoAtual = $this->permiteImportacaoRecursoAtual($this->verificaTipo($arrRecursosManifestacao, 'R1'), $ultimoTipoRecursoImportado);
-                $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] Permite criar o recurso atual: ' . $permiteImportacaoRecursoAtual);
-
-                if ($permiteImportacaoRecursoAtual == 'bloquear') {
-                    $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] Não foi permitido criar o recurso, pode deve haver recurso anterior já importado');
-                    // Se não for permitido criar o recurso
-                    $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'O recurso existente no FalaBR não será importado devido à regra implementada - tipoAtual: "' . $this->verificaTipo($arrRecursosManifestacao, 'R') . '" | tipoAnterior: '. $ultimoTipoRecursoImportado .' | protocolo.', 'S', $ultimoTipoRecursoImportado, $objUltimaDataPrazoAtendimento->getDthDthPrazoAtendimento());
+                if ($tipoUltimaImportacao == null) {
+                    $this->gravarLogProtocolo($numProtocoloFormatado, 'Já existe um processo SEI utilizando o número de protocolo, ' .
+                        'mas aparentemente ele não foi criado pela integração com o FalaBR. Dados não serão importados.', 'N', $tipoImportacaoAtual);
                     return;
                 }
 
-                // Verificar se houve alteração na data 'PrazoAtendimento'
-                if (($objUltimaDataPrazoAtendimento && $objUltimaDataPrazoAtendimento->getDthDthPrazoAtendimento() <> $dataPrazoAtendimento) || $objUltimaDataPrazoAtendimento === null) {
-
-                    $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] Data de prazo de atendimento diferente da última, incinia importacao');
-
-                    // Importar anexos do novo recurso
-                    try {
-                        if (isset($arrRecursosManifestacao)) {
-                            // Verifica Tipo de Recurso
-                            $tipo_recurso = $this->verificaTipo($arrRecursosManifestacao);
-                            $unidadeDestino = $this->getUnidadeDestino($tipo_recurso);
-
-                            $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] Tipo de recurso: ' . $tipo_recurso);
-
-                            // Buscar dados da Manifestação
-                            $numProtocoloSemFormatacao = str_replace(['.', '/', '-'], ['', '', ''], $numProtocoloFormatado);
-                            $retornoWsLinha = $this->apiClient->consultaManifestacao($numProtocoloSemFormatacao);
-                            $arrDetalheManifestacao = $this->apiClient->consultaDetalhadaManifestacao($retornoWsLinha);
-
-                            $debugLocal && LogSEI::getInstance()->gravar('Importando Recurso processo: ' . $numProtocoloFormatado . ' | tipo: ' . $tipo_recurso);
-
-                            // Processa anexos
-                            $ocorreuErroAdicionarAnexo = false;
-                            $arrAnexos = [];
-                            if (count($arrRecursosManifestacao['anexos']) > 0) {
-                                $anexosGerados = $this->gerarAnexosProtocolo($arrRecursosManifestacao['anexos'], $numProtocoloFormatado, $tipoManifestacao);
-                                $ocorreuErroAdicionarAnexo = $anexosGerados['erro'];
-                                $arrAnexos = $anexosGerados['documentos'];
-                            }
-
-                            /**
-                             * Verificar o tipo de recurso de for diferente de segunda instãncia, trazer todos os recursos para o documento pdf
-                             */
-                            if ($tipo_recurso <> 'R1') {
-                                $arrRecursosManifestacaoComAnteriores = $this->apiClient->consultaRecursosDaManifestacao($numProtocoloSemFormatacao);
-                                $objDocumentoRecurso = $this->gerarPDFLai($arrDetalheManifestacao, $arrRecursosManifestacaoComAnteriores, $tipo_recurso, $ocorreuErroAdicionarAnexo);
-                            } else {
-                                $objDocumentoRecurso = $this->gerarPDFLai($arrDetalheManifestacao, $arrRecursosManifestacao, $tipo_recurso, $ocorreuErroAdicionarAnexo);
-                            }
-
-                            // Insere documentos no processo
-                            $arrDocumentos = array_merge([$objDocumentoRecurso], $arrAnexos);
-                            $objSeiRN = new SeiRN();
-                            foreach($arrDocumentos as $objDocumentoAPI) {
-                                $objDocumentoAPI->setIdProcedimento($objProtocoloDTOExistente->getDblIdProtocolo());
-                                $objSeiRN->incluirDocumento($objDocumentoAPI);
-                            }
-
-                            $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Recurso tipo ' . $tipo_recurso . ' com protocolo ' . $numProtocoloFormatado . ' importado com sucesso com ' . count($arrAnexos) . ' anexos incluidos no protocolo.', 'S', $tipo_recurso, $dataPrazoAtendimento);
-                            $debugLocal && LogSEI::getInstance()->gravar('Importando Recurso processo: ' . $numProtocoloFormatado . ' | tipo: ' . $tipo_recurso . 'depois de gravar log ?!');
-                            LogSEI::getInstance()->gravar('Módulo Integração FalaBR - Importação de Recurso ' . $numProtocoloFormatado . ': total de  Anexos configurados: ' . count($arrAnexos), InfraLog::$INFORMACAO);
-
-                            try {
-                                $objEntradaEnviarProcesso = new EntradaEnviarProcessoAPI();
-                                $objEntradaEnviarProcesso->setIdProcedimento($objProtocoloDTOExistente->getDblIdProtocolo());
-                                $objEntradaEnviarProcesso->setUnidadesDestino([$unidadeDestino]);
-                                $objEntradaEnviarProcesso->setSinManterAbertoUnidade('S');
-                                $objEntradaEnviarProcesso->setSinEnviarEmailNotificacao('S');
-                                $objEntradaEnviarProcesso->setSinReabrir('S');
-
-                                $objSeiRN = new SeiRN();
-                                $objSeiRN->enviarProcesso($objEntradaEnviarProcesso);
-                                LogSEI::getInstance()->gravar('Módulo Integração FalaBR - (Recurso tipo ' . $tipo_recurso . ') Processo ' . $numProtocoloFormatado . ' enviado para unidade ' . $this->idUnidadeRecursoPrimeiraInstancia, InfraLog::$INFORMACAO);
-
-                            } catch (Exception $e) {
-                                LogSEI::getInstance()->gravar('Módulo Integração FalaBR - (Recurso tipo ' . $tipo_recurso . ') Não foi possivel abrir o Processo ' . $numProtocoloFormatado . ' na unidade ' . $this->idUnidadeRecursoPrimeiraInstancia . ' - erro: ' . $e, InfraLog::$INFORMACAO);
-                            }
-                        } else {
-                            $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Sem recursos novos.', 'S', $ultimoTipoRecursoImportado, $dataPrazoAtendimento);
-                        }
-                    } catch (Exception $e) {
-                        $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] Erro importando anexo do recruso');
-                        $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Erro na gravação recurso: ' . $e, 'N', $tipoManifestacao);
-                    }
-                } else {
-                    $debugLocal && LogSEI::getInstance()->gravar('[executarImportacaoLinhaRecursos] Não importou recurso pois o prazo de atendimento é igual e não faz nada.. não atualiza o log para não atualizar a data do novo prazo nem o tipo de recurso');
-                    // Se não houve alteração na data 'PrazoAtendimento' retornar log
-                    $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Já existe um recurso (e-Sic) do tipo "' . $this->verificaTipo($arrRecursosManifestacao, 'R') . '" para este protocolo e não há alteração para nova importação.', 'S', $ultimoTipoRecursoImportado, $objUltimaDataPrazoAtendimento->getDthDthPrazoAtendimento());
+                // Se existir e for manifestação de Ouvidoria
+                if ($tipoImportacaoAtual == 'P') {
+                    $debugLocal && LogSEI::getInstance()->gravar('Importando Linha Manifestação e-ouv - protocolo: ' . $this->formatarProcesso($numProtocoloFormatado));
+                    $this->gravarLogProtocolo($numProtocoloFormatado, 'Protocolo já importado anteriormente.', 'S', $tipoImportacaoAtual);
+                    return;
                 }
             }
-        } else {
-            $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao, 'Existe recurso para o processo ' . $numProtocoloFormatado . ', porém este processo não existe no SEI. Provavelmente é um processo antes da data de início de utilização do módulo ou o Tipo de Manifestação do FalaBR não foi registrada para este módulo.', 'S', $tipoManifestacao);
+
+            // Gerar documentos a serem importados
+            if ($tipoImportacaoAtual == 'P') {
+                $anexosGerados = $this->gerarAnexosProtocolo($manifestacao['Teor']['Anexos'], $numProtocoloFormatado);
+                $objDocumentoManifestacao = $this->gerarPDFOuvidoria($manifestacao, $anexosGerados['erro']);
+                $arrDocumentos = array_merge([$objDocumentoManifestacao], $anexosGerados['documentos']);
+            } else {
+                // Consulta recursos
+                $arrRecursos = $this->apiClient->consultaRecursosDaManifestacao($numProtocolo);
+                $arrRecursos = $this->filtraRecursosSuportados($arrRecursos);
+                $numRecursos = count($arrRecursos);
+
+                // Se há recursos, atualiza o tipo de importação
+                if ($numRecursos > 0) {
+                    // Verifica o tipo do último recurso
+                    $tipoImportacaoAtual = $this->obterTipoImportacao($arrRecursos[$numRecursos-1]);
+                }
+
+                // Verifica se a importação é necessária
+                if ($tipoUltimaImportacao == $tipoImportacaoAtual) {
+                    $this->gravarLogProtocolo($numProtocoloFormatado, 'Protocolo já importado anteriormente.', 'S', $tipoUltimaImportacao);
+                    return;
+                }
+
+                // Verifica se a importação é permitida
+                if ($tipoUltimaImportacao && !$this->permiteImportacaoRecursoAtual($tipoImportacaoAtual, $tipoUltimaImportacao)) {
+                    $this->gravarLogProtocolo($numProtocoloFormatado, 'Importação inconsistente. ' .
+                        'Importação atual: ' . $tipoImportacaoAtual . ', Importação anterior: ' . $tipoUltimaImportacao,
+                        'N', $tipoImportacaoAtual);
+                    return;
+                }
+
+                $arrAnexos = [];
+                $ocorreuErroAnexos = false;
+
+                // Caso seja a primeira importação, importa anexos do pedido inicial
+                if ($tipoUltimaImportacao == null) {
+                    $anexosGerados = $this->gerarAnexosProtocolo($manifestacao['Teor']['Anexos'], $numProtocoloFormatado);
+                    if ($anexosGerados['erro']) {
+                        $ocorreuErroAnexos = true;
+                    }
+                    $arrAnexos = array_merge($arrAnexos, $anexosGerados['documentos']);
+                }
+
+                // Importa anexos de recursos desde a última importação
+                if ($numRecursos > 0) {
+                    $aposUltimaImportacao = ($tipoUltimaImportacao == null);
+
+                    foreach ($arrRecursos as $recurso) {
+                        if (!$aposUltimaImportacao) {
+                            if ($this->obterTipoImportacao($recurso) == $tipoUltimaImportacao) {
+                                $aposUltimaImportacao = true;
+                            }
+                        } else {
+                            $anexosGerados = $this->gerarAnexosProtocolo($recurso['anexos'], $numProtocoloFormatado);
+                            if ($anexosGerados['erro']) {
+                                $ocorreuErroAnexos = true;
+                            }
+                            $arrAnexos = array_merge($arrAnexos, $anexosGerados['documentos']);
+                        }
+                    }
+                }
+
+                // Gera PDF principal 
+                $objDocumentoManifestacao = $this->gerarPDFLai($manifestacao, $arrRecursos, $tipoImportacaoAtual, $ocorreuErroAnexos);
+
+                // Agrupa documentos
+                $arrDocumentos = array_merge([$objDocumentoManifestacao], $arrAnexos);
+            }
+
+            // Verificar a unidade de destino
+            $idUnidadeDestino = $this->obterUnidadeDestino($tipoImportacaoAtual);
+
+            // Verifica se cria um processo ou inclui documento
+            if (is_null($objProtocoloDTOExistente)) {
+                // Primeira importação, deve-se criar um processo
+                $this->simulaLogin($this->siglaSistema, $this->identificacaoServico, $idUnidadeDestino);
+                $this->criarNovoProcesso($idTipoManifestacaoSei, $manifestacao, $idUnidadeDestino, $numProtocoloFormatado, $arrDocumentos);
+                $this->gravarLogProtocolo($numProtocoloFormatado, 'Protocolo importado com sucesso.', 'S', $tipoImportacaoAtual);
+            } else {
+                // Simula login na unidade geradora do processo existente
+                $this->simulaLogin($this->siglaSistema, $this->identificacaoServico, $objProtocoloDTOExistente->getNumIdUnidadeGeradora());
+
+                // Inclui os documentos no processo
+                $objSeiRN = new SeiRN();
+                foreach($arrDocumentos as $objDocumentoAPI) {
+                    $objDocumentoAPI->setIdProcedimento($objProtocoloDTOExistente->getDblIdProtocolo());
+                    $objSeiRN->incluirDocumento($objDocumentoAPI);
+                }
+
+                // Remete o processo para a unidade correta
+                $objEntradaEnviarProcesso = new EntradaEnviarProcessoAPI();
+                $objEntradaEnviarProcesso->setIdProcedimento($objProtocoloDTOExistente->getDblIdProtocolo());
+                $objEntradaEnviarProcesso->setUnidadesDestino([$idUnidadeDestino]);
+                $objEntradaEnviarProcesso->setSinManterAbertoUnidade('S');
+                $objEntradaEnviarProcesso->setSinEnviarEmailNotificacao('S');
+                $objEntradaEnviarProcesso->setSinReabrir('S');
+
+                $objSeiRN->enviarProcesso($objEntradaEnviarProcesso);
+
+                $this->gravarLogProtocolo($numProtocoloFormatado, 'Recurso importado com sucesso.', 'S', $tipoImportacaoAtual);
+            }
+        } catch (\Exception $e) {
+            $this->gravarLogProtocolo($numProtocoloFormatado, 'Erro na importação: ' . $e, 'N', $tipoImportacaoAtual);
+            throw $e;
         }
+    }
+
+    /**
+     * Filtra um array, removendo tipos de recursos não suportados pela integração
+     * @param array $arrRecursos Lista de estruturas RecursoDTO
+     * (https://falabr.cgu.gov.br/Help/ResourceModel?modelName=RecursoDTO)
+     * @return array Lista de estruturas RecursoDTO apenas com tipos de recurso
+     * suportados
+     */
+    private function filtraRecursosSuportados($arrRecursos) {
+        return array_filter($arrRecursos, function ($recurso) {
+            // 1 -> Recurso de primeira instância
+            // 2 -> Recurso de segunda instância
+            // 6 -> Pedido de Revisão
+            return in_array($recurso['instancia']['IdInstanciaRecurso'], [1, 2, 6]);
+        });
+    }
+
+    public function executarImportacaoLinhaRecursos($recurso)
+    {
+        $numProtocolo = $recurso['numProtocolo'];
+
+        if (array_key_exists($numProtocolo, $this->protocolosProcessados)) {
+            return; // Protocolo já processado nessa execução
+        }
+
+        // Consultar manifestação do recurso
+        $manifestacao = $this->apiClient->consultaManifestacao($numProtocolo);
+
+        // Processar importação da manifestação atualizada
+        $this->executarImportacaoLinha($manifestacao);
     }
 
     public function limparErrosParaNup($numProtocoloComErro){
@@ -975,11 +820,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
      * DadosBasicosAnexoRecursoDTO
      * (https://falabr.cgu.gov.br/Help/ResourceModel?modelName=DadosBasicosAnexoRecursoDTO)
      * @param string $numProtocoloFormatado Número do protocolo da manifestação formatado
-     * @param string $tipoManifestacao 'P' se for manifestação de ouvidoria e 'R' se for de acesso à informação
      * @return array Array associativo cuja chave 'documentos' é um array de objetos
      * DocumentoAPI do SEI e achave 'erro' é um bool que indica se algum anexo tem extensão inválida
      */
-    private function gerarAnexosProtocolo($arrAnexosManifestacao, $numProtocoloFormatado, $tipoManifestacao = 'P')
+    private function gerarAnexosProtocolo($arrAnexosManifestacao, $numProtocoloFormatado)
     {
         $arrAnexosAdicionados = array();
         $intTotAnexos = count($arrAnexosManifestacao);
@@ -1045,14 +889,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 }
                 LogSEI::getInstance()->gravar('Importação de Manifestação ' . $numProtocoloFormatado . ': Arquivo ' . $strNomeArquivoOriginal . ' possui extensão inválida.', InfraLog::$INFORMACAO);
             }
-        }
-
-        if (count($arrExtensoesInvalidas) > 0) {
-            $this->gravarLogLinha($numProtocoloFormatado, $this->idRelatorioImportacao,
-                'Um ou mais documentos anexos não foram importados corretamente '.
-                    'pois o SEI não está habilitado a receber arquivos dos seguintes tipos: '.
-                    implode(',', $arrExtensoesInvalidas),
-                'S', $tipoManifestacao);
         }
 
         return [
@@ -1160,40 +996,12 @@ class MdCguEouvAgendamentoRN extends InfraRN
     }
 
     /**
-     * Verifica o tipo de Recuso com base na API do FalaBR
-     *
-     * - IdInstanciaRecurso
-     * - 1 = primeira instância
-     * - 2 = segunda instância
-     *
-     * @param null $recursos
-     * @return string
-     *
-     * - 'P' - Padrão, não possui recursos de primeira ou segunda instância
-     * - 'R1' - Recurso de primeira instância
-     * - 'R2' - Recurso de segunda instância
+     * Obter o tipo de importação a partir de um recurso
+     * @param array $recurso Estrutura RecursoDTO
+     * (https://falabr.cgu.gov.br/Help/ResourceModel?modelName=RecursoDTO)
+     * @return string Tipo de importação representado por este recurso
      */
-    public function verificaTipo($recursos = null, $default_response = 'P')
-    {
-        $response = $default_response;
-        if (isset($recursos)) {
-            if (isset($recursos['instancia'])) {
-                $response = $this->checkTipoRecurso($recursos);
-            } else {
-                foreach ($recursos as $recurso) {
-                    if ($this->checkTipoRecurso($recurso)) {
-                        $response = $this->checkTipoRecurso($recurso);
-                        break;
-                    }
-                }
-
-            }
-        }
-
-        return $response;
-    }
-
-    public function checkTipoRecurso($recurso)
+    private function obterTipoImportacao($recurso)
     {
         if ($recurso['instancia']['IdInstanciaRecurso'] == 6) {
             return 'PR'; // Pedido Revisão
@@ -1245,7 +1053,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
              */
             if ($tipoManifestacaoAtual == 'R1' && in_array($ultimoTipoRecursoImportado, ['R2', 'RC', 'R3'])) {
                 $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criação deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
-                return 'bloquear';
+                return false;
             }
 
             /**
@@ -1254,7 +1062,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
              */
             if ($tipoManifestacaoAtual == 'R2' && in_array($ultimoTipoRecursoImportado, ['RC', 'R3'])) {
                 $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criação deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
-                return 'bloquear';
+                return false;
             }
 
             /**
@@ -1262,7 +1070,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
              */
             if ($tipoManifestacaoAtual == 'RE') {
                 $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criação deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
-                return 'bloquear';
+                return false;
             }
 
             /**
@@ -1270,7 +1078,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
              */
             if ($tipoManifestacaoAtual == 'PR' && in_array($ultimoTipoRecursoImportado, ['R1', 'R2', 'RC', 'R3'])) {
                 $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criação deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
-                return 'bloquear';
+                return false;
             }
         }
 
@@ -1281,7 +1089,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
          * "instancia": { "IdInstanciaRecurso": ## > na API do FalaBR
          */
         $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Vai permitir a criação desse recurso!');
-        return 'permitir';
+        return true;
     }
 }
 ?>
