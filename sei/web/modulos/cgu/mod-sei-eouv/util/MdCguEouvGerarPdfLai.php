@@ -136,9 +136,7 @@ class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
          */
         $this->secao('Recursos');
         if (count($recursos) > 0) {
-            $reversedRecursos = array_reverse($recursos);
-
-            foreach ($reversedRecursos as $recurso) {
+            foreach ($recursos as $recurso) {
 
                 /**
                  * Somente gerará documento caso seja recursos 1ª ou 2ª instancia ou pedido de revisão,

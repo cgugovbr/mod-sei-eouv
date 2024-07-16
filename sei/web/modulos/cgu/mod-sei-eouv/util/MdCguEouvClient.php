@@ -153,7 +153,12 @@ class MdCguEouvClient {
 
         try {
             $resposta = $this->apiRestRequest('/api/recursos', $params);
-            return $resposta['Recursos'];
+            // Garante ordenação cronológica dos recursos (a ordenação por parâmetro da API não funciona)
+            $recursos = $resposta['Recursos'];
+            usort($recursos, function ($r1, $r2) {
+                return $this->comparaDataRecursos($r1, $r2);
+            });
+            return $recursos;
         } catch (MdCguEouvExceptionHttpNotFound $e) {
             return [];
         }
@@ -174,10 +179,59 @@ class MdCguEouvClient {
 
         try {
             $resposta = $this->apiRestRequest('/api/recursos', $params);
-            return $resposta['Recursos'];
+            // Garante ordenação cronológica dos recursos (a ordenação por parâmetro da API não funciona)
+            $recursos = $resposta['Recursos'];
+            usort($recursos, function ($r1, $r2) {
+                return $this->comparaDataRecursos($r1, $r2);
+            });
+            return $recursos;
         } catch (MdCguEouvExceptionHttpNotFound $e) {
             return [];
         }
+    }
+
+    /**
+     * Compara datas de dois recursos para fins de ordenação
+     * @param array $r1 Estrutura RecursoDTO
+     * (https://falabr.cgu.gov.br/Help/ResourceModel?modelName=RecursoDTO)
+     * @param array $r2 Estrutura RecursoDTO
+     * (https://falabr.cgu.gov.br/Help/ResourceModel?modelName=RecursoDTO)
+     * @return int 0 se as datas são iguais, 1 se a data de $r1 é posterior e
+     * -1 se a data de $r1 é anterior à de $r2
+     */
+    private function comparaDataRecursos($r1, $r2)
+    {
+        $dth1 = $this->converteDataHora($r1['dataRecurso']);
+        $dth2 = $this->converteDataHora($r2['dataRecurso']);
+
+        if ($dth1 == $dth2) {
+            return 0;
+        } else if ($dth1 > $dth2) {
+            return 1;
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * Converte data e hora de string para um objeto DateTime
+     * @param string $strDatahora Valor de data e hora como string em um dos formatos:
+     * "d/m/Y H:i" ou "d/m/Y H:i:s" ou "d/m/Y"
+     * @return DateTime Objeto que representa a data e hora
+     */
+    public function converteDataHora($strDataHora)
+    {
+        // Formatos de data e hora a serem tentados na ordem
+        $formatos = ['d/m/Y H:i', 'd/m/Y H:i:s', 'd/m/Y'];
+
+        foreach ($formatos as $formato) {
+            $objDth = DateTime::createFromFormat($formato, $strDataHora);
+            if ($objDth !== false) {
+                return $objDth;
+            }
+        }
+
+        throw new InfraException('Campo de data e hora inválido: ' . $strDataHora);
     }
 
     /**
@@ -292,7 +346,7 @@ class MdCguEouvClient {
                 throw new MdCguEouvExceptionHttpNotFound('HTTP 404: página não encontrada');
                 break;
             default:
-                throw new InfraException('Ocorreu algum erro não tratado. HTTP Status: ' . $httpcode);
+                throw new InfraException("Erro não tratado (HTTP Status $httpcode). URL: $url");
                 break;
         }
 
