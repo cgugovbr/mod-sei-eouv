@@ -872,6 +872,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $strCaminhoArquivoUpload = DIR_SEI_TEMP . '/' . $strNomeArquivoUpload;
                 $this->apiClient->downloadAnexo($retornoWsAnexoLinha, $strCaminhoArquivoUpload);
 
+                // Se o arquivo vier vazio irá gerar erro ao cadastrar no SEI
+                if (filesize($strCaminhoArquivoUpload) == 0) {
+                    continue;
+                }
+
                 $objAnexoManifestacao = new DocumentoAPI();
 
                 $objAnexoManifestacao->setTipo('R');
