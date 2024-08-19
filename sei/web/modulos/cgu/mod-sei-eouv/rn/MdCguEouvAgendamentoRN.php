@@ -426,6 +426,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
     {
         $objEouvRelatorioImportacaoDetalheDTO = new MdCguEouvRelatorioImportacaoDetalheDTO();
         $objEouvRelatorioImportacaoDetalheDTO->retStrProtocoloFormatado();
+        $objEouvRelatorioImportacaoDetalheDTO->retStrTipManifestacao();
         $objEouvRelatorioImportacaoDetalheDTO->setStrSinSucesso('N');
 
         $objEouvRelatorioImportacaoDetalheRN = new MdCguEouvRelatorioImportacaoDetalheRN();
