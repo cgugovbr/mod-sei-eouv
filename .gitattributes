@@ -1,1 +1,3 @@
-* text working-tree-encoding=iso-8859-1 eol=crlf
+*.php text working-tree-encoding=iso-8859-1 eol=crlf
+*.md text working-tree-encoding=iso-8859-1 eol=crlf
+*.png binary
