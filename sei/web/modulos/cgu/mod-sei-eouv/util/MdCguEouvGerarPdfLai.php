@@ -94,7 +94,7 @@ class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
                     $this->item('Tipo de Resposta', $evento['Resposta']['TipoRespostaManifestacao']['DescTipoRespostaManifestacao']);
                     $this->item('Data e Hora', $evento['HistoricoAcao']['DataHoraAcao']);
                     $this->item('Decisão', $evento['Resposta']['Decisao']['descricaoDecisao']);
-                    $this->item('Teor da Resposta', $evento['Resposta']['TxtResposta']);
+                    $this->item('Teor da Resposta', $evento['Resposta']['TxtResposta'], true);
                     $this->espacamento();
 
                     ++$iResposta;
@@ -150,7 +150,7 @@ class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
                     $this->item('Data de abertura', $recurso['dataRecurso']);
                     $this->item('Prazo de Atendimento', $recurso['prazoAtendimento']);
                     $this->item('Tipo de Recurso', $recurso['tipoRecurso']['DescTipoRecurso']);
-                    $this->item('Justificativa', $recurso['justificativa']);
+                    $this->item('Justificativa', $recurso['justificativa'], true);
 
                     // Anexos
                     $textoAnexos = '';
@@ -165,6 +165,21 @@ class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
                     $this->item('Anexos', $textoAnexos, true);
 
                     $this->espacamento();
+
+                    if (is_array($recurso['respostasRecurso'])) {
+                        foreach ($recurso['respostasRecurso'] as $resposta) {
+                            $this->texto('Resposta - ' . $recurso['instancia']['DescInstanciaRecurso'], true);
+
+                            $this->item('Data da Resposta', $resposta['datRegistroResposta']);
+                            $this->item('Tipo de Resposta', $resposta['tipoRespostaRecurso']['descTipoRespostaRecurso']);
+                            $this->item('Justificativa', $resposta['txtJustificativa'], true);
+                            $this->item('Responsável pela Resposta', $resposta['responsavelResposta']);
+                            $this->item('Destinatário do Recurso da Próxima Instância', $resposta['destinatarioRecursoProximaInstancia']);
+                            $this->item('Prazo para Recurso', $resposta['datPrazoRecurso']);
+
+                            $this->espacamento();
+                        }
+                    }
                 }
             }
         } else {
