@@ -552,10 +552,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
         // Verifica Tipo de Manifestação: Ouvidoria ou LAI
         if ($numIdTipoManifestacao != 8) {
             $debugLocal && LogSEI::getInstance()->gravar('Importação tipo "P" - tipoManifestação <> "8"');
-            $tipoImportacaoAtual = 'P';
+            $tipoManifestacao = 'P';
         } else {
             $debugLocal && LogSEI::getInstance()->gravar('Importação tipo "R" - tipoManifestação == "8"');
-            $tipoImportacaoAtual = 'R';
+            $tipoManifestacao = 'R';
         }
 
         try {
@@ -570,7 +570,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
             if ($objEouvDeparaImportacaoDTO == null) {
                 $this->gravarLogProtocolo($numProtocoloFormatado,
                 'Não existe mapeamento desse tipo de manifestação do FalaBR para o tipo de processo do SEI.',
-                'N', $tipoImportacaoAtual);
+                'N', $tipoManifestacao);
                 return;
             } else {
                 $idTipoManifestacaoSei = $objEouvDeparaImportacaoDTO->getNumIdTipoProcedimento();
@@ -590,49 +590,44 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                 if ($tipoUltimaImportacao == null) {
                     $this->gravarLogProtocolo($numProtocoloFormatado, 'Já existe um processo SEI utilizando o número de protocolo, ' .
-                        'mas aparentemente ele não foi criado pela integração com o FalaBR. Dados não serão importados.', 'N', $tipoImportacaoAtual);
+                        'mas aparentemente ele não foi criado pela integração com o FalaBR. Dados não serão importados.', 'N', $tipoManifestacao);
                     return;
                 }
+            }
 
-                // Se existir e for manifestação de Ouvidoria
-                if ($tipoImportacaoAtual == 'P') {
-                    $debugLocal && LogSEI::getInstance()->gravar('Importando Linha Manifestação e-ouv - protocolo: ' . $this->formatarProcesso($numProtocoloFormatado));
-                    $this->gravarLogProtocolo($numProtocoloFormatado, 'Protocolo já importado anteriormente.', 'S', $tipoImportacaoAtual);
-                    return;
-                }
+            // Consulta recursos
+            $arrRecursos = $this->apiClient->consultaRecursosDaManifestacao($numProtocoloFormatado);
+            $arrRecursos = $this->filtraRecursosSuportados($arrRecursos);
+            $numRecursos = count($arrRecursos);
+
+            // Define o tipo de importação
+            if ($numRecursos > 0) {
+                // Verifica o tipo do último recurso
+                $tipoImportacaoAtual = $this->obterTipoImportacao($arrRecursos[$numRecursos-1]);
+            } else {
+                $tipoImportacaoAtual = $tipoManifestacao;
+            }
+
+            // Verifica se a importação é necessária
+            if ($tipoUltimaImportacao == $tipoImportacaoAtual) {
+                $this->gravarLogProtocolo($numProtocoloFormatado, 'Protocolo já importado anteriormente.', 'S', $tipoUltimaImportacao);
+                return;
+            }
+
+            // Verifica se a importação é permitida
+            if ($tipoUltimaImportacao && !$this->permiteImportacaoAtual($tipoImportacaoAtual, $tipoUltimaImportacao)) {
+                $this->gravarLogProtocolo($numProtocoloFormatado, 'Importação inconsistente. ' .
+                    'Importação atual: ' . $tipoImportacaoAtual . ', Importação anterior: ' . $tipoUltimaImportacao,
+                    'N', $tipoImportacaoAtual);
+                return;
             }
 
             // Gerar documentos a serem importados
             if ($tipoImportacaoAtual == 'P') {
                 $anexosGerados = $this->gerarAnexosProtocolo($manifestacao['Teor']['Anexos'], $numProtocoloFormatado);
-                $objDocumentoManifestacao = $this->gerarPDFOuvidoria($manifestacao, $anexosGerados['erro']);
+                $objDocumentoManifestacao = $this->gerarPDFOuvidoria($manifestacao, [], $tipoImportacaoAtual, $anexosGerados['erro']);
                 $arrDocumentos = array_merge([$objDocumentoManifestacao], $anexosGerados['documentos']);
             } else {
-                // Consulta recursos
-                $arrRecursos = $this->apiClient->consultaRecursosDaManifestacao($numProtocolo);
-                $arrRecursos = $this->filtraRecursosSuportados($arrRecursos);
-                $numRecursos = count($arrRecursos);
-
-                // Se há recursos, atualiza o tipo de importação
-                if ($numRecursos > 0) {
-                    // Verifica o tipo do último recurso
-                    $tipoImportacaoAtual = $this->obterTipoImportacao($arrRecursos[$numRecursos-1]);
-                }
-
-                // Verifica se a importação é necessária
-                if ($tipoUltimaImportacao == $tipoImportacaoAtual) {
-                    $this->gravarLogProtocolo($numProtocoloFormatado, 'Protocolo já importado anteriormente.', 'S', $tipoUltimaImportacao);
-                    return;
-                }
-
-                // Verifica se a importação é permitida
-                if ($tipoUltimaImportacao && !$this->permiteImportacaoRecursoAtual($tipoImportacaoAtual, $tipoUltimaImportacao)) {
-                    $this->gravarLogProtocolo($numProtocoloFormatado, 'Importação inconsistente. ' .
-                        'Importação atual: ' . $tipoImportacaoAtual . ', Importação anterior: ' . $tipoUltimaImportacao,
-                        'N', $tipoImportacaoAtual);
-                    return;
-                }
-
                 $arrAnexos = [];
                 $ocorreuErroAnexos = false;
 
@@ -647,7 +642,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                 // Importa anexos de recursos desde a última importação
                 if ($numRecursos > 0) {
-                    $aposUltimaImportacao = ($tipoUltimaImportacao == null);
+                    $aposUltimaImportacao = ($tipoUltimaImportacao == null) ||
+                        ($tipoUltimaImportacao == 'R') ||
+                        ($tipoUltimaImportacao == 'P');
 
                     foreach ($arrRecursos as $recurso) {
                         if (!$aposUltimaImportacao) {
@@ -664,8 +661,12 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     }
                 }
 
-                // Gera PDF principal 
-                $objDocumentoManifestacao = $this->gerarPDFLai($manifestacao, $arrRecursos, $tipoImportacaoAtual, $ocorreuErroAnexos);
+                // Gera PDF principal
+                if ($tipoManifestacao == 'P') {
+                    $objDocumentoManifestacao = $this->gerarPDFOuvidoria($manifestacao, $arrRecursos, $tipoImportacaoAtual, $ocorreuErroAnexos);
+                } else {
+                    $objDocumentoManifestacao = $this->gerarPDFLai($manifestacao, $arrRecursos, $tipoImportacaoAtual, $ocorreuErroAnexos);
+                }
 
                 // Agrupa documentos
                 $arrDocumentos = array_merge([$objDocumentoManifestacao], $arrAnexos);
@@ -760,9 +761,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
     }
 
-    private function gerarPDFOuvidoria($retornoWsLinha, $ocorreuErroAdicionarAnexo)
+    private function gerarPDFOuvidoria($retornoWsLinha, $recursos, $tipoImportacaoAtual, $ocorreuErroAdicionarAnexo)
     {
-        $mdCguEouvGerarPdf = new MdCguEouvGerarPdfOuv($retornoWsLinha, $this->importar_dados_manifestante, $ocorreuErroAdicionarAnexo);
+        $pedidoRevisao = count($recursos) > 0 ? $recursos[0] : null;
+        $mdCguEouvGerarPdf = new MdCguEouvGerarPdfOuv($retornoWsLinha, $pedidoRevisao, $this->importar_dados_manifestante, $ocorreuErroAdicionarAnexo);
         $pdf = $mdCguEouvGerarPdf->obterPDF();
 
         $objAnexoRN = new AnexoRN();
@@ -775,6 +777,12 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         $objDocumentoManifestacao = new DocumentoAPI();
         $objDocumentoManifestacao->setTipo('R');
+        if ($tipoImportacaoAtual == 'PR') {
+            $nomeDocumentoArvore = 'Pedido Revisão';
+        } else {
+            $nomeDocumentoArvore = 'Manifestação';
+        }
+        $objDocumentoManifestacao->setNumero($nomeDocumentoArvore);
         $objDocumentoManifestacao->setIdSerie($this->idTipoDocumentoAnexoDadosManifestacao);
         $objDocumentoManifestacao->setData($retornoWsLinha['DataCadastro']);
         $objDocumentoManifestacao->setNomeArquivo('RelatórioDadosManifestação.pdf');
@@ -1038,70 +1046,53 @@ class MdCguEouvAgendamentoRN extends InfraRN
     }
 
     /**
-     * Verifica se existe recurso 'posterior' cadastrado
-     *
-     * - Posterior está entre aspas pq o recurso deve seguir uma órdem cronológica para se adequar à importação dos
-     * dados no SEI
-     *
+     * Verifica se a importação é consistente com a ordem lógica dos recursos.
+     * Ex: um recurso de primeira instância não pode ser importado se a
+     * última importação foi de um recurso de segunda instância no mesmo processo.
+     * @param string $tipoImportacaoAtual O tipo da importação corrente dentre os
+     * tipos suportados
+     * @param string $ultimoTipoImportacao O tipo da última importação bem
+     * sucedida do protocolo.
+     * @return bool true se a importação é permitida e false caso contrário
+     * 
+     * Obs: Tipos suportados são: P, R, PR, R1, R2, R3 e RC
      */
-    public function permiteImportacaoRecursoAtual($tipoManifestacaoAtual, $ultimoTipoRecursoImportado)
+    public function permiteImportacaoAtual($tipoImportacaoAtual, $ultimoTipoImportacao)
     {
-        $debugLocal = false;
-
-        $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Verificando se existe algum recurso anterior');
-
-        // Se ja existir no log um recurso anterior verifica se o novo recurso e 'superior' ao já registrado
-        if ($tipoManifestacaoAtual) {
-
-            $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Existe log, validando o tipo de manifestação: ' . $tipoManifestacaoAtual . ' para o anteior existente: ' . $ultimoTipoRecursoImportado);
-
-            /**
-             * [CUIDADO] Nâo é possível utilizar o 'switch > case' aqui - não sei o por quê, mas não funciona....  @study (??)
-             */
-
-            /**
-             * Para criar um R1 (Recurso de Primeira Instância) pode existir somente PR (Pedido de Revisão),
-             * R (Pedido Inicial do e-Sic)
-             */
-            if ($tipoManifestacaoAtual == 'R1' && in_array($ultimoTipoRecursoImportado, ['R2', 'RC', 'R3'])) {
-                $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criação deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
-                return false;
-            }
-
-            /**
-             * Para criar um R2 (Recurso de Segunda Instância) pode existir somente R1 (Recurso de Primeira Instância),
-             * PR (Pedido de Revisão), R (Pedido Inicial do e-Sic)
-             */
-            if ($tipoManifestacaoAtual == 'R2' && in_array($ultimoTipoRecursoImportado, ['RC', 'R3'])) {
-                $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criação deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
-                return false;
-            }
-
-            /**
-             * Se for tipo 4 - Reclamação - não importar
-             */
-            if ($tipoManifestacaoAtual == 'RE') {
-                $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criação deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
-                return false;
-            }
-
-            /**
-             * Para criar um PR (Pedido de Revisão) pode existir somente R (Pedido Inicial do e-Sic)
-             */
-            if ($tipoManifestacaoAtual == 'PR' && in_array($ultimoTipoRecursoImportado, ['R1', 'R2', 'RC', 'R3'])) {
-                $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Deve bloquear a criação deste recurso! tipoAtual: ' . $tipoManifestacaoAtual . ' - tipoAnterior: ' . $ultimoTipoRecursoImportado);
-                return false;
-            }
-        }
-
         /**
-         * Se existir algo na tabela, porém, não estiver definido na regra acima ou se não existir nenhum registro na
-         * tabela, a importação será permitida
-         * [CUIDADO] Caso haja duplicidade na importação, pode haver algum tipo de recurso não mapeado no campo
-         * "instancia": { "IdInstanciaRecurso": ## > na API do FalaBR
-         */
-        $debugLocal && LogSEI::getInstance()->gravar('[permiteImportacaoRecursoAtual] Vai permitir a criação desse recurso!');
-        return true;
+         * Os pedidos iniciais, tanto de LAI quanto de Ouvidoria (R e P),
+         * formam o estágio inicial.
+         * 
+         * Em seguida pode vir um Pedido de Revisão, que é uma espécie de
+         * recurso que pode ser enviado quando há reclassificação de uma
+         * manifestação (Ex: uma denúncia pode ser reclassificada pelo órgão
+         * como pedido de acesso à informação e vice-versa).
+         * 
+         * Em seguida pode vir um Recurso de 1ª instância (R1).
+         * 
+         * Em seguida pode vir um recurso de 2ª instância (R2).
+         * 
+         * Em seguida pode vir um recurso de 3ª instância (R3 ou RC). RC indica
+         * que a terceira instância é a CGU, que ocorre quando o pedido é feito
+         * a um órgão federal. R3 indica que o pedido não é na esfera federal.
+        */
+        $ordem = [
+            'P' => 0,
+            'R' => 0,
+            'PR' => 1,
+            'R1' => 2,
+            'R2' => 3,
+            'R3' => 4,
+            'RC' => 4,
+        ];
+
+        // Verifica se um recurso de fase anterior não está sendo importado
+        // após um recurso de fase posterior
+        if ($ordem[$tipoImportacaoAtual] <= $ordem[$ultimoTipoImportacao]) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }
 ?>

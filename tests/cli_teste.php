@@ -134,7 +134,9 @@ try {
             $nup = verificaArgumentoNUP(2);
             $manifestacao = $client->consultaManifestacao($nup);
             $detalhada = $client->consultaDetalhadaManifestacao($manifestacao);
-            $geradorPdf = new MdCguEouvGerarPdfOuv($detalhada, true, false);
+            $recursos = $client->consultaRecursosDaManifestacao($nup);
+            $pedidoRevisao = count($recursos) > 0 ? $recursos[0] : null;
+            $geradorPdf = new MdCguEouvGerarPdfOuv($detalhada, $pedidoRevisao, true, false);
             $pdf = $geradorPdf->obterPDF();
             $arquivo = __DIR__ . '/Relatorio_'.$nup.'.pdf';
             echoln("Gerando arquivo PDF $arquivo");

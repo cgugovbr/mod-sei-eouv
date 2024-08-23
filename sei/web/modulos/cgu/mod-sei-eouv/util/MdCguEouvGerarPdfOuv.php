@@ -11,7 +11,7 @@ require_once __DIR__ . '/MdCguEouvGerarPdf.php';
 
 class MdCguEouvGerarPdfOuv extends MdCguEouvGerarPdf
 {
-    public function __construct($manifestacao, $importarDadosDoManifestante, $ocorreuErroAdicionarAnexo)
+    public function __construct($manifestacao, $pedidoRevisao, $importarDadosDoManifestante, $ocorreuErroAdicionarAnexo)
     {
         $this->criarPDF();
 
@@ -71,6 +71,31 @@ class MdCguEouvGerarPdfOuv extends MdCguEouvGerarPdf
             }
         } else {
             $this->texto('Não há campos adicionais.', true);
+        }
+
+        /**
+         * Seção Pedido de Revisão
+         */
+        if ($pedidoRevisao && is_array($pedidoRevisao['instancia']) &&
+                $pedidoRevisao['instancia']['IdInstanciaRecurso'] == 6) {
+            $this->secao('Pedido de Revisão');
+
+            $this->item('Data de abertura', $pedidoRevisao['dataRecurso']);
+            $this->item('Prazo de Atendimento', $pedidoRevisao['prazoAtendimento']);
+            $this->item('Tipo', $pedidoRevisao['tipoRecurso']['DescTipoRecurso']);
+            $this->item('Justificativa', $pedidoRevisao['justificativa']);
+
+            // Anexos
+            $textoAnexos = '';
+            $anexosPedido = $pedidoRevisao['anexos'];
+            if (is_array($anexosPedido) && count($anexosPedido) > 0) {
+                foreach ($anexosPedido as $anexo) {
+                    $textoAnexos .= $anexo['nomeArquivo'] . "\n";
+                }
+            } else {
+                $textoAnexos = 'Pedido não possui anexos.';
+            }
+            $this->item('Anexos', $textoAnexos, true);
         }
 
         /**
