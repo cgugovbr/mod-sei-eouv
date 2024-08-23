@@ -947,6 +947,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $objProtocoloDTOExistente = new ProtocoloDTO();
         $objProtocoloRNExistente = new ProtocoloRN();
         $objProtocoloDTOExistente->retDblIdProtocolo();
+        $objProtocoloDTOExistente->retNumIdUnidadeGeradora();
         $objProtocoloDTOExistente->retStrProtocoloFormatado();
         $objProtocoloDTOExistente->setStrProtocoloFormatado($this->formatarProcesso($numProtocoloFormatado));
         $objProtocoloDTOExistente = $objProtocoloRNExistente->consultarRN0186($objProtocoloDTOExistente);
