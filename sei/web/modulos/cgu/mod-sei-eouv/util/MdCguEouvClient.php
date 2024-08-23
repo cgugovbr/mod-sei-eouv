@@ -102,7 +102,7 @@ class MdCguEouvClient {
 
     /**
      * Consulta manifestação por protocolo específico
-     * @param string $protocolo NUP sem formatação (apenas dígitos)
+     * @param string $protocolo NUP com ou sem formatação (apenas dígitos)
      * @return array|null Estrutura DadosBasicosManifestacaoDTO
      * (https://falabr.cgu.gov.br/Help/ResourceModel?modelName=DadosBasicosManifestacaoDTO)
      * ou null caso a manifestação não seja encontrada 
@@ -110,7 +110,7 @@ class MdCguEouvClient {
     public function consultaManifestacao($protocolo)
     {
         $params = [
-            'NumProtocolo' => $protocolo,
+            'NumProtocolo' => $this->removeFormatacao($protocolo),
         ];
 
         try {
@@ -166,7 +166,7 @@ class MdCguEouvClient {
 
     /**
      * Consulta recursos relacionados a uma manifestação
-     * @param string $protocolo NUP sem formatação (apenas dígitos)
+     * @param string $protocolo NUP com ou sem formatação (apenas dígitos)
      * @return array Lista de estruturas RecursoDTO
      * (https://falabr.cgu.gov.br/Help/ResourceModel?modelName=RecursoDTO)
      * ou array vazio caso a manifestação não tenha recursos.
@@ -174,7 +174,7 @@ class MdCguEouvClient {
     public function consultaRecursosDaManifestacao($protocolo)
     {
         $params = [
-            'NumProtocolo' => $protocolo,
+            'NumProtocolo' => $this->removeFormatacao($protocolo),
         ];
 
         try {
@@ -188,6 +188,16 @@ class MdCguEouvClient {
         } catch (MdCguEouvExceptionHttpNotFound $e) {
             return [];
         }
+    }
+
+    /**
+     * Remove formatação do número do protocolo, caso esteja formatado
+     * @param string $protocolo
+     * @return string O número do protocolo sem formatação
+     */
+    private function removeFormatacao($protocolo)
+    {
+        return preg_replace("/[^0-9]/", "", $protocolo);
     }
 
     /**

@@ -437,21 +437,22 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         foreach($objListaErros as $erro) {
 
-            $numProtocolo = preg_replace("/[^0-9]/", "", $erro->getStrProtocoloFormatado());
+            $numProtocoloFormatado = $erro->getStrProtocoloFormatado();
 
             //Se já estiver na lista não faz novamente para determinado protocolo
-            if (!in_array($numProtocolo, $arrProtocolos)){
+            if (!in_array($numProtocoloFormatado, $arrProtocolos)){
 
                 //Adiciona no array de Protocolos
-                array_push($arrProtocolos, $numProtocolo);
+                array_push($arrProtocolos, $numProtocoloFormatado);
 
-                $retornoWsErro = $this->apiClient->consultaManifestacao($numProtocolo);
+                $retornoWsErro = $this->apiClient->consultaManifestacao($numProtocoloFormatado);
 
                 if (!is_null($retornoWsErro)){
                     $arrResult[] = $retornoWsErro;
                 } else {
                     // Marca protocolo como bem sucedido para não tentar de novo na próxima execução
-                    $this->gravarLogProtocolo($this->formatarProcesso($numProtocolo), 'Protocolo não encontrado!', 'S', $erro->getStrTipManifestacao());
+                    $this->limparErrosParaNup($numProtocoloFormatado);
+                    $this->gravarLogProtocolo($numProtocoloFormatado, 'Protocolo não encontrado!', 'S', $erro->getStrTipManifestacao());
                 }
             }
         }
@@ -522,10 +523,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
     {
         $debugLocal = false;
 
-        $numProtocolo = $retornoWsLinha['NumerosProtocolo'][0];
-        $numProtocoloFormatado =  $this->formatarProcesso($numProtocolo);
+        $numProtocoloFormatado =  $this->formatarProcesso($retornoWsLinha['NumerosProtocolo'][0]);
 
-        if (array_key_exists($numProtocolo, $this->protocolosProcessados)) {
+        if (array_key_exists($numProtocoloFormatado, $this->protocolosProcessados)) {
             return; // Protocolo já processado nessa execução
         }
         
@@ -727,17 +727,22 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
     public function executarImportacaoLinhaRecursos($recurso)
     {
-        $numProtocolo = $recurso['numProtocolo'];
+        $numProtocoloFormatado = $this->formatarProcesso($recurso['numProtocolo']);
 
-        if (array_key_exists($numProtocolo, $this->protocolosProcessados)) {
+        if (array_key_exists($numProtocoloFormatado, $this->protocolosProcessados)) {
             return; // Protocolo já processado nessa execução
         }
 
         // Consultar manifestação do recurso
-        $manifestacao = $this->apiClient->consultaManifestacao($numProtocolo);
+        $manifestacao = $this->apiClient->consultaManifestacao($numProtocoloFormatado);
 
         // Processar importação da manifestação atualizada
-        $this->executarImportacaoLinha($manifestacao);
+        if ($manifestacao) {
+            $this->executarImportacaoLinha($manifestacao);
+        } else {
+            $this->gravarLogProtocolo($numProtocoloFormatado, 'Não foi possível acessar a manifestação',
+                'N', $this->obterTipoImportacao($recurso));
+        }
     }
 
     public function limparErrosParaNup($numProtocoloComErro){
