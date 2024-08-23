@@ -240,7 +240,7 @@ PaginaSEI::getInstance()->abrirJavaScript();
             return false;
         }
         if (infraTrim(document.getElementById('EOUV_URL_WEBSERVICE_IMPORTACAO').value)=='') {
-            alert('Informe a URL do Webservice.');
+            alert('Informe a URL do FalaBR.');
             document.getElementById('EOUV_URL_WEBSERVICE_IMPORTACAO').focus();
             return false;
         }
@@ -287,7 +287,7 @@ PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
     <!-- EOUV_URL_WEBSERVICE_IMPORTACAO -->
     <div class="infraAreaDados">
         <label id="lblEOUV_URL_WEBSERVICE_IMPORTACAO" for="EOUV_URL_WEBSERVICE_IMPORTACAO" accesskey="W" class="infraLabelObrigatorio">
-            URL do <span class="infraTeclaAtalho">W</span>ebService:</label>
+        UR<span class="infraTeclaAtalho">L</span> do FalaBR</label>
         <input type="text" id="EOUV_URL_WEBSERVICE_IMPORTACAO" name="EOUV_URL_WEBSERVICE_IMPORTACAO" class="infraText"
                value="<?=PaginaSEI::tratarHTML($urlWebServiceEOuv->getStrDeValorParametro());?>" onkeypress="return infraMascaraTexto(this,event,100);"
                maxlength="100" size="50" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" />
