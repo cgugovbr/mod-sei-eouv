@@ -23,21 +23,6 @@ class MdCguEouvIntegracao extends SeiIntegracao
         return 'CGU - Controladoria Geral da União';
     }
 
-    public function processarControladorWebServices($strServico)
-    {
-        $strArq = null;
-        switch ($strServico) {
-            case 'eouv':
-                $strArq = 'eouv.wsdl';
-                break;
-        }
-
-        if ($strArq!=null){
-            $strArq = dirname(__FILE__).'/ws/'.$strArq;
-        }
-        return $strArq;
-    }
-
     public function processarControlador($strAcao)
     {
 
