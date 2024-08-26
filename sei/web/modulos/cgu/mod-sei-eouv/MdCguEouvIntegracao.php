@@ -10,7 +10,7 @@ class MdCguEouvIntegracao extends SeiIntegracao
 {
     public function getNome()
     {
-        return 'Módulo de Integração entre o sistema SEI e o FalaBR (Sistema de Ouvidorias - e-Ouv|e-Sic)';
+        return 'Módulo de Integração entre o sistema SEI e o FalaBR';
     }
 
     public function getVersao()
