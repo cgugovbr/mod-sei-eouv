@@ -405,7 +405,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
      * @param string $sinSucesso 'S' se a importação foi bem sucedida, 'N'
      * se ocorreram erros na importação
      * @param string $tipoManifestacao 'P' para manifestação de Ouvidoria, 'R'
-     * para manifestação de LAI, 'R1' para recurso @TODO melhorar
+     * para manifestação de LAI, 'R1' para recurso de 1ª instância, 'R2' para
+     * recurso de 2ª instância, 'R3' para recurso de 3ª instância genérico,
+     * 'RC' para recurso de 3ª instância na CGU (federal), 'PR' para pedido de
+     * revisão
      * @return void
      */
     private function gravarLogProtocolo($numProtocoloFormatado, $mensagem, $sinSucesso, $tipoManifestacao)
@@ -739,7 +742,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         // Processar importação da manifestação atualizada
         if ($manifestacao) {
-            $this->executarImportacaoLinha($manifestacao);
+            if (in_array($manifestacao['TipoManifestacao']['IdTipoManifestacao'], $this->tiposDeManifestacaoAtivos)) {
+                $this->executarImportacaoLinha($manifestacao);
+            }
         } else {
             $this->gravarLogProtocolo($numProtocoloFormatado, 'Não foi possível acessar a manifestação',
                 'N', $this->obterTipoImportacao($recurso));
