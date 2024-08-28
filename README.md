@@ -161,4 +161,4 @@ Ajuste a periodicidade de execução do agendamento no menu *Infra > Agendamento
 
 ## Orientações Gerais
 
-Em caso dúvidas favor enviar um email para [DISOL - disol@cgu.gov.br](mailto:disol@cgu.gov.br?subject=[DUVIDA]%20SEI%20-%20módulo%20FalaBR)
+Em caso de dúvidas favor enviar um email para [DISOL - disol@cgu.gov.br](mailto:disol@cgu.gov.br?subject=[DUVIDA]%20SEI%20-%20módulo%20FalaBR)
