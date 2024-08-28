@@ -17,12 +17,12 @@ Fazer backup completo dos bancos de dados do SEI e do SIP.
 
 ### Download do módulo
 
-Baixar o arquivo zip da versão desejada na página: https://github.com/cgugovbr/mod-sei-eouv/releases
+Baixar o arquivo integracao-falabr-VERSAO.zip da versão desejada na página: https://github.com/cgugovbr/mod-sei-eouv/releases
  
-A estrutura de pastas deste módulo é a seguinte:
+A estrutura de pastas do arquivo zip é a seguinte:
 
 ```bash
-./mod-sei-eouv
+./
  --/sei
  --/sip
  --/README.md
@@ -36,7 +36,7 @@ Copie o arquivo zip para o servidor do SEI e descompacte-o na raiz de instalaç�
   
 ```bash
 $ cd <DIRETORIDIO_RAZ_DE_INSTALAÇÃO_DO_SEI>
-$ unzip mod-sei-eouv-VERSAO.zip
+$ unzip integracao-falabr-VERSAO.zip
 ```
 
 > Lembre-se de substituir o termo **'VERSAO'** pelo nome do arquivo zip com a versão que está sendo instalada.

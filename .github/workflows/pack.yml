@@ -1,0 +1,28 @@
+name: Empacotar Módulo
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  pack:
+    name: Empacotar e adicionar ao release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Criar zip
+        run: zip -r integracao-falabr-${{ github.ref_name }}.zip sei sip README.md
+
+      - name: Adiciona zip ao release
+        uses: csexton/release-asset-action@v3
+        with:
+          file: integracao-falabr-${{ github.ref_name }}.zip
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+
