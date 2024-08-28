@@ -9,8 +9,6 @@
  * Versão no CVS: $Id$
  */
 
-require_once dirname(__FILE__) . '/../../../../SEI.php';
-
 class MdCguEouvParametroDTO extends InfraDTO {
 
     public function getStrNomeTabela() {
@@ -30,10 +28,6 @@ class MdCguEouvParametroDTO extends InfraDTO {
         $this->adicionarAtributoTabela(InfraDTO::$PREFIXO_STR,
             'DeValorParametro',
             'de_valor_parametro');
-
-        $this->adicionarAtributoTabela(InfraDTO::$PREFIXO_STR,
-            'DeTipo',
-            'de_tipo');
 
         $this->configurarPK('IdParametro',InfraDTO::$TIPO_PK_INFORMADO);
 

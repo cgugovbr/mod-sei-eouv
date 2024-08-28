@@ -10,8 +10,6 @@
  */
 
 
-require_once dirname(__FILE__) . '/../../../../SEI.php';
-
 class MdEouvDeparaImportacaoBD extends InfraBD {
 
   public function __construct(InfraIBanco $objInfraIBanco){

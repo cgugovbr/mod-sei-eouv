@@ -9,10 +9,6 @@
 * Versão no CVS: $Id$
 */
 
-//try {
-
-  require_once dirname(__FILE__).'/../../../SEI.php';
-  
   session_start();
 
   //////////////////////////////////////////////////////////////////////////////
@@ -41,7 +37,6 @@
   $objEouvRelatorioImportacaoDTO->retNumIdRelatorioImportacao();
   $objEouvRelatorioImportacaoDTO->retDthDthImportacao();
   $objEouvRelatorioImportacaoDTO->retStrSinSucesso();
-  $objEouvRelatorioImportacaoDTO->retStrTipManifestacao();
   $objEouvRelatorioImportacaoDTO->retDthDthPeriodoInicial();
   $objEouvRelatorioImportacaoDTO->retDthDthPeriodoFinal();
   $objEouvRelatorioImportacaoDTO->retStrDeLogProcessamento();
@@ -83,8 +78,7 @@
     $bolCheck = false;
 
     if ($_GET['acao']=='md_cgu_eouv_relatorio_importacao_listar'){
-      $bolAcaoConsultar = true;//SessaoSEI::getInstance()->verificarPermissao('infra_agendamento_tarefa_consultar');
-      //$bolCheck = true;
+      $bolAcaoConsultar = true;
       $bolAcaoExecutar = false;
     }else{
       $bolAcaoConsultar = SessaoSEI::getInstance()->verificarPermissao('md_cgu_eouv_relatorio_importacao_detalhe');
@@ -101,7 +95,6 @@
 
     $strResultado .= '<th class="infraTh" width="5%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'ID','IdRelatorioImportacao',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh" width="10%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'Data da Execução','DthImportacao',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
-    $strResultado .= '<th class="infraTh" width="7%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'Tipo','TipManifestacao',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh" width="7%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'Sucesso','SinSucesso',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh" width="10%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'Período Inicial','DthPeriodoInicial',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
     $strResultado .= '<th class="infraTh" width="10%">'.PaginaSEI::getInstance()->getThOrdenacao($objEouvRelatorioImportacaoDTO,'Período Final','DthPeriodoFinal',$arrObjEouvRelatorioImportacaoDTO).'</th>'."\n";
@@ -121,7 +114,6 @@
 
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDTO[$i]->getNumIdRelatorioImportacao().'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDTO[$i]->getDthDthImportacao().'</td>';
-      $strResultado .= '<td align="center">'.(in_array(trim($arrObjEouvRelatorioImportacaoDTO[$i]->getStrTipManifestacao()), ['R', 'R1', 'R2', 'R3', 'RE', 'RC', 'PR']) ? 'e-Sic' : 'e-Ouv').'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDTO[$i]->getStrSinSucesso().'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDTO[$i]->getDthDthPeriodoInicial().'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDTO[$i]->getDthDthPeriodoFinal().'</td>';
@@ -131,7 +123,6 @@
       $strResultado .= PaginaSEI::getInstance()->getAcaoTransportarItem($i,$arrObjEouvRelatorioImportacaoDTO[$i]->getNumIdRelatorioImportacao());
 
       $strId = $arrObjEouvRelatorioImportacaoDTO[$i]->getNumIdRelatorioImportacao();
-      //$strDescricao = PaginaSEI::getInstance()->formatarParametrosJavaScript($arrObjEouvRelatorioImportacaoDTO[$i]->getStrComando());
 
       if ($bolAcaoConsultar){
         $strResultado .= '<a href="'.PaginaSEI::getInstance()->formatarXHTML(SessaoSEI::getInstance()->assinarLink('controlador.php?acao=md_cgu_eouv_relatorio_importacao_detalhar&acao_origem='.$_GET['acao'].'&acao_retorno='.$_GET['acao'].'&id_relatorio_importacao='.$arrObjEouvRelatorioImportacaoDTO[$i]->getNumIdRelatorioImportacao())).'" tabindex="'.PaginaSEI::getInstance()->getProxTabTabela().'"><img src="'.PaginaSEI::getInstance()->getIconeConsultar().'" title="Detalhar Importação" alt="Detalhar Importacação" class="infraImg" /></a>&nbsp;';
@@ -150,9 +141,6 @@
   $arrMascaraProtocolo = explode('|',$objInfraParametro->getValor('SEI_MASCARA_NUMERO_PROCESSO_INFORMADO'));
   $strMascaraProtocolo = trim($arrMascaraProtocolo[0]);
 
-/*}catch(Exception $e){
-  PaginaSEI::getInstance()->processarExcecao($e);
-} */
 
 PaginaSEI::getInstance()->montarDocType();
 PaginaSEI::getInstance()->abrirHtml();

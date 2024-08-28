@@ -9,11 +9,9 @@
  * Versão no CVS: $Id$
  */
 
-require_once dirname(__FILE__).'/../../../../SEI.php';
-
 class MdCguEouvAgendamentoINT extends InfraINT
 {
-    public static function retornarUltimaExecucaoSucesso($tipManifestacao = 'P')
+    public static function retornarUltimaExecucaoSucesso()
     {
 
         $objEouvRelatorioImportacaoDTO=new MdCguEouvRelatorioImportacaoDTO();
@@ -22,7 +20,6 @@ class MdCguEouvAgendamentoINT extends InfraINT
         $objEouvRelatorioImportacaoDTO->retDthDthPeriodoFinal();
         $objEouvRelatorioImportacaoDTO->retNumIdRelatorioImportacao();
         $objEouvRelatorioImportacaoDTO->setStrSinSucesso('S');
-        $objEouvRelatorioImportacaoDTO->setStrTipManifestacao($tipManifestacao);
         $objEouvRelatorioImportacaoDTO->setOrdDthDthImportacao(InfraDTO::$TIPO_ORDENACAO_DESC);
         $objEouvRelatorioImportacaoDTO->setNumMaxRegistrosRetorno(1);
 
@@ -92,6 +89,27 @@ class MdCguEouvAgendamentoINT extends InfraINT
         $resultadoObjEouvRelatorioImportacaoDetalheDTO = $objEouvRelatorioImportacaoDetalheRN->consultar($objEouvRelatorioImportacaoDetalheDTO);
 
         return $resultadoObjEouvRelatorioImportacaoDetalheDTO;
+    }
+
+    public static function retornarUltimoTipoManifestacao($protocoloFormatado)
+    {
+        $objEouvRelatorioImportacaoDetalheDTO = new MdCguEouvRelatorioImportacaoDetalheDTO();
+        $objEouvRelatorioImportacaoDetalheDTO->retStrProtocoloFormatado();
+        $objEouvRelatorioImportacaoDetalheDTO->retStrTipManifestacao();
+        $objEouvRelatorioImportacaoDetalheDTO->setStrProtocoloFormatado($protocoloFormatado);
+        $objEouvRelatorioImportacaoDetalheDTO->setStrSinSucesso('S');
+        $objEouvRelatorioImportacaoDetalheDTO->setOrdNumIdRelatorioImportacao(InfraDTO::$TIPO_ORDENACAO_DESC);
+        $objEouvRelatorioImportacaoDetalheDTO->setNumMaxRegistrosRetorno(1);
+
+        $objEouvRelatorioImportacaoDetalheRN = new MdCguEouvRelatorioImportacaoDetalheRN();
+
+        $resultadoObjEouvRelatorioImportacaoDetalheDTO = $objEouvRelatorioImportacaoDetalheRN->consultar($objEouvRelatorioImportacaoDetalheDTO);
+
+        if ($resultadoObjEouvRelatorioImportacaoDetalheDTO == null) {
+            return null;
+        } else {
+            return $resultadoObjEouvRelatorioImportacaoDetalheDTO->getStrTipManifestacao();
+        }
     }
 }
 ?>

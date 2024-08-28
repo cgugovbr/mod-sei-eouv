@@ -5,8 +5,6 @@
  * 08/12/2020 - criado por Evert Ramos <evert.ramos@cgu.gov.br>
  */
 
-require_once dirname(__FILE__) . '/../../../../SEI.php';
-
 class MdCguEouvConsultarHashBD extends InfraBD {
 
     public function __construct(InfraIBanco $objInfraIBanco)

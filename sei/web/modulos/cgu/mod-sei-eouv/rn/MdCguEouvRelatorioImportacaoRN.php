@@ -9,8 +9,6 @@
  * Versão no CVS: $Id$
  */
 
-require_once dirname(__FILE__) . '/../../../../SEI.php';
-
 class MdCguEouvRelatorioImportacaoRN extends InfraRN
 {
 
@@ -36,14 +34,10 @@ class MdCguEouvRelatorioImportacaoRN extends InfraRN
             //Regras de Negocio
             $objInfraException = new InfraException();
 
-            //$this->validarNumIdOrgao($objInfraAgendamentoTarefaDTO, $objInfraException);
-
             $objInfraException->lancarValidacoes();
 
             $objEouvRelatorioImportacaoBD = new MdCguEouvRelatorioImportacaoBD($this->getObjInfraIBanco());
             $ret = $objEouvRelatorioImportacaoBD->cadastrar($objEouvRelatorioImportacaoDTO);
-
-            //Auditoria
 
             return $ret;
 
@@ -60,8 +54,6 @@ class MdCguEouvRelatorioImportacaoRN extends InfraRN
 
             //Regras de Negocio
             $objInfraException = new InfraException();
-
-            //$this->validarNumIdOrgao($objInfraAgendamentoTarefaDTO, $objInfraException);
 
             $objInfraException->lancarValidacoes();
 
@@ -80,15 +72,8 @@ class MdCguEouvRelatorioImportacaoRN extends InfraRN
             //Valida Permissao
             SessaoSEI::getInstance()->validarPermissao('md_cgu_eouv_relatorio_importacao_listar');
 
-            //Regras de Negocio
-            //$objInfraException = new InfraException();
-
-            //$objInfraException->lancarValidacoes();
-
             $objEouvRelatorioImportacaoBD = new MdCguEouvRelatorioImportacaoBD($this->getObjInfraIBanco());
             $ret = $objEouvRelatorioImportacaoBD->listar($objEouvRelatorioImportacaoDTO);
-
-            //Auditoria
 
             return $ret;
 
@@ -100,19 +85,11 @@ class MdCguEouvRelatorioImportacaoRN extends InfraRN
     protected function consultarConectado(MdCguEouvRelatorioImportacaoDTO $objEouvRelatorioImportacaoDTO)
     {
         try {
-
             //Valida Permissao
             SessaoSEI::getInstance()->validarPermissao('md_cgu_eouv_relatorio_importacao_listar');
 
-            //Regras de Negocio
-            //$objInfraException = new InfraException();
-
-            //$objInfraException->lancarValidacoes();
-
             $objEouvRelatorioImportacaoBD = new MdCguEouvRelatorioImportacaoBD($this->getObjInfraIBanco());
             $ret = $objEouvRelatorioImportacaoBD->consultar($objEouvRelatorioImportacaoDTO);
-
-            //Auditoria
 
             return $ret;
 

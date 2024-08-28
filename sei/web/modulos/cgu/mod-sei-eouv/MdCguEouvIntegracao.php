@@ -8,48 +8,19 @@
 
 class MdCguEouvIntegracao extends SeiIntegracao
 {
-
-//    public function __construct()
-//    {
-//    }
-
     public function getNome()
     {
-        return 'Módulo de Integração entre o sistema SEI e o FalaBR (Sistema de Ouvidorias - e-Ouv|e-Sic)';
+        return 'Módulo de Integração entre o sistema SEI e o FalaBR';
     }
 
     public function getVersao()
     {
-        return '4.0.2';
+        return '4.1.0';
     }
 
     public function getInstituicao()
     {
         return 'CGU - Controladoria Geral da União';
-    }
-
-//    public function inicializar($strVersaoSEI)
-//    {
-//        /*
-//        if (substr($strVersaoSEI, 0, 2) != '3.'){
-//          die('Módulo "'.$this->getNome().'" ('.$this->getVersao().') não é compatível com esta versão do SEI ('.$strVersaoSEI.').');
-//        }
-//        */
-//    }
-
-    public function processarControladorWebServices($strServico)
-    {
-        $strArq = null;
-        switch ($strServico) {
-            case 'eouv':
-                $strArq = 'eouv.wsdl';
-                break;
-        }
-
-        if ($strArq!=null){
-            $strArq = dirname(__FILE__).'/ws/'.$strArq;
-        }
-        return $strArq;
     }
 
     public function processarControlador($strAcao)
@@ -72,19 +43,13 @@ class MdCguEouvIntegracao extends SeiIntegracao
             case 'md_cgu_eouv_integracao_sei':
                 require_once dirname(__FILE__).'/md_cgu_eouv_relatorio_importacao.php';
                 return true;
-
+            case 'md_cgu_eouv_parametro_alterar':
             case 'md_cgu_eouv_parametro_listar':
                 require_once dirname(__FILE__).'/md_cgu_eouv_parametro_lista.php';
                 return true;
 
-            case 'md_cgu_eouv_parametro_listar_esic':
-                require_once dirname(__FILE__).'/md_cgu_eouv_parametro_lista_esic.php';
-                return true;
-
-            case 'md_cgu_eouv_parametro_alterar':
-                require_once dirname(__FILE__).'/md_cgu_eouv_parametro_cadastro.php';
-                return true;
-
+            case 'md_cgu_eouv_depara_importacao_desativar':
+            case 'md_cgu_eouv_depara_importacao_reativar':
             case 'md_cgu_eouv_depara_importacao_listar':
                 require_once dirname(__FILE__).'/md_cgu_eouv_depara_importacao_lista.php';
                 return true;

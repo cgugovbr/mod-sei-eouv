@@ -1,11 +1,11 @@
 
-# Módulo de Integração SUPER & FalaBR (e-Ouv e e-Sic)
+# Módulo de Integração SEI & FalaBR
 
 ## Requisitos
 
-- SUPER ou SEI versão 4.0.3 ou superior (verificar versão no arquivo /sei/web/SEI.php).
+- SEI versão 4.0.3 ou superior (verificar versão no arquivo /sei/web/SEI.php).
 
-- Utilizar o Sistema FalaBR do Governo Federal (e-Ouv e e-Sic). Caso ainda não tenha aderido ao FalaBR e queira saber mais informações acesse https://falabr.cgu.gov.br/.
+- Utilizar o Sistema FalaBR do Governo Federal. Caso ainda não tenha aderido ao FalaBR e queira saber mais informações acesse https://falabr.cgu.gov.br/.
 
 - [IMPORTANTE] Ao executar os scripts de instalação/atualização (seção [Executar scripts](#executar-scripts) abaixo), você precisará informar um usuário e senha para se conectar ao banco de dados do SEI e do SIP. Tal usuário precisa ter permissão de acesso total, sendo capaz de criar e excluir tabelas.
 
@@ -17,12 +17,12 @@ Fazer backup completo dos bancos de dados do SEI e do SIP.
 
 ### Download do módulo
 
-Baixar o arquivo zip da versão desejada na página: https://github.com/cgugovbr/mod-sei-eouv/releases
+Baixar o arquivo integracao-falabr-VERSAO.zip da versão desejada na página: https://github.com/cgugovbr/mod-sei-eouv/releases
  
-A estrutura de pastas deste módulo é a seguinte:
+A estrutura de pastas do arquivo zip é a seguinte:
 
 ```bash
-./mod-sei-eouv
+./
  --/sei
  --/sip
  --/README.md
@@ -36,7 +36,7 @@ Copie o arquivo zip para o servidor do SEI e descompacte-o na raiz de instalaç�
   
 ```bash
 $ cd <DIRETORIDIO_RAZ_DE_INSTALAÇÃO_DO_SEI>
-$ unzip mod-sei-eouv-VERSAO.zip
+$ unzip integracao-falabr-VERSAO.zip
 ```
 
 > Lembre-se de substituir o termo **'VERSAO'** pelo nome do arquivo zip com a versão que está sendo instalada.
@@ -82,9 +82,13 @@ Para executar os *scripts* digite os comandos a seguir:
 
 Parametrizar o módulo, usando o usuário com perfil "Administrador" do SEI, conforme descrito a seguir.
 
+**Atenção!** Se estiver atualizando da versão 4.0.2 ou anterior é **obrigatório**
+refazer os passos de configuração, pois foram feitas alterações significativas
+nas configurações.
+
 #### Tipos de Manifestação
 
-Acessar o menu *E-Ouv > Tipos de Manifestação* e associar cada tipo de manifestação do FalaBR com um tipo de processo existente no SEI. Você poderá criar um novo tipo de processo para cada tipo de manifestação do FalaBR se for o caso.
+Acessar o menu *Administração -> Integração com FalaBR -> Tipos de Manifestação* e associar cada tipo de manifestação do FalaBR com um tipo de processo existente no SEI. Você poderá criar um novo tipo de processo para cada tipo de manifestação do FalaBR se for o caso.
 
 Abaixo estão os tipos de manifestações do FalaBR que serão importadas para o SEI:
 
@@ -101,60 +105,58 @@ Abaixo estão os tipos de manifestações do FalaBR que serão importadas para o
 
 > Obs: manifestações do tipo "Simplifique" não são suportadas.
 
-#### Parâmetros E-Ouv
+Caso não deseje importar algum tipo de manifestação, desative o tipo correspondente
+usando o botão na coluna de *Ações*.
 
-Acessar o menu *E-Ouv > Parâmetros do Módulo E-ouv* ajustando os seguintes parâmetros:
+![Desativar algum tipo de manifestação](imagens/tipos-manifestacao.png)
 
-- **EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES** - Inserir neste campo a Data Inicial, no formato (DD/MM/AAAA), para carregar as manifestações do FalaBR (e-Ouv) dos tipos 1 à 7. Sugerimos que seja colocada a **data atual** para que apenas as novas manifestações sejam importadas para o SEI.
+Os tipos desativados ficam com a linha toda vermelha.
 
-- **EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO** - Quando a rotina de importação for executada, será gerado um documento PDF com os dados da manifestação que será anexado ao processo com o mesmo número de identificação do FalaBR. Este parâmetro será usado para indicar qual o Tipo de Documento no SEI será utilizado para este PDF. Lembrando que deve ser do Grupo de **Documentos Externos**. Para verificar os tipos existentes acesse *Administração > Tipos de Documento > Listar*.
+#### Parâmetros
 
-- **EOUV_USUARIO_ACESSO_WEBSERVICE** - Nome de usuário para acesso aos WebServices do FalaBR, gerado especificamente para cada órgão. Caso ainda não possua este usuário e a senha abaixo, solicitar via formulário para o [Suporte Técnico do Fala.BR](https://formularios.cgu.gov.br/index.php/679625?lang=pt-BR)
+Acessar o menu *Administração -> Integração com FalaBR -> Parâmetros da Integração* e preencha o formulário:
 
-- **EOUV_SENHA_ACESSO_WEBSERVICE** - Senha do usuário para acesso aos WebServices do FalaBR
+![Formulário de parâmetros](imagens/form-parametros.png)
 
-- **CLIENT_ID** - Id gerado para acesso aos WebServices.
+Explicação dos campos do formulário:
+- **URL do FalaBR**: URL do sistema FalaBR. Em produção, usar o valor https://falabr.cgu.gov.br.
+Em ambientes de teste usar o valor https://treinafalabr.cgu.gov.br.
+- **Usuário**: Nome de usuário para acesso aos WebServices do FalaBR, gerado especificamente para cada órgão.
+Caso ainda não possua este usuário, solicitar via formulário para o
+[Suporte Técnico do Fala.BR](https://formularios.cgu.gov.br/index.php/679625?lang=pt-BR).
+- **Senha**: Senha do usuário para acesso aos WebServices do FalaBR.
+- **ClientID**: ID gerado para acesso aos WebServices.
+- **ClientSecret**: Senha gerada para acesso aos WebServices.
+- **Data inicial de Importação**:  Data a partir da qual as manifestações devem
+ser importadas. Sugerimos que seja colocada a **data da instalação** para que apenas as
+novas manifestações sejam importadas para o SEI.
+- **Importar dados do manifestante**: Marque para importar os dados pessoais da
+pessoa que enviou a manifestação para o processo SEI, caso eles estejam visíveis
+para o órgão.
+- **Tipo de documento usado na importação**: Quando a rotina de importação for
+executada, será gerado um documento PDF com os dados da manifestação. Este documento
+será anexado ao processo. Este campo indica o Tipo de Documento SEI que será
+utilizado para este PDF. Lembrando que deve ser do Grupo de **Documentos Externos**.
+Para verificar os tipos existentes acesse *Administração > Tipos de Documento > Listar*.
+- **Unidade de Ouvidoria**: Unidade no SEI que deverá receber os processos
+oriundos de manifestações de Ouvidoria importados do FalaBR.
+- **Unidade de Acesso à Informação**: Unidade no SEI que deverá receber os processos
+oriundos de pedidos de Acesso à Informação importados do FalaBR.
+- **Unidade de Recurso em 1ª Instância**: Unidade no SEI que deverá receber os
+processos quando houver recurso de **primeira** instância.
+- **Unidade de Recurso em 2ª Instância**: Unidade no SEI que deverá receber os
+processos quando houver recurso de **segunda** instância.
+- **Unidade de Recurso em 3ª Instância**: Unidade no SEI que deverá receber os
+processos quando houver recurso de **terceira** instância.
+- **Unidade de Pedido de Revisão**: Unidade no SEI que deverá receber os
+processos quando houver pedido de **revisão**.
 
-- **CLIENT_SECRET** - Senha gerada para acesso aos WebServices.
+#### Agendamento
 
-- **TOKEN** - Token gerado para acesso aos WebServices. Se não for preenchido, o módulo pede ao sistema FalaBR um novo token automaticamente.
+O script de instalação já cria o agendamento **MdCguEouvAgendamentoRN::executarImportacaoManifestacaoFalaBr**,
+responsável por realizar a importação e atualização dos processos.
 
-- **EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO** - Já vem configurado para o ambiente de produção do FalaBR com https://falabr.cgu.gov.br/api/manifestacoes
-
-> Para efeitos de testes e homologação utilizar o ambiente de treinamento: https://treinafalabr.cgu.gov.br/api/manifestacoes
-
-- **ID_UNIDADE_OUVIDORIA** - Código da Unidade no SEI que deverá registrar os novos processos 'e-Ouv' importados do FalaBR
-
-> Caso esteja atualizando a versão, já deverá constar os *ids* corretos, portanto siga para o próximo item
-
-#### Parâmetros e-Sic
-
-Acessar o menu *E-Ouv > Parâmetros do Módulo e-Sic* ajustando os seguintes parâmetros:
-
-- **ESIC_DATA_INICIAL_IMPORTACAO_MANIFESTACOES** - Inserir neste campo a Data Inicial, no formato (DD/MM/AAAA), para carregar as manifestações do FalaBR (e-Sic) do tipo 8. Sugerimos que seja colocada a **data atual** para que apenas as novas manifestações sejam importadas para o SEI.
-
-- **ESIC_URL_WEBSERVICE_IMPORTACAO_RECURSOS** - Já vem configurado para o ambiente de produção do FalaBR com 'https://falabr.cgu.gov.br/api/recursos'
-
-> Para efeitos de testes e homologação utilizar o ambiente de treinamento: https://treinafalabr.cgu.gov.br/api/recursos
-
-- **ESIC_ID_UNIDADE_PRINCIPAL** - Código da Unidade no SEI que deverá registrar os novos processos 'e-Sic' importados do FalaBR
-
-- **ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA** - Código da Unidade no SEI que deverá registrar os recursos de **primeira** instância
-
-- **ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA** - Código da Unidade no SEI que deverá registrar os recursos de **segunda** instância
-
-- **ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA** - Código da Unidade no SEI que deverá registrar os recursos de **terceira** instância
-
-- **ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO** - Código da Unidade no SEI que deverá registrar os pedidos de **revisão**
-
-#### Agendamentos
-
-Este módulo possui duas funções para importação das manifestações 'e-Ouv' (tipo 1 a 7) e 'e-Sic' (tipo 8), indicadas abaixo:
-
-- **MdCguEouvAgendamentoRN::executarImportacaoManifestacaoEOuv**
-- **MdCguEouvAgendamentoRN::executarImportacaoManifestacaoESic**
-
-Os agendamentos são criados automaticamente pelos scripts de instalação. Ajuste a periodicidade de execução das importações no menu Infra > Agendamentos.
+Ajuste a periodicidade de execução do agendamento no menu *Infra > Agendamentos*.
 > Sugerimos que os agendamentos sejam executados uma vez por dia
 
 ## Orientações Gerais

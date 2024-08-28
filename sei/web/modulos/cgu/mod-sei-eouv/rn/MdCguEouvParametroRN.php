@@ -9,8 +9,6 @@
  * Versão no CVS: $Id$
  */
 
-require_once dirname(__FILE__).'/../../../../SEI.php';
-
 class MdCguEouvParametroRN extends InfraRN {
 
     public function __construct(){
@@ -53,8 +51,6 @@ class MdCguEouvParametroRN extends InfraRN {
             $objEouvParametroBD = new MdCguEouvParametroBD($this->getObjInfraIBanco());
             $objEouvParametroBD->alterar($objEouvParametroDTO);
 
-            //Auditoria
-
         }catch(Exception $e){
             throw new InfraException('Erro alterando parâmetro.',$e);
         }
@@ -66,22 +62,14 @@ class MdCguEouvParametroRN extends InfraRN {
             //Valida Permissao
             SessaoSEI::getInstance()->validarAuditarPermissao('md_cgu_eouv_parametro_excluir',__METHOD__,$objEouvParametroDTO);
 
-            //Regras de Negocio
-            //$objInfraException = new InfraException();
-
-            //$objInfraException->lancarValidacoes();
-
             $objEouvParametroBD = new MdCguEouvParametroBD($this->getObjInfraIBanco());
             $objEouvParametroBD->excluir($objEouvParametroDTO);
-
-            //Auditoria
 
         }catch(Exception $e){
             throw new InfraException('Erro excluindo .',$e);
         }
     }
 
-    
     protected function consultarParametroConectado(MdCguEouvParametroDTO $objEouvParametroDTO){
       try {
 
@@ -91,14 +79,11 @@ class MdCguEouvParametroRN extends InfraRN {
         $objEouvParametroBD = new MdCguEouvParametroBD($this->getObjInfraIBanco());
         $ret = $objEouvParametroBD->consultar($objEouvParametroDTO);
 
-        //Auditoria
-
         return $ret;
       }catch(Exception $e){
         throw new InfraException('Erro consultando Parâmetro do módulo de integração SEI x E-ouv.',$e);
       }
     }
-
 
     protected function listarParametroConectado(MdCguEouvParametroDTO $objEouvParametroDTO) {
         try {
@@ -108,9 +93,6 @@ class MdCguEouvParametroRN extends InfraRN {
 
             $objEouvParametroBD = new MdCguEouvParametroBD($this->getObjInfraIBanco());
             $ret = $objEouvParametroBD->listar($objEouvParametroDTO);
-
-
-            //Auditoria
 
             return $ret;
 
@@ -128,17 +110,12 @@ class MdCguEouvParametroRN extends InfraRN {
             $objEouvParametroBD = new MdCguEouvParametroBD($this->getObjInfraIBanco());
             $ret = $objEouvParametroBD->listar($objEouvParametroDTO);
 
-
-            //Auditoria
-
             return $ret;
 
         }catch(Exception $e){
             throw new InfraException('Erro listando associações entre Protocolo e Assunto.',$e);
         }
     }
-
-
 
 }
 ?>

@@ -9,8 +9,6 @@
  * Versão no CVS: $Id$
  */
 
-require_once dirname(__FILE__) . '/../../../../SEI.php';
-
 class MdCguEouvRelatorioImportacaoDetalheRN extends InfraRN {
 
 
@@ -31,14 +29,10 @@ class MdCguEouvRelatorioImportacaoDetalheRN extends InfraRN {
             //Regras de Negocio
             $objInfraException = new InfraException();
 
-            //$this->validarNumIdOrgao($objInfraAgendamentoTarefaDTO, $objInfraException);
-
             $objInfraException->lancarValidacoes();
 
             $objEouvRelatorioImportacaoDetalheBD = new MdCguEouvRelatorioImportacaoDetalheBD($this->getObjInfraIBanco());
             $ret = $objEouvRelatorioImportacaoDetalheBD->cadastrar($objEouvRelatorioImportacaoDetalheDTO);
-
-            //Auditoria
 
             return $ret;
 
@@ -56,14 +50,10 @@ class MdCguEouvRelatorioImportacaoDetalheRN extends InfraRN {
             //Regras de Negocio
             $objInfraException = new InfraException();
 
-            //$this->validarNumIdOrgao($objInfraAgendamentoTarefaDTO, $objInfraException);
-
             $objInfraException->lancarValidacoes();
 
             $objEouvRelatorioImportacaoDetalheBD = new MdCguEouvRelatorioImportacaoDetalheBD($this->getObjInfraIBanco());
             $ret = $objEouvRelatorioImportacaoDetalheBD->alterar($objEouvRelatorioImportacaoDetalheDTO);
-
-            //Auditoria
 
             return $ret;
 
@@ -79,17 +69,8 @@ class MdCguEouvRelatorioImportacaoDetalheRN extends InfraRN {
             //Valida Permissao
             SessaoSEI::getInstance()->validarPermissao('md_cgu_eouv_relatorio_importacao_listar');
 
-            //Regras de Negocio
-            //$objInfraException = new InfraException();
-
-            //$objInfraException->lancarValidacoes();
-
             $objEouvRelatorioImportacaoDetalheBD = new MdCguEouvRelatorioImportacaoDetalheBD($this->getObjInfraIBanco());
             $ret = $objEouvRelatorioImportacaoDetalheBD->listar($objEouvRelatorioImportacaoDetalheDTO);
-
-            
-
-            //Auditoria
 
             return $ret;
 
@@ -105,15 +86,8 @@ class MdCguEouvRelatorioImportacaoDetalheRN extends InfraRN {
             //Valida Permissao
             SessaoSEI::getInstance()->validarPermissao('md_cgu_eouv_relatorio_importacao_listar');
 
-            //Regras de Negocio
-            //$objInfraException = new InfraException();
-
-            //$objInfraException->lancarValidacoes();
-
             $objEouvRelatorioImportacaoDetalheBD = new MdCguEouvRelatorioImportacaoDetalheBD($this->getObjInfraIBanco());
             $ret = $objEouvRelatorioImportacaoDetalheBD->consultar($objEouvRelatorioImportacaoDetalheDTO);
-
-            //Auditoria
 
             return $ret;
 
