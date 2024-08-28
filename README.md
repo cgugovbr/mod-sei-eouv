@@ -161,10 +161,4 @@ Ajuste a periodicidade de execução do agendamento no menu *Infra > Agendamento
 
 ## Orientações Gerais
 
-### Tutorial
-
-Criamos um vídeo com a demonstração do funcionamento do módulo focado na parte negocial:
-
-[![Tutorial módulo integração SEI & FalaBR](https://img.youtube.com/vi/geUCx7H79Gw/0.jpg)](https://www.youtube.com/watch?v=geUCx7H79Gw)
-
-> Em caso dúvidas favor enviar um email para [DISOL - disol@cgu.gov.br](mailto:disol@cgu.gov.br?subject=[DUVIDA]%20SEI%20-%20módulo%20FalaBR)
+Em caso dúvidas favor enviar um email para [DISOL - disol@cgu.gov.br](mailto:disol@cgu.gov.br?subject=[DUVIDA]%20SEI%20-%20módulo%20FalaBR)
