@@ -158,7 +158,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $arrManifestacoes = array_merge($arrManifestacoes, $arrComErro);
 
             // Consulta novos recursos, caso a importação de manifestações de acesso à informação esteja ativa
-            if ($this->tipoAcessoAInformacaoAtivo) {
+            if ($this->tipoAcessoAInformacaoAtivo) { // TODO talvez importar sempre, por conta dos pedidos de revisão?
                 $debugLocal && LogSEI::getInstance()->gravar('Consulta novos recursos');
                 $arrRecursos = $this->apiClient->consultaRecursosNoIntervalo($ultimaDataExecucao, $dataAtual);
                 $qtdRecursosNovos = count($arrRecursos);
