@@ -61,19 +61,41 @@ try {
           throw new InfraException("Registro não encontrado.");
         }
 
-        // Atualiza o tipo de processo
         $objDeParaDTO->setNumIdTipoProcedimento($_POST['selTipoProc']);
-        $objMdCguEouvDeparaImportacaoRN->alterar($objDeParaDTO);
 
-        // Registra mensagem e redireciona
-        PaginaSEI::getInstance()->setStrMensagem('Associação com Tipo de Manifestação "'.$objDeParaDTO->getStrDeTipoManifestacaoEouv().'" alterada com sucesso.');
-        $strLinkRedirect = SessaoSEI::getInstance()->assinarLink('controlador.php?'.
-          'acao='.PaginaSEI::getInstance()->getAcaoRetorno().'&'.
-          'acao_origem='.$_GET['acao'].
-          '#ID-'.$objDeParaDTO->getNumIdTipoManifestacaoEouv()
-        );
-        header('Location: '.$strLinkRedirect);
-        die;
+        // Verifica se o nível sugerido para o tipo de processo selecionado é público
+        // e se for lança um erro
+        $objTipoProcedimentoDTO = new TipoProcedimentoDTO();
+        $objTipoProcedimentoDTO->setNumIdTipoProcedimento($_POST['selTipoProc']);
+        $objTipoProcedimentoDTO->retStrStaNivelAcessoSugestao();
+        $objTipoProcedimentoDTO->retNumIdHipoteseLegalSugestao();
+        $objTipoProcedimentoRN = new TipoProcedimentoRN();
+        $objTipoProcedimentoDTO = $objTipoProcedimentoRN->consultarRN0267($objTipoProcedimentoDTO);
+        if (!$objTipoProcedimentoDTO) {
+          PaginaSEI::getInstance()->setStrMensagem('Tipo de Processo não encontrado',
+            PaginaSEI::$TIPO_MSG_ERRO);
+        } else if ($objTipoProcedimentoDTO->getStrStaNivelAcessoSugestao() == ProtocoloRN::$NA_PUBLICO) {
+          PaginaSEI::getInstance()->setStrMensagem('O nível de acesso sugerido '.
+            'do tipo de processo não pode ser público. Ajuste os parâmetros '.
+            'do tipo ou então escolha um outro.', PaginaSEI::$TIPO_MSG_ERRO);
+        } else if (is_null($objTipoProcedimentoDTO->getNumIdHipoteseLegalSugestao())) {
+          PaginaSEI::getInstance()->setStrMensagem('O tipo de processo não tem '.
+            'uma Hipótese Legal de restrição de acesso sugerida. Ajuste os '.
+            'parâmetros do tipo ou então escolha um outro.', PaginaSEI::$TIPO_MSG_ERRO);
+        } else {
+          // Atualiza o tipo de processo
+          $objMdCguEouvDeparaImportacaoRN->alterar($objDeParaDTO);
+
+          // Registra mensagem e redireciona
+          PaginaSEI::getInstance()->setStrMensagem('Associação com Tipo de Manifestação "'.$objDeParaDTO->getStrDeTipoManifestacaoEouv().'" alterada com sucesso.');
+          $strLinkRedirect = SessaoSEI::getInstance()->assinarLink('controlador.php?'.
+            'acao='.PaginaSEI::getInstance()->getAcaoRetorno().'&'.
+            'acao_origem='.$_GET['acao'].
+            '#ID-'.$objDeParaDTO->getNumIdTipoManifestacaoEouv()
+          );
+          header('Location: '.$strLinkRedirect);
+          die;
+        }
       } else {
         throw new InfraException("Parâmetros inválidos");
       }

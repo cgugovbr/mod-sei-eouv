@@ -317,7 +317,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $objProcedimentoAPI->setIdUnidadeGeradora($idUnidadeDestino);
             $objProcedimentoAPI->setNumeroProtocolo($numProtocoloFormatado);
             $objProcedimentoAPI->setDataAutuacao($manifestacao['DataCadastro']);
-            $objProcedimentoAPI->setNivelAcesso($objTipoProcedimentoDTO->getStrStaNivelAcessoSugestao()); // TODO garantir que não seja público
+            $objProcedimentoAPI->setNivelAcesso($objTipoProcedimentoDTO->getStrStaNivelAcessoSugestao());
             $objProcedimentoAPI->setGrauSigilo($objTipoProcedimentoDTO->getStrStaGrauSigiloSugestao());
             $objProcedimentoAPI->setIdHipoteseLegal($objTipoProcedimentoDTO->getNumIdHipoteseLegalSugestao());
             $objProcedimentoAPI->setObservacao("Processo Gerado Automaticamente pela Integração SEI x FalaBR");
