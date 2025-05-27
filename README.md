@@ -90,6 +90,11 @@ nas configurações.
 
 Acessar o menu *Administração -> Integração com FalaBR -> Tipos de Manifestação* e associar cada tipo de manifestação do FalaBR com um tipo de processo existente no SEI. Você poderá criar um novo tipo de processo para cada tipo de manifestação do FalaBR se for o caso.
 
+**Importante:** é preciso configurar o nível de acesso sugerido do tipo de
+processo associado para *Restrito*. Dessa forma, os processos criados pela
+integração ficarão restritos. Configurar também a Hipótese Legal sugerida como
+"Informação Pessoal (Art. 31 da Lei 12.527/2011)".
+
 Abaixo estão os tipos de manifestações do FalaBR que serão importadas para o SEI:
 
 | ID FalaBR                | Tipo de Manifestação |
