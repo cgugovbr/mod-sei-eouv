@@ -1,5 +1,5 @@
 
-# Módulo de Integração SEI & FalaBRxxxxx
+# Módulo de Integração SEI & FalaBR
 
 ## Requisitos
 
