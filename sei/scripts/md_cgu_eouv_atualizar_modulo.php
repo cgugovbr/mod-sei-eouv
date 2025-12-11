@@ -105,9 +105,9 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
     $objInfraParametro->setValor('ID_SERIE_EXTERNO_OUVIDORIA', '92');
     $objInfraParametro->setValor('EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO', '63');
     $objInfraParametro->setValor('EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES ', date('d/m/Y'));
-    $objInfraParametro->setValor('EOUV_URL_DETALHE_MANIFESTACAO', '');
-    $objInfraParametro->setValor('EOUV_USUARIO_ACESSO_WEBSERVICE', '');
-    $objInfraParametro->setValor('EOUV_SENHA_ACESSO_WEBSERVICE', '');
+    $objInfraParametro->setValor('EOUV_URL_DETALHE_MANIFESTACAO', 'XXX');
+    $objInfraParametro->setValor('EOUV_USUARIO_ACESSO_WEBSERVICE', 'XXX');
+    $objInfraParametro->setValor('EOUV_SENHA_ACESSO_WEBSERVICE', 'XXX');
 
     $this->logar('Criando Agendamento da tarefa no SEI');
     $objInfraAgendamentoTarefaDTO = new InfraAgendamentoTarefaDTO();
