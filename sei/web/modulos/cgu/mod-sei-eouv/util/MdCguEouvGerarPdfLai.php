@@ -139,11 +139,10 @@ class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
             foreach ($recursos as $recurso) {
 
                 /**
-                 * Somente gerará documento caso seja recursos 1ª ou 2ª instancia ou pedido de revisão,
-                 * IdInstanciaRecurso = [1, 2, 6] conforme API FalaBR consultado dia 01/12/2020
+                 * Somente gerará documento caso seja recursos 1ª, 2ª ou 3ª instancia ou pedido de revisão,
                  * url: https://falabr.cgu.gov.br/Help
                  */
-                if (in_array($recurso['instancia']['IdInstanciaRecurso'], [1, 2, 6])) {
+                if (in_array($recurso['instancia']['IdInstanciaRecurso'], [1, 2, 3, 6, 7])) {
                     $this->texto('Dados do Recurso -  ' . $recurso['instancia']['DescInstanciaRecurso'], true);
 
                     $this->item('Destinatário', $manifestacao['OuvidoriaDestino']['NomOuvidoria']);

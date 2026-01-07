@@ -724,8 +724,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
         return array_filter($arrRecursos, function ($recurso) {
             // 1 -> Recurso de primeira instância
             // 2 -> Recurso de segunda instância
+            // 3 -> Recurso à CGU
             // 6 -> Pedido de Revisão
-            return in_array($recurso['instancia']['IdInstanciaRecurso'], [1, 2, 6]);
+            // 7 -> Recurso em terceira instância
+            return in_array($recurso['instancia']['IdInstanciaRecurso'], [1, 2, 3, 6, 7]);
         });
     }
 
