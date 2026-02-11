@@ -36,7 +36,7 @@ class MdCguEouvGerarPdf
             $linhas = [$texto];
         }
 
-        $this->pdf->SetFont('arial', 'B', 18);
+        $this->pdf->SetFont('Arial', 'B', 15);
         $qtde = count($linhas);
         for ($i = 0; $i < $qtde; ++$i) {
             $this->pdf->Cell(0, 5, $linhas[$i], 0, 1, 'C');
@@ -56,8 +56,9 @@ class MdCguEouvGerarPdf
     protected function secao($texto)
     {
         $this->pdf->Ln();
-        $this->pdf->SetFont('arial', 'B', 14);
-        $this->pdf->Cell(0, 20, $this->numSecao . '. ' . $texto, 1, 0, 'L');
+        $this->pdf->SetFont('Arial', 'B', 10);
+        $this->pdf->SetFillColor(0xb0, 0xc4, 0xde);
+        $this->pdf->Cell(0, 20, $texto, 0, 0, 'L', true);
         $this->pdf->Ln(30);
         $this->numSecao += 1;
     }
