@@ -7,19 +7,13 @@
  * importadas do FalaBR
  */
 
-class MdCguEouvGerarPdf
+class MdCguEouvGerarPdf extends InfraPDF
 {
-    protected $pdf;
     private $numSecao;
 
-    /**
-     * Cria um novo arquivo PDF
-     * @return void
-     */
-    protected function criarPDF()
-    {
-        $this->pdf = new InfraPDF('P', 'pt', 'A4');
-        $this->pdf->AddPage();
+    public function __construct() {
+        parent::__construct('P', 'pt', 'A4');
+        $this->AddPage();
         $this->numSecao = 1;
     }
 
@@ -36,14 +30,14 @@ class MdCguEouvGerarPdf
             $linhas = [$texto];
         }
 
-        $this->pdf->SetFont('Arial', 'B', 15);
+        $this->SetFont('Arial', 'B', 15);
         $qtde = count($linhas);
         for ($i = 0; $i < $qtde; ++$i) {
-            $this->pdf->Cell(0, 5, $linhas[$i], 0, 1, 'C');
+            $this->Cell(0, 5, $linhas[$i], 0, 1, 'C');
             if ($i < ($qtde-1)) {
-                $this->pdf->Ln(20);
+                $this->Ln(20);
             } else {
-                $this->pdf->Ln(30); // Dá um espaço maior após a última linha
+                $this->Ln(30); // Dá um espaço maior após a última linha
             }
         }
     }
@@ -55,11 +49,11 @@ class MdCguEouvGerarPdf
      */
     protected function secao($texto)
     {
-        $this->pdf->Ln();
-        $this->pdf->SetFont('Arial', 'B', 10);
-        $this->pdf->SetFillColor(0xb0, 0xc4, 0xde);
-        $this->pdf->Cell(0, 20, $texto, 0, 0, 'L', true);
-        $this->pdf->Ln(30);
+        $this->Ln();
+        $this->SetFont('Arial', 'B', 10);
+        $this->SetFillColor(0xb0, 0xc4, 0xde);
+        $this->Cell(0, 20, $texto, 0, 0, 'L', true);
+        $this->Ln(30);
         $this->numSecao += 1;
     }
 
@@ -73,15 +67,15 @@ class MdCguEouvGerarPdf
      */
     protected function item($nome, $valor, $quebrarLinha = false)
     {
-        $this->pdf->SetFont('arial', 'B', 12);
+        $this->SetFont('arial', 'B', 12);
         // Mede tamanho do nome
-        $largura = $this->pdf->GetStringWidth($nome . ': ');
+        $largura = $this->GetStringWidth($nome . ': ');
         if ($largura < 180) {
             $largura = 180; // Garante espaçamento mínimo
         }
-        $this->pdf->Cell($largura, 20, $nome.':', 0, $quebrarLinha ? 1 : 0, 'L');
-        $this->pdf->SetFont('arial', '', 12);
-        $this->pdf->MultiCell(0, 20, $valor, 0, 'J');
+        $this->Cell($largura, 20, $nome.':', 0, $quebrarLinha ? 1 : 0, 'L');
+        $this->SetFont('arial', '', 12);
+        $this->MultiCell(0, 20, $valor, 0, 'J');
     }
 
     /**
@@ -92,8 +86,8 @@ class MdCguEouvGerarPdf
      */
     protected function texto($texto, $negrito = false)
     {
-        $this->pdf->SetFont('arial', $negrito ? 'B' : '', 12);
-        $this->pdf->MultiCell(0, 20, $texto, 0, 'J');
+        $this->SetFont('arial', $negrito ? 'B' : '', 12);
+        $this->MultiCell(0, 20, $texto, 0, 'J');
     }
 
     /**
@@ -102,16 +96,19 @@ class MdCguEouvGerarPdf
      */
     protected function espacamento()
     {
-        $this->pdf->Ln(20);
+        $this->Ln(20);
     }
 
     /**
-     * Retorna o objeto InfraPDF gerado
-     * @return InfraPDF
+     * Cabeçalho do documento
+     * @return void
      */
-    public function obterPDF()
+    public function Header()
     {
-        return $this->pdf;
+        $this->titulo([
+            'Plataforma Integrada de Ouvidoria e Acesso à Informação',
+            'Detalhes da Manifestação',
+        ]);
     }
 
     /**

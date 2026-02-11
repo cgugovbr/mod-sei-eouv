@@ -137,10 +137,9 @@ try {
             $recursos = $client->consultaRecursosDaManifestacao($nup);
             $pedidoRevisao = count($recursos) > 0 ? $recursos[0] : null;
             $geradorPdf = new MdCguEouvGerarPdfOuv($detalhada, $pedidoRevisao, true, false);
-            $pdf = $geradorPdf->obterPDF();
             $arquivo = __DIR__ . '/Relatorio_'.$nup.'.pdf';
             echoln("Gerando arquivo PDF $arquivo");
-            $pdf->Output($arquivo, 'F');
+            $geradorPdf->Output($arquivo, 'F');
             echoln("PDF gerado");
             break;
         case 'gerar_pdf_lai':
@@ -149,10 +148,9 @@ try {
             $detalhada = $client->consultaDetalhadaManifestacao($manifestacao);
             $recursos = $client->consultaRecursosDaManifestacao($nup);
             $geradorPdf = new MdCguEouvGerarPdfLai($detalhada, $recursos, true, false);
-            $pdf = $geradorPdf->obterPDF();
             $arquivo = __DIR__ . '/Relatorio_'.$nup.'.pdf';
             echoln("Gerando arquivo PDF $arquivo");
-            $pdf->Output($arquivo, 'F');
+            $geradorPdf->Output($arquivo, 'F');
             echoln("PDF gerado");
             break;
         case 'importar_manifestacao':

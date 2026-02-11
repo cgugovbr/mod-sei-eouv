@@ -13,12 +13,7 @@ class MdCguEouvGerarPdfOuv extends MdCguEouvGerarPdf
 {
     public function __construct($manifestacao, $pedidoRevisao, $importarDadosDoManifestante, $ocorreuErroAdicionarAnexo)
     {
-        $this->criarPDF();
-
-        $this->titulo([
-            'Plataforma Integrada de Ouvidoria e Acesso à Informação',
-            'Detalhes da Manifestação',
-        ]);
+        parent::__construct();
 
         /**
          * Seção dados básicos

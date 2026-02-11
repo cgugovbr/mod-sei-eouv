@@ -772,12 +772,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
     {
         $pedidoRevisao = count($recursos) > 0 ? $recursos[0] : null;
         $mdCguEouvGerarPdf = new MdCguEouvGerarPdfOuv($retornoWsLinha, $pedidoRevisao, $this->importar_dados_manifestante, $ocorreuErroAdicionarAnexo);
-        $pdf = $mdCguEouvGerarPdf->obterPDF();
 
         $objAnexoRN = new AnexoRN();
         $strNomeArquivoInicialUpload = $objAnexoRN->gerarNomeArquivoTemporario();
 
-        $pdf->Output(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", "F");
+        $mdCguEouvGerarPdf->Output(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", "F");
 
         //Renomeia tirando a extensão para o SEI trabalhar o Arquivo
         rename(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload);
@@ -801,11 +800,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
     private function gerarPDFLai($retornoWsLinha, $retornoWsRecursos = [], $tipo_recurso = '', $ocorreuErroAdicionarAnexo = false)
     {
         $objGerarPdf = new MdCguEouvGerarPdfLai($retornoWsLinha, $retornoWsRecursos, $this->importar_dados_manifestante, $ocorreuErroAdicionarAnexo);
-        $pdf = $objGerarPdf->obterPDF();
         $objAnexoRN = new AnexoRN();
         $strNomeArquivoInicialUpload = $objAnexoRN->gerarNomeArquivoTemporario();
 
-        $pdf->Output(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", "F");
+        $objGerarPdf->Output(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", "F");
 
         //Renomeia tirando a extensão para o SEI trabalhar o Arquivo
         rename(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload);
