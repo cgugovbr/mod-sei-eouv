@@ -30,37 +30,68 @@ class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
          */
         $this->secao('Teor da Manifestação');
         $teor = $manifestacao['Teor'];
-        $this->item('Resumo', $manifestacao['ResumoSolicitacao'], true);
-        $this->item('Extrato', $teor['DescricaoAtosOuFatos'], true);
+        $this->item('Resumo:', $manifestacao['ResumoSolicitacao'], false, 'R');
+        $this->item('Teor:', $teor['DescricaoAtosOuFatos'], false, 'R');
+        $this->item('Proposta de melhoria:', $teor['PropostaMelhoria'] ?? '', false, 'R');
+        $this->item('Município do local do fato:', $teor['LocalFato']['Municipio']['DescMunicipio'] ?? '', false, 'R');
+        $this->item('UF do local do fato:', $teor['LocalFato']['Municipio']['Uf']['SigUf'] ?? '', false, 'R');
+        $this->item('Local:', $teor['LocalFato']['DescricaoLocalFato'] ?? '', false, 'R');
+        $this->espacamento();
 
-        /**
-         * Seção Anexos
-         */
-        $this->secao('Anexo(s) do Pedido Inicial');
-        $anexoTipoOriginal = 0;
-        $anexoTipoComplementar = 0;
+        // Anexos
+        $anexosOriginais = [];
+        $anexosComplementares = [];
         if (is_array($teor['Anexos'])) {
             foreach ($teor['Anexos'] as $anexo) {
                 if ($anexo['TipoAnexoManifestacao']['IdTipoAnexoManifestacao'] == 1) {
                     if ($anexo['IndComplementar']) {
-                        $anexoTipoComplementar++;
+                        $anexosComplementares[] = $anexo;
                     } else {
-                        $anexoTipoOriginal++;
+                        $anexosOriginais[] = $anexo;
                     }
-
-                    $this->item('Nome do Arquivo', $anexo['NomeArquivo']);
-                    $this->item('Tipo de Anexo', $anexo['TipoAnexoManifestacao']['DescTipoAnexoManifestacao']);
-                    $this->item('Anexo Complementar', $anexo['IndComplementar'] ? 'Sim' : 'Não');
-                    $this->espacamento();
                 }
             }
         }
-        if ($anexoTipoOriginal == 0) {
-            $this->texto('Não há anexos originais da manifestação.', true);
+
+        if (count($anexosOriginais) > 0) {
+            $itens = [];
+            foreach ($anexosOriginais as $anexo) {
+                $itens[] = [$anexo['NomeArquivo']];
+            }
+            $this->tabela('', ['Anexos Originais'], $itens);
+        } else {
+            $this->texto('Não há anexos originais da manifestação.');
         }
-        if ($anexoTipoComplementar == 0) {
-            $this->texto('Não há anexos complementares.', true);
+        $this->espacamento();
+
+        if (count($anexosComplementares) > 0) {
+            $itens = [];
+            foreach ($anexosComplementares as $anexo) {
+                $itens[] = [$anexo['NomeArquivo']];
+            }
+            $this->tabela('', 'Anexos Complementares', $itens);
+        } else {
+            $this->texto('Não há anexos complementares.');
         }
+        $this->espacamento();
+
+        // Envolvidos
+        $envolvidos = $teor['EnvolvidosManifestacao'];
+        if (is_array($envolvidos) && count($envolvidos) > 0) {
+            $itens = [];
+            foreach ($envolvidos as $envolvido) {
+                $itens[] = [
+                    $envolvido['Nome'] ?? '',
+                    $envolvido['Funcao'] ?? '',
+                    $envolvido['CpfEnvolvido'] ?? '',
+                    $envolvido['Orgao'] ?? '',
+                ];
+            }
+            $this->tabela('Envolvidos', ['Nome', 'Função', 'CPF', 'Órgão/Empresa'], $itens);
+        } else {
+            $this->texto('Não há envolvidos na manifestação.');
+        }
+        $this->espacamento();
 
         /**
          * Seção campos adicionais
