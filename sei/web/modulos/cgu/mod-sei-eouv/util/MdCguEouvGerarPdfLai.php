@@ -268,6 +268,7 @@ class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
                 if (is_array($evento['Encaminhamento'])) {
                     $possuiEncaminhamento = true;
 
+                    $this->item('Data/Hora', $evento['HistoricoAcao']['DataHoraAcao']);
                     $this->item('Órgão/Entidade de Origem',
                         $evento['Encaminhamento']['OuvidoriaOrigem']['NomOuvidoria']);
                     $this->item('Órgão/Entidade Destinatária',
@@ -283,7 +284,7 @@ class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
         }
 
         if (!$possuiEncaminhamento) {
-            $this->texto('Não há registro de encaminhamentos.', true);
+            $this->texto('Não há registro de encaminhamentos.');
         }
 
         /**
@@ -311,7 +312,7 @@ class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
         }
 
         if (!$possuiProrrogacao) {
-            $this->texto('Não há registro de prorrogações.', true);
+            $this->texto('Não há registro de prorrogações.');
         }
 
         /**
