@@ -118,6 +118,9 @@ class MdCguEouvGerarPdf extends InfraPDF
             foreach ($palavrasDaColuna as $palavra) {
                 $larguraCol = max($larguraCol, $this->GetStringWidth($palavra));
             }
+            if ($larguraCol == 0) {
+                $larguraCol = $this->GetStringWidth('AAA');
+            }
             $larguras[$j] = $larguraCol;
             $somaLarguras += $larguraCol;
         }

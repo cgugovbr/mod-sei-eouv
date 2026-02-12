@@ -112,6 +112,42 @@ class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
         }
 
         /**
+         * Seção Dados das Respostas
+         */
+        $this->secao('Dados das Respostas');
+        if (is_array($manifestacao['InformacoesAdicionais'])) {
+            $info = $manifestacao['InformacoesAdicionais'];
+            $dados = [];
+            if ($info['EnvolveCargoComissionadoDAS4OuSuperior']) {
+                $dados[] = [
+                    'Envolve ocupante de cargo comissionado DAS a partir do nível 4 ou equivalente?',
+                    $info['EnvolveCargoComissionadoDAS4OuSuperior'],
+                ];
+            }
+            if ($info['Apta']) {
+                $dados[] = [
+                    'Manifestação Apta?',
+                    $info['Apta'],
+                ];
+            }
+            if ($info['EnvolveEmpresa']) {
+                $dados[] = [
+                    'Há envolvimento de Empresa?',
+                    $info['EnvolveEmpresa'],
+                ];
+            }
+            if ($info['EnvolveServidorPublico']) {
+                $dados[] = [
+                    'Há envolvimento de Servidor Público?',
+                    $info['EnvolveServidorPublico'],
+                ];
+            }
+            if (count($dados) > 0) {
+                $this->tabela($dados);
+            }
+        }
+
+        /**
          * Seção respostas
          */
         $this->secao('Resposta(s)');
