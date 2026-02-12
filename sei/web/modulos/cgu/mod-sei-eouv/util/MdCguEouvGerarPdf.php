@@ -78,7 +78,6 @@ class MdCguEouvGerarPdf extends InfraPDF
             // uma tabela de 2 colunas
             $larguras = [150, 390];
             $matriz = $this->calculaMatrizDaLinha([$nome, $valor], $larguras);
-            var_dump($matriz);
             foreach ($matriz as $linha) {
                 foreach ($linha as $j => $texto) {
                     $this->Cell($larguras[$j], 15, $texto, 0, 0, $j == 0 ? $alinhamento : 'J');

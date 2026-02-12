@@ -247,13 +247,14 @@ class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
                 if (is_array($evento['Denuncia']) && $evento['Denuncia']['TxtFato']) {
                     $possuiDenuncia = true;
 
-                    $this->texto($evento['Denuncia']['TxtFato']);
+                    $this->item('Data/Hora', $evento['Denuncia']['Data']);
+                    $this->item('Teor', $evento['Denuncia']['TxtFato']);
                     $this->espacamento();
                 }
             }
         }
         if (!$possuiDenuncia) {
-            $this->texto('Não há registro de denúncias de descumprimento.', true);
+            $this->texto('Não há registro de denúncias de descumprimento.');
         }
 
         /**
