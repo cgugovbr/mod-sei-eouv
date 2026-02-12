@@ -307,49 +307,33 @@ class MdCguEouvGerarPdf extends InfraPDF
      */
     protected function secaoDadosManifestante($manifestacao, $importarDadosDoManifestante)
     {
-        $this->secao('Dados do Manifestante');
         if ($importarDadosDoManifestante) {
+            $this->secao('Dados do Usuário');
+            $this->item('Tipo de Identificação:',
+                $manifestacao['TipoIdentificacaoManifestante']['DescTipoIdentificacaoManifestante'] ?? '',
+                false, 'R');
+            $this->item('Pedido de restrição de identidade:',
+                $manifestacao['IndPossuiIdentidadePreservada'] ? 'Sim' : 'Não',
+                false,
+                'R');
             if (is_array($manifestacao['Manifestante']) && is_array($manifestacao['Manifestante']['TipoPessoa'])) {
                 // Manifestante identificado
                 $pessoa = $manifestacao['Manifestante'];
 
+                $this->item('Tipo de Pessoa:', $pessoa['TipoPessoa']['DescTipoPessoa'] ?? '', false, 'R');
+                $this->item('Login Gov.BR:', $pessoa['IndLoginGovBr'] ? 'Sim' : 'Não', false, 'R');
+                $this->item('País:', $pessoa['Pais']['Descricao'] ?? '', false, 'R');
+
                 $this->item('Nome:', $pessoa['Nome'], false, 'R');
-                if (is_array($pessoa['FaixaEtaria'])) {
-                    $this->item('Faixa Etária', $pessoa['FaixaEtaria']['DescFaixaEtaria']);
-                }
-
-                $chaveCorRaca = mb_convert_encoding('corRaça', 'UTF-8', 'ISO-8859-1');
-                if (is_array($pessoa[$chaveCorRaca])) {
-                    $this->item('Raça/Cor:', $pessoa[$chaveCorRaca]['DescRacaCor'], false, 'R');
-                }
-
-                if ($pessoa['genero']) {
-                    $this->item('Sexo:', $pessoa['genero'], false, 'R');
-                }
 
                 if (is_array($pessoa['TipoDocumentoIdentificacao'])) {
-                    $documento = $pessoa['TipoDocumentoIdentificacao']['DescTipoDocumentoIdentificacao'].' '.
-                        $pessoa['NumeroDocumentoIdentificacao'];
-                    $this->item('Documento de Identificação:', $documento, false, 'R');
+                    $documento = 'Tipo de Documento: ' . $pessoa['TipoDocumentoIdentificacao']['DescTipoDocumentoIdentificacao'];
+                    $documento .= "\n" . 'Número do Documento: ' . $pessoa['NumeroDocumentoIdentificacao'];
+                    $this->item('Dados de Identificação:', $documento, false, 'R');
                 }
 
-                if (is_array($pessoa['Endereco']) && $pessoa['Endereco']['Logradouro']) {
-                    $endereco = $pessoa['Endereco']['Logradouro'];
-                    $endereco .= ', ' . $pessoa['Endereco']['Numero'];
-                    if ($pessoa['Endereco']['Complemento']) {
-                        $endereco .= ', ' . $pessoa['Endereco']['Complemento'];
-                    }
-                    if ($pessoa['Endereco']['Bairro']) {
-                        $endereco .= "\n" . $pessoa['Endereco']['Bairro'];
-                    }
-                    if (is_array($pessoa['Endereco']['Municipio'])) {
-                        $endereco .= "\n" . $pessoa['Endereco']['Municipio']['DescMunicipio'] . ' - ' .
-                            $pessoa['Endereco']['Municipio']['Uf']['SigUf'];
-                    }
-                    if ($pessoa['Endereco']['CEP']) {
-                        $endereco .= "\nCEP: " . $pessoa['Endereco']['CEP'];
-                    }
-                    $this->item('Endereço:', $endereco, true, 'R');
+                if ($pessoa['Email']) {
+                    $this->item('Email:', $pessoa['Email'], false, 'R');
                 }
 
                 if (is_array($pessoa['Telefone'])) {
@@ -357,16 +341,39 @@ class MdCguEouvGerarPdf extends InfraPDF
                     $this->item('Telefone:', $telefone, false, 'R');
                 }
 
-                if ($pessoa['Email']) {
-                    $this->item('Email:', $pessoa['Email'], false, 'R');
+                if (is_array($pessoa['Endereco'])) {
+                    $endereco = $pessoa['Endereco'];
+                    $this->item('CEP:', $endereco['CEP'] ?? '', false, 'R');
+                    $this->item('UF:', $endereco['Municipio']['Uf']['SigUf'] ?? '', false, 'R');
+                    $this->item('Município:', $endereco['Municipio']['DescMunicipio'] ?? '', false, 'R');
+                    $this->item('Logradouro:', $endereco['Logradouro'] ?? '', false, 'R');
+                    $this->item('Número:', $endereco['Numero'] ?? '', false, 'R');
+                    $this->item('Complemento:', $endereco['Complemento'] ?? '', false, 'R');
+                    $this->item('Bairro:', $endereco['Bairro'] ?? '', false, 'R');
                 }
-            } else {
-                // Manifestação anônima
-                $this->texto('Manifestação anônima');
+
+                $dadosComplementares = [];
+                if ($pessoa['genero']) {
+                    $dadosComplementares[] = 'Gênero: ' . $pessoa['genero'];
+                }
+                if ($pessoa['DataNascimento']) {
+                    $dadosComplementares[] = 'Data de Nascimento: ' . $pessoa['DataNascimento'];
+                }
+                $chaveCorRaca = mb_convert_encoding('corRaça', 'UTF-8', 'ISO-8859-1');
+                if (is_array($pessoa[$chaveCorRaca])) {
+                    $dadosComplementares[] = 'Cor/Raça: ' . $pessoa[$chaveCorRaca]['descRacaCor'];
+                }
+                if (is_array($pessoa['Escolaridade'])) {
+                    $dadosComplementares[] = 'Escolaridade: ' . $pessoa['Escolaridade']['Descricao'];
+                }
+                if (is_array($pessoa['Profissao'])) {
+                    $dadosComplementares[] = 'Profissão: ' . $pessoa['Profissao']['DescProfissao'];
+                }
+
+                if (count($dadosComplementares) > 0) {
+                    $this->item('Dados Complementares:', implode("\n", $dadosComplementares), false, 'R');
+                }
             }
-        } else {
-            // Importação desabilitada
-            $this->texto('Não importado devido à configuração do módulo');
         }
     }
 }

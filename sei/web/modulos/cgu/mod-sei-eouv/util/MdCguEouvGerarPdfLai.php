@@ -21,11 +21,6 @@ class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
         $this->secaoDadosBasicos($manifestacao);
 
         /**
-         * Seção dados do manifestante
-         */
-        $this->secaoDadosManifestante($manifestacao, $importarDadosDoManifestante);
-
-        /**
          * Seção teor da manifestação
          */
         $this->secao('Teor da Manifestação');
@@ -92,6 +87,11 @@ class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
             $this->texto('Não há envolvidos na manifestação.');
         }
         $this->espacamento();
+
+        /**
+         * Seção dados do manifestante
+         */
+        $this->secaoDadosManifestante($manifestacao, $importarDadosDoManifestante);
 
         /**
          * Seção campos adicionais
