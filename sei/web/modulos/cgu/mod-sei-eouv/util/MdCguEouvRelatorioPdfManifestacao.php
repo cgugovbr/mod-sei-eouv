@@ -4,12 +4,12 @@
  * CONTROLADORIA-GERAL DA UNIÃO - CGU
  *
  * Classe que gera PDFs com as informações das manifestações
- * de acesso à informação importadas do FalaBR
+ * importadas do FalaBR
  */
 
- require_once __DIR__ . '/MdCguEouvGerarPdf.php';
+ require_once __DIR__ . '/MdCguEouvRelatorioPdf.php';
 
-class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
+class MdCguEouvRelatorioPdfManifestacao extends MdCguEouvRelatorioPdf
 {
     public function __construct($manifestacao, $recursos, $importarDadosDoManifestante, $ocorreuErroAdicionarAnexo)
     {
@@ -323,6 +323,130 @@ class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
             $this->texto('Um ou mais anexos da manifestação não foram '.
                 'importados para o SEI devido a restrições da extensão '.
                 'do arquivo.');
+        }
+    }
+
+    /**
+     * Cabeçalho do documento
+     * @return void
+     */
+    public function Header()
+    {
+        $this->titulo([
+            'Plataforma Integrada de Ouvidoria e Acesso à Informação',
+            'Detalhes da Manifestação',
+        ]);
+    }
+
+    /**
+     * Escreve no PDF a seção comum de dados básicos
+     * da manifestação
+     * @param array $manifestacao Estrutura ManifestacaoDTO
+     * (https://falabr.cgu.gov.br/Help/ResourceModel?modelName=ManifestacaoDTO)
+     * @return void
+     */
+    protected function secaoDadosBasicos($manifestacao)
+    {
+        $this->secao('Dados Básicos da Manifestação');
+        $this->item('Tipo da Manifestação:', $manifestacao['TipoManifestacao']['DescTipoManifestacao'], false, 'R');
+        $this->item('Esfera:', $manifestacao['OuvidoriaDestino']['Esfera']['DescEsfera'], false, 'R');
+        $this->item('NUP:', $manifestacao['NumerosProtocolo'][0], false, 'R');
+        $this->item('Órgão Destinatário:', $manifestacao['OuvidoriaDestino']['NomOuvidoria'], false, 'R');
+        $this->item('Órgão de Interesse:', $manifestacao['OrgaoInteresse']['NomeOrgao'] ?? '', false, 'R');
+        $this->item('Assunto:', $manifestacao['Assunto']['DescAssunto'], false, 'R');
+        $this->item('Subassunto:', $manifestacao['SubAssunto']['DescSubAssunto'] ?? '', false, 'R');
+        $this->item('Data de Cadastro:', $manifestacao['DataCadastro'], false, 'R');
+        $this->item('Situação:', $manifestacao['Situacao']['DescSituacaoManifestacao'] ?? '', false, 'R');
+        $this->item('Data limite para resposta:', $manifestacao['PrazoAtendimento'], false, 'R');
+        $this->item('Canal de Entrada:', $manifestacao['CanalEntrada']['DescCanalEntrada'] ?? '', false, 'R');
+        $this->item('Modo de Resposta:', $manifestacao['ModoResposta']['DescModoResposta'] ?? '', false, 'R');
+        $this->item('Registrado Por:', $manifestacao['RegistradoPor'], false, 'R');
+        $this->item('Tipo de formulário:', $manifestacao['TipoFormulario']['DescTipoFormulario'] ?? '', false, 'R');
+        $servico = (isset($manifestacao['Servico']['IdServicoMPOG']) && $manifestacao['Servico']['IdServicoMPOG'] > 0) ?
+            $manifestacao['Servico']['Nome'] : '';
+        $this->item('Serviço:', $servico, false, 'R');
+        $outroServico = (isset($manifestacao['Servico']['IdServicoMPOG']) && $manifestacao['Servico']['IdServicoMPOG'] == 0) ?
+            $manifestacao['Servico']['Nome'] : '';
+        $this->item('Outro Serviço:', $outroServico, false, 'R');
+    }
+
+    /**
+     * Escreve no PDF a seção comum de dados do manifestante
+     * @param array $manifestacao Estrutura ManifestacaoDTO
+     * (https://falabr.cgu.gov.br/Help/ResourceModel?modelName=ManifestacaoDTO)
+     * @param bool $importarDadosDoManifestante Se o módulo está configurado para
+     * importar dados do manifestante
+     * @return void
+     */
+    protected function secaoDadosManifestante($manifestacao, $importarDadosDoManifestante)
+    {
+        if ($importarDadosDoManifestante) {
+            $this->secao('Dados do Usuário');
+            $this->item('Tipo de Identificação:',
+                $manifestacao['TipoIdentificacaoManifestante']['DescTipoIdentificacaoManifestante'] ?? '',
+                false, 'R');
+            $this->item('Pedido de restrição de identidade:',
+                $manifestacao['IndPossuiIdentidadePreservada'] ? 'Sim' : 'Não',
+                false,
+                'R');
+            if (is_array($manifestacao['Manifestante']) && is_array($manifestacao['Manifestante']['TipoPessoa'])) {
+                // Manifestante identificado
+                $pessoa = $manifestacao['Manifestante'];
+
+                $this->item('Tipo de Pessoa:', $pessoa['TipoPessoa']['DescTipoPessoa'] ?? '', false, 'R');
+                $this->item('Login Gov.BR:', $pessoa['IndLoginGovBr'] ? 'Sim' : 'Não', false, 'R');
+                $this->item('País:', $pessoa['Pais']['Descricao'] ?? '', false, 'R');
+
+                $this->item('Nome:', $pessoa['Nome'], false, 'R');
+
+                if (is_array($pessoa['TipoDocumentoIdentificacao'])) {
+                    $documento = 'Tipo de Documento: ' . $pessoa['TipoDocumentoIdentificacao']['DescTipoDocumentoIdentificacao'];
+                    $documento .= "\n" . 'Número do Documento: ' . $pessoa['NumeroDocumentoIdentificacao'];
+                    $this->item('Dados de Identificação:', $documento, false, 'R');
+                }
+
+                if ($pessoa['Email']) {
+                    $this->item('Email:', $pessoa['Email'], false, 'R');
+                }
+
+                if (is_array($pessoa['Telefone'])) {
+                    $telefone = '(' . $pessoa['Telefone']['ddd'] . ') ' . $pessoa['Telefone']['Numero'];
+                    $this->item('Telefone:', $telefone, false, 'R');
+                }
+
+                if (is_array($pessoa['Endereco'])) {
+                    $endereco = $pessoa['Endereco'];
+                    $this->item('CEP:', $endereco['CEP'] ?? '', false, 'R');
+                    $this->item('UF:', $endereco['Municipio']['Uf']['SigUf'] ?? '', false, 'R');
+                    $this->item('Município:', $endereco['Municipio']['DescMunicipio'] ?? '', false, 'R');
+                    $this->item('Logradouro:', $endereco['Logradouro'] ?? '', false, 'R');
+                    $this->item('Número:', $endereco['Numero'] ?? '', false, 'R');
+                    $this->item('Complemento:', $endereco['Complemento'] ?? '', false, 'R');
+                    $this->item('Bairro:', $endereco['Bairro'] ?? '', false, 'R');
+                }
+
+                $dadosComplementares = [];
+                if ($pessoa['genero']) {
+                    $dadosComplementares[] = 'Gênero: ' . $pessoa['genero'];
+                }
+                if ($pessoa['DataNascimento']) {
+                    $dadosComplementares[] = 'Data de Nascimento: ' . $pessoa['DataNascimento'];
+                }
+                $chaveCorRaca = mb_convert_encoding('corRaça', 'UTF-8', 'ISO-8859-1');
+                if (is_array($pessoa[$chaveCorRaca])) {
+                    $dadosComplementares[] = 'Cor/Raça: ' . $pessoa[$chaveCorRaca]['descRacaCor'];
+                }
+                if (is_array($pessoa['Escolaridade'])) {
+                    $dadosComplementares[] = 'Escolaridade: ' . $pessoa['Escolaridade']['Descricao'];
+                }
+                if (is_array($pessoa['Profissao'])) {
+                    $dadosComplementares[] = 'Profissão: ' . $pessoa['Profissao']['DescProfissao'];
+                }
+
+                if (count($dadosComplementares) > 0) {
+                    $this->item('Dados Complementares:', implode("\n", $dadosComplementares), false, 'R');
+                }
+            }
         }
     }
 }

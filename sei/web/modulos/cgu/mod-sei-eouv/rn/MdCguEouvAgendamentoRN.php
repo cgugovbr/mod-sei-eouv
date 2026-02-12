@@ -7,8 +7,7 @@
  *
  */
 
-require_once dirname(__FILE__) . '/../util/MdCguEouvGerarPdfLai.php';
-require_once dirname(__FILE__) . '/../util/MdCguEouvGerarPdfOuv.php';
+require_once dirname(__FILE__) . '/../util/MdCguEouvRelatorioPdfManifestacao.php';
 require_once __DIR__ . '/../util/MdCguEouvClient.php';
 
 class MdCguEouvAgendamentoRN extends InfraRN
@@ -770,13 +769,12 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
     private function gerarPDFOuvidoria($retornoWsLinha, $recursos, $tipoImportacaoAtual, $ocorreuErroAdicionarAnexo)
     {
-        $pedidoRevisao = count($recursos) > 0 ? $recursos[0] : null;
-        $mdCguEouvGerarPdf = new MdCguEouvGerarPdfOuv($retornoWsLinha, $pedidoRevisao, $this->importar_dados_manifestante, $ocorreuErroAdicionarAnexo);
+        $mdCguEouvRelatorioPdf = new MdCguEouvRelatorioPdfManifestacao($retornoWsLinha, $recursos, $this->importar_dados_manifestante, $ocorreuErroAdicionarAnexo);
 
         $objAnexoRN = new AnexoRN();
         $strNomeArquivoInicialUpload = $objAnexoRN->gerarNomeArquivoTemporario();
 
-        $mdCguEouvGerarPdf->Output(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", "F");
+        $mdCguEouvRelatorioPdf->Output(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", "F");
 
         //Renomeia tirando a extensão para o SEI trabalhar o Arquivo
         rename(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload);
@@ -799,11 +797,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
     private function gerarPDFLai($retornoWsLinha, $retornoWsRecursos = [], $tipo_recurso = '', $ocorreuErroAdicionarAnexo = false)
     {
-        $objGerarPdf = new MdCguEouvGerarPdfLai($retornoWsLinha, $retornoWsRecursos, $this->importar_dados_manifestante, $ocorreuErroAdicionarAnexo);
+        $objRelatorioPdf = new MdCguEouvRelatorioPdfManifestacao($retornoWsLinha, $retornoWsRecursos, $this->importar_dados_manifestante, $ocorreuErroAdicionarAnexo);
         $objAnexoRN = new AnexoRN();
         $strNomeArquivoInicialUpload = $objAnexoRN->gerarNomeArquivoTemporario();
 
-        $objGerarPdf->Output(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", "F");
+        $objRelatorioPdf->Output(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", "F");
 
         //Renomeia tirando a extensão para o SEI trabalhar o Arquivo
         rename(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload);

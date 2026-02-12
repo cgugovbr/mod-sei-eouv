@@ -22,8 +22,7 @@ $MODULO_WEB_DIR = $SEI_DIR . '/sei/web/modulos/cgu/mod-sei-eouv';
 
 require_once $SEI_DIR . '/sei/web/SEI.php';
 require_once $MODULO_WEB_DIR . '/util/MdCguEouvClient.php';
-require_once $MODULO_WEB_DIR . '/util/MdCguEouvGerarPdfOuv.php';
-require_once $MODULO_WEB_DIR . '/util/MdCguEouvGerarPdfLai.php';
+require_once $MODULO_WEB_DIR . '/util/MdCguEouvRelatorioPdfManifestacao.php';
 
 function verificaArgumentoNUP($indice, $formatado = false) {
     global $argc, $argv;
@@ -130,27 +129,15 @@ try {
                 }
             }
             break;
-        case 'gerar_pdf_ouv':
+        case 'gerar_relatorio_pdf':
             $nup = verificaArgumentoNUP(2);
             $manifestacao = $client->consultaManifestacao($nup);
             $detalhada = $client->consultaDetalhadaManifestacao($manifestacao);
             $recursos = $client->consultaRecursosDaManifestacao($nup);
-            $pedidoRevisao = count($recursos) > 0 ? $recursos[0] : null;
-            $geradorPdf = new MdCguEouvGerarPdfOuv($detalhada, $pedidoRevisao, true, false);
+            $relatorio = new MdCguEouvRelatorioPdfManifestacao($detalhada, $recursos, true, false);
             $arquivo = __DIR__ . '/Relatorio_'.$nup.'.pdf';
             echoln("Gerando arquivo PDF $arquivo");
-            $geradorPdf->Output($arquivo, 'F');
-            echoln("PDF gerado");
-            break;
-        case 'gerar_pdf_lai':
-            $nup = verificaArgumentoNUP(2);
-            $manifestacao = $client->consultaManifestacao($nup);
-            $detalhada = $client->consultaDetalhadaManifestacao($manifestacao);
-            $recursos = $client->consultaRecursosDaManifestacao($nup);
-            $geradorPdf = new MdCguEouvGerarPdfLai($detalhada, $recursos, true, false);
-            $arquivo = __DIR__ . '/Relatorio_'.$nup.'.pdf';
-            echoln("Gerando arquivo PDF $arquivo");
-            $geradorPdf->Output($arquivo, 'F');
+            $relatorio->Output($arquivo, 'F');
             echoln("PDF gerado");
             break;
         case 'importar_manifestacao':
