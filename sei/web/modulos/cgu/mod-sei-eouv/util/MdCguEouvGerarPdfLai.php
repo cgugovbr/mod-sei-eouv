@@ -58,7 +58,7 @@ class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
             foreach ($anexosOriginais as $anexo) {
                 $itens[] = [$anexo['NomeArquivo']];
             }
-            $this->tabela('', ['Anexos Originais'], $itens);
+            $this->tabela($itens, ['Anexos Originais']);
         } else {
             $this->texto('Não há anexos originais da manifestação.');
         }
@@ -69,7 +69,7 @@ class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
             foreach ($anexosComplementares as $anexo) {
                 $itens[] = [$anexo['NomeArquivo']];
             }
-            $this->tabela('', 'Anexos Complementares', $itens);
+            $this->tabela($itens, ['Anexos Complementares']);
         } else {
             $this->texto('Não há anexos complementares.');
         }
@@ -87,7 +87,7 @@ class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
                     $envolvido['Orgao'] ?? '',
                 ];
             }
-            $this->tabela('Envolvidos', ['Nome', 'Função', 'CPF', 'Órgão/Empresa'], $itens);
+            $this->tabela($itens, ['Nome', 'Função', 'CPF', 'Órgão/Empresa'], 'Envolvidos');
         } else {
             $this->texto('Não há envolvidos na manifestação.');
         }
@@ -99,11 +99,16 @@ class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
         $this->secao('Campos Adicionais');
         $camposAdicionais = $teor['CamposAdicionaisManifestacao'];
         if (is_array($camposAdicionais) && count($camposAdicionais) > 0) {
+            $dados = [];
             foreach ($camposAdicionais as $campo) {
-                $this->item($campo['NomeExibido'], $campo['Valor']);
+                $dados[] = [
+                    $campo['NomeExibido'],
+                    $campo['Valor'],
+                ];
             }
+            $this->tabela($dados);
         } else {
-            $this->texto('Não há campos adicionais.', true);
+            $this->texto('Não há campos adicionais.');
         }
 
         /**

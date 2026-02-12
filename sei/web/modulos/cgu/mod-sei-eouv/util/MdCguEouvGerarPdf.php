@@ -84,12 +84,12 @@ class MdCguEouvGerarPdf extends InfraPDF
     /**
      * Adiciona uma tabela
      * @param string $titulo Título da tabela
-     * @param array[string] $colunas Array em que cada elemento representa o
+     * @param array<string> $cabecalhos Array em que cada elemento representa o
      * nome de exibição da coluna
-     * @param array[array[string]] $dados Matriz em que cada elemento representa
+     * @param array<array<string>> $dados Matriz em que cada elemento representa
      * o texto de uma célula da tabela
      */
-    protected function tabela($titulo, $colunas, $dados)
+    protected function tabela($dados, $cabecalhos = [], $titulo = '')
     {
         $this->SetFont('arial', '', 10);
         $this->SetDrawColor(0xd3, 0xd3, 0xd3);
@@ -97,18 +97,28 @@ class MdCguEouvGerarPdf extends InfraPDF
         $this->SetFillColor(0xd3, 0xd3, 0xd3);
 
         // Calcula largura das colunas identificando a maior palavra
+        $dadosCombinados = $dados;
+        if (count($cabecalhos) > 0) {
+            $dadosCombinados = array_merge([$cabecalhos], $dadosCombinados);
+        }
+        $palavras = [];
+        foreach ($dadosCombinados as $i => $celulasDaLinha) {
+            foreach ($celulasDaLinha as $j => $texto) {
+                if (!isset($palavras[$j])) {
+                    $palavras[$j] = explode(' ', $texto);
+                } else {
+                    $palavras[$j] = array_merge($palavras[$j], explode(' ', $texto));
+                }
+            }
+        }
         $larguras = [];
         $somaLarguras = 0;
-        foreach ($colunas as $i => $coluna) {
-            $palavras = explode(' ', $coluna);
-            foreach ($dados as $linha) {
-                $palavras = array_merge($palavras, explode($linha[$i], ' '));
-            }
+        foreach ($palavras as $j => $palavrasDaColuna) {
             $larguraCol = 0;
-            foreach ($palavras as $palavra) {
+            foreach ($palavrasDaColuna as $palavra) {
                 $larguraCol = max($larguraCol, $this->GetStringWidth($palavra));
             }
-            $larguras[$i] = $larguraCol;
+            $larguras[$j] = $larguraCol;
             $somaLarguras += $larguraCol;
         }
 
@@ -129,10 +139,12 @@ class MdCguEouvGerarPdf extends InfraPDF
         if ($titulo) {
             $this->MultiCell(540, 20, $titulo, 1, 'L', true);
         }
-        foreach ($colunas as $i => $coluna) {
-            $this->Cell($larguras[$i], 20, $coluna, 1, 0, 'L', true);
+        if (count($cabecalhos) > 0) {
+            foreach ($cabecalhos as $i => $cabecalho) {
+                $this->Cell($larguras[$i], 20, $cabecalho, 1, 0, 'L', true);
+            }
+            $this->Ln();
         }
-        $this->Ln();
         foreach ($matrizesDeLinha as $matrizDeLinha) {
             $iUltimaLinha = count($matrizDeLinha) - 1;
             foreach ($matrizDeLinha as $i => $linha) {
@@ -154,11 +166,11 @@ class MdCguEouvGerarPdf extends InfraPDF
     /**
      * A partir das células que compões uma linha e das larguras de cada coluna
      * a função distribui o texto de cada célula quebrando-o se necessário.
-     * @param array[string] $celulas Array em que cada elemento
+     * @param array<string> $celulas Array em que cada elemento
      * representa o texto da célula
-     * @param array[float] $larguraDasColunas Array em que cada elemento
+     * @param array<float> $larguraDasColunas Array em que cada elemento
      * representa a largura da coluna
-     * @return string[][] Matriz contendo a disposição dos textos para renderizar
+     * @return array<array<string>> Matriz contendo a disposição dos textos para renderizar
      */
     private function calculaMatrizDaLinha($celulas, $largurasDasColunas) {
         $larguraDoEspaco = $this->GetStringWidth(' ');
