@@ -148,49 +148,30 @@ class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
         }
 
         /**
-         * Seção respostas
+         * Respostas
          */
-        $this->secao('Resposta(s)');
         $historico = $manifestacao['Historico'];
-        $iResposta = 1;
         if (is_array($historico)) {
             foreach ($historico as $evento) {
                 if ($evento['HistoricoAcao']['DescTipoAcaoManifestacao'] == 'Registro Resposta') {
-                    $this->texto('Resposta ' . $iResposta, true);
+                    $this->secao('Resposta - ' . $evento['HistoricoAcao']['DataHoraAcao']);
 
-                    $this->item('Tipo de Resposta', $evento['Resposta']['TipoRespostaManifestacao']['DescTipoRespostaManifestacao']);
-                    $this->item('Data e Hora', $evento['HistoricoAcao']['DataHoraAcao']);
-                    $this->item('Decisão', $evento['Resposta']['Decisao']['descricaoDecisao']);
-                    $this->item('Teor da Resposta', $evento['Resposta']['TxtResposta'], true);
-                    $this->espacamento();
+                    $this->item('Tipo de Resposta', $evento['Resposta']['TipoRespostaManifestacao']['DescTipoRespostaManifestacao'] ?? '');
+                    $this->item('Data/Hora', $evento['HistoricoAcao']['DataHoraAcao'] ?? '');
+                    $this->item('Teor da Resposta', $evento['Resposta']['TxtResposta'] ?? '');
+                    $this->item('Decisão', $evento['Resposta']['Decisao']['descricaoDecisao'] ?? '');
+                    $this->item('Especificação da Decisão', $evento['Resposta']['EspecificacaoDecisao']['DescClassificacaoAvaliacaoManifestacao'] ?? '');
+                    $this->item('Compromisso', $evento['Resposta']['DataCompromisso'] ?? '');
 
-                    ++$iResposta;
+                    $nomesDosAnexos = [];
+                    foreach ($teor['Anexos'] as $anexo) {
+                        if ($anexo['IdObjeto'] == $evento['Resposta']['IdRespostaManifestacao']) {
+                            $nomesDosAnexos[] = $anexo['NomeArquivo'];
+                        }
+                    }
+                    $this->item('Anexos', implode("\n", $nomesDosAnexos));
                 }
             }
-        }
-
-        if ($iResposta == 1) {
-            $this->texto('Não há registro de respostas.', true);
-        }
-
-        /**
-         * Seção anexo das respostas
-         */
-        $this->secao('Anexos das Respostas');
-        $possuiAnexoResposta = false;
-        foreach ($teor['Anexos'] as $anexo) {
-            if ($anexo['TipoAnexoManifestacao']['IdTipoAnexoManifestacao'] == 2) {
-                $possuiAnexoResposta = true;
-
-                $this->item('Nome do Arquivo', $anexo['NomeArquivo']);
-                $this->item('Tipo de Anexo', $anexo['TipoAnexoManifestacao']['DescTipoAnexoManifestacao']);
-                $this->item('Anexo Complementar', $anexo['IndComplementar'] ? 'Sim' : 'Não');
-                $this->espacamento();
-            }
-        }
-
-        if (!$possuiAnexoResposta) {
-            $this->texto('Não há anexos de respostas.', true);
         }
 
         /**
