@@ -70,14 +70,25 @@ class MdCguEouvGerarPdf extends InfraPDF
     protected function item($nome, $valor, $quebrarLinha = false, $alinhamento = 'L')
     {
         $this->SetFont('arial', '', 10);
-        // Mede tamanho do nome
-        $largura = $this->GetStringWidth($nome . ': ');
-        if ($largura < 150) {
-            $largura = 150; // Garante espaçamento mínimo
+
+        $largura = $this->GetStringWidth($nome);
+        if ($largura > 150 && !$quebrarLinha) {
+            // Se a largura do nome ultrapassar 150 e o valor não ficar na linha
+            // de baixo (quebrarLinha = false) renderiza como se fosse
+            // uma tabela de 2 colunas
+            $larguras = [150, 390];
+            $matriz = $this->calculaMatrizDaLinha([$nome, $valor], $larguras);
+            var_dump($matriz);
+            foreach ($matriz as $linha) {
+                foreach ($linha as $j => $texto) {
+                    $this->Cell($larguras[$j], 15, $texto, 0, 0, $j == 0 ? $alinhamento : 'J');
+                }
+                $this->Ln();
+            }
+        } else {
+            $this->Cell(150, 15, $nome, 0, $quebrarLinha ? 1 : 0, $alinhamento);
+            $this->MultiCell(0, 15, $valor, 0, 'J');
         }
-        $this->Cell($largura, 15, $nome, 0, $quebrarLinha ? 1 : 0, $alinhamento);
-        $this->SetFont('arial', '', 10);
-        $this->MultiCell(0, 15, $valor, 0, 'J');
         $this->Ln(5);
     }
 
@@ -190,9 +201,9 @@ class MdCguEouvGerarPdf extends InfraPDF
                     $x += $larguraDoEspaco + $larguraDaPalavra;
                     $bufferDePalavras[] = $palavra;
                 } else { // nova linha dentro da célula
-                    $x = -$larguraDoEspaco;
                     $linhasDeTexto[] = implode(' ', $bufferDePalavras);
-                    $bufferDePalavras = [];
+                    $x = $larguraDaPalavra;
+                    $bufferDePalavras = [$palavra];
                 }
             }
 

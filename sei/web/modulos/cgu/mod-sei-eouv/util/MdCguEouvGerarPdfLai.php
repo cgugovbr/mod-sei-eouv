@@ -181,8 +181,8 @@ class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
          * - Pedido de Revisão
          * - Recurso de Primeira Instância
          * - Recurso de Segunda Instância
+         * - Recursos para CGU ou Terceira Instância
          */
-        $this->secao('Recursos');
         if (count($recursos) > 0) {
             foreach ($recursos as $recurso) {
 
@@ -191,46 +191,49 @@ class MdCguEouvGerarPdfLai extends MdCguEouvGerarPdf
                  * url: https://falabr.cgu.gov.br/Help
                  */
                 if (in_array($recurso['instancia']['IdInstanciaRecurso'], [1, 2, 3, 6, 7])) {
-                    $this->texto('Dados do Recurso -  ' . $recurso['instancia']['DescInstanciaRecurso'], true);
+                    $this->secao('Dados do Recurso - ' . $recurso['instancia']['DescInstanciaRecurso']);
 
-                    $this->item('Destinatário', $manifestacao['OuvidoriaDestino']['NomOuvidoria']);
-                    $this->item('Data de abertura', $recurso['dataRecurso']);
-                    $this->item('Prazo de Atendimento', $recurso['prazoAtendimento']);
-                    $this->item('Tipo de Recurso', $recurso['tipoRecurso']['DescTipoRecurso']);
-                    $this->item('Justificativa', $recurso['justificativa'], true);
+                    $this->item('Destinatário', $manifestacao['OuvidoriaDestino']['NomOuvidoria'] ?? '');
+                    $this->item('Data de Abertura', $recurso['dataRecurso'] ?? '');
+                    $this->item('Prazo de Atendimento', $recurso['prazoAtendimento'] ?? '');
+                    $this->item('Tipo de Recurso', $recurso['tipoRecurso']['DescTipoRecurso'] ?? '');
+                    $this->item('Origem da Solicitação', $recurso['origemSolicitacao']['descOrigemSolicitacao'] ?? '');
+                    $this->item('Justificativa', $recurso['justificativa'] ?? '', true);
 
-                    // Anexos
-                    $textoAnexos = '';
+                    $nomesDosAnexos = [];
                     $anexosRecursos = $recurso['anexos'];
-                    if (is_array($anexosRecursos) && count($anexosRecursos) > 0) {
+                    if (is_array($anexosRecursos)) {
                         foreach ($anexosRecursos as $anexoRecurso) {
-                            $textoAnexos .= $anexoRecurso['nomeArquivo'] . "\n";
+                            $nomesDosAnexos[] = $anexoRecurso['nomeArquivo'];
                         }
-                    } else {
-                        $textoAnexos = 'Recurso não possui anexos.';
                     }
-                    $this->item('Anexos', $textoAnexos, true);
-
-                    $this->espacamento();
+                    $this->item('Anexos', implode("\n", $nomesDosAnexos));
 
                     if (is_array($recurso['respostasRecurso'])) {
                         foreach ($recurso['respostasRecurso'] as $resposta) {
-                            $this->texto('Resposta - ' . $recurso['instancia']['DescInstanciaRecurso'], true);
+                            $this->secao('Resposta do Recurso - ' . $recurso['instancia']['DescInstanciaRecurso']);
 
-                            $this->item('Data da Resposta', $resposta['datRegistroResposta']);
-                            $this->item('Tipo de Resposta', $resposta['tipoRespostaRecurso']['descTipoRespostaRecurso']);
-                            $this->item('Justificativa', $resposta['txtJustificativa'], true);
-                            $this->item('Responsável pela Resposta', $resposta['responsavelResposta']);
-                            $this->item('Destinatário do Recurso da Próxima Instância', $resposta['destinatarioRecursoProximaInstancia']);
-                            $this->item('Prazo para Recurso', $resposta['datPrazoRecurso']);
+                            $this->item('Data da Resposta', $resposta['datRegistroResposta'] ?? '');
+                            //$this->item('Prazo para disponibilizar informação', '');
+                            $this->item('Tipo de Resposta', $resposta['tipoRespostaRecurso']['descTipoRespostaRecurso'] ?? '');
+                            $this->item('Informação Recursal', $resposta['txtInformacaoRecursal'] ?? '');
+                            $this->item('Justificativa', $resposta['txtJustificativa'] ?? '', true);
+                            $this->item('Responsável pela Resposta', $resposta['responsavelResposta'] ?? '');
+                            $this->item('Destinatário do Recurso da Próxima Instância', $resposta['destinatarioRecursoProximaInstancia'] ?? '');
+                            $this->item('Prazo limite para recurso', $resposta['datPrazoRecurso'] ?? '');
+                            // $this->item('Contém informações pessoais ou protegidas por outras hipóteses de sigilo?', '')
 
-                            $this->espacamento();
+                            $nomesDosAnexos = [];
+                            if (is_array($resposta['anexos'])) {
+                                foreach ($resposta['anexos'] as $anexoResposta) {
+                                    $nomesDosAnexos[] = $anexoResposta['nomeArquivo'];
+                                }
+                            }
+                            $this->item('Anexos', implode("\n", $nomesDosAnexos));
                         }
                     }
                 }
             }
-        } else {
-            $this->texto('Não há recursos.', true);
         }
 
         /**
