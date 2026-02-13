@@ -14,6 +14,7 @@ require_once __DIR__ . '/../util/MdCguEouvClient.php';
 class MdCguEouvAgendamentoRN extends InfraRN
 {
     protected $idTipoDocumentoAnexoDadosManifestacao;
+    protected $idHipoteseLegalDocumento;
     protected $idUnidadeOuvidoria;
     protected $idUnidadeEsicPrincipal;
     protected $idUnidadeRecursoPrimeiraInstancia;
@@ -236,6 +237,10 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                     case "EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO":
                         $this->idTipoDocumentoAnexoDadosManifestacao = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
+                        break;
+
+                    case "EOUV_ID_HIPOTESE_LEGAL_DOCUMENTO":
+                        $this->idHipoteseLegalDocumento = intval($arrObjEouvParametroDTO[$i]->getStrDeValorParametro());
                         break;
 
                     case "ESIC_ID_UNIDADE_PRINCIPAL":
@@ -791,6 +796,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
         }
         $objDocumentoManifestacao->setNumero($nomeDocumentoArvore);
         $objDocumentoManifestacao->setIdSerie($this->idTipoDocumentoAnexoDadosManifestacao);
+        $objDocumentoManifestacao->setNivelAcesso(1); // restrito
+        $objDocumentoManifestacao->setIdHipoteseLegal($this->idHipoteseLegalDocumento);
         $objDocumentoManifestacao->setData($retornoWsLinha['DataCadastro']);
         $objDocumentoManifestacao->setNomeArquivo('RelatórioDadosManifestação.pdf');
         $objDocumentoManifestacao->setConteudo(base64_encode(file_get_contents(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload)));
@@ -826,6 +833,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         $objDocumentoManifestacao->setNumero($nomeDocumentoArvore);
         $objDocumentoManifestacao->setIdSerie($this->idTipoDocumentoAnexoDadosManifestacao);
+        $objDocumentoManifestacao->setNivelAcesso(1); // restrito
+        $objDocumentoManifestacao->setIdHipoteseLegal($this->idHipoteseLegalDocumento);
         $objDocumentoManifestacao->setData($retornoWsLinha['DataCadastro']);
         $objDocumentoManifestacao->setNomeArquivo('RelatorioDadosManifestacao.pdf');
         $objDocumentoManifestacao->setConteudo(base64_encode(file_get_contents(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload)));
@@ -901,6 +910,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                 $objAnexoManifestacao->setTipo('R');
                 $objAnexoManifestacao->setIdSerie($this->idTipoDocumentoAnexoDadosManifestacao);
+                $objAnexoManifestacao->setNivelAcesso(1); // restrito
+                $objAnexoManifestacao->setIdHipoteseLegal($this->idHipoteseLegalDocumento);
                 $objAnexoManifestacao->setData(InfraData::getStrDataHoraAtual());
                 $objAnexoManifestacao->setNomeArquivo($strNomeArquivoOriginal);
                 $objAnexoManifestacao->setNumero($strNomeArquivoOriginal);

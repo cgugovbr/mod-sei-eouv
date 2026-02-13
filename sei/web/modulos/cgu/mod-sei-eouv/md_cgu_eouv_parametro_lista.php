@@ -46,6 +46,10 @@ try {
                     $idTipoDocumentoAnexoDadosManifestacao = $arrObjMdCguEouvParametroDTO[$i];
                     break;
 
+                case "EOUV_ID_HIPOTESE_LEGAL_DOCUMENTO":
+                    $idHipoteseLegalDocumento = $arrObjMdCguEouvParametroDTO[$i];
+                    break;
+
                 case "EOUV_USUARIO_ACESSO_WEBSERVICE":
                     $usuarioWebService = $arrObjMdCguEouvParametroDTO[$i];
                     break;
@@ -112,6 +116,10 @@ try {
             $idTipoDocumentoAnexoDadosManifestacao->setStrDeValorParametro($_POST['EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO']);
             $objMdCguEouvAlterarParametroRN->alterarParametro($idTipoDocumentoAnexoDadosManifestacao);
         }
+        if($_POST['EOUV_ID_HIPOTESE_LEGAL_DOCUMENTO'] != $idHipoteseLegalDocumento->getStrDeValorParametro()) {
+            $idHipoteseLegalDocumento->setStrDeValorParametro($_POST['EOUV_ID_HIPOTESE_LEGAL_DOCUMENTO']);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($idHipoteseLegalDocumento);
+        }
         if($_POST['EOUV_USUARIO_ACESSO_WEBSERVICE'] != $usuarioWebService->getStrDeValorParametro()){
             $usuarioWebService->setStrDeValorParametro($_POST['EOUV_USUARIO_ACESSO_WEBSERVICE']);
             $objMdCguEouvAlterarParametroRN->alterarParametro($usuarioWebService);
@@ -173,6 +181,7 @@ try {
       throw new InfraException("Ação '".$_GET['acao']."' não reconhecida.");
   }
     $strItensSelSerie = SerieINT::montarSelectNomeExternos('null','&nbsp;',$idTipoDocumentoAnexoDadosManifestacao->getStrDeValorParametro());
+    $strItensHipotesesLegais = HipoteseLegalINT::montarSelectNomeBaseLegal('null', '&nbsp', $idHipoteseLegalDocumento->getStrDeValorParametro(), ProtocoloRN::$NA_RESTRITO);
     $strItensSelUnidadeOuv = UnidadeINT::montarSelectSiglaDescricao('null','&nbsp;',$idUnidadeOuvidoria->getStrDeValorParametro());
     $strItensSelUnidadeEsic = UnidadeINT::montarSelectSiglaDescricao('null','&nbsp;',$idUnidadeEsicPrincipal->getStrDeValorParametro());
     $strItensSelUnidadePrimeira = UnidadeINT::montarSelectSiglaDescricao('null','&nbsp;',$idUnidadeRecursoPrimeiraInstancia->getStrDeValorParametro());
@@ -195,6 +204,9 @@ PaginaSEI::getInstance()->abrirStyle();
 .infraAreaDados {
     margin-bottom: 1em;
 }
+.alerta {
+    color: #ff4545;
+}
 <?
 PaginaSEI::getInstance()->fecharStyle();
 PaginaSEI::getInstance()->montarJavaScript();
@@ -211,12 +223,17 @@ PaginaSEI::getInstance()->abrirJavaScript();
     function ValidarCadastroParametro() {
         if (infraTrim(document.getElementById('EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES').value)=='') {
             alert('Informe a Data Inicial de Importação.');
-            document.getElementById('EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO').focus();
+            document.getElementById('EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES').focus();
             return false;
         }
         if (infraTrim(document.getElementById('EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO').value)=='null') {
             alert('Informe o Tipo de Documento.');
             document.getElementById('EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('EOUV_ID_HIPOTESE_LEGAL_DOCUMENTO').value) == 'null') {
+            alert('Informe a Hipótese Legal.');
+            document.getElementById('EOUV_ID_HIPOTESE_LEGAL_DOCUMENTO').focus();
             return false;
         }
         if (infraTrim(document.getElementById('EOUV_USUARIO_ACESSO_WEBSERVICE').value)=='') {
@@ -342,6 +359,15 @@ PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
         <select id="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" name="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" class="infraSelect"
                 tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
             <?=$strItensSelSerie?>
+        </select>
+    </div>
+
+    <div class="infraAreaDados">
+        <p>Os documentos gerados pela integração sempre possuem nível de acesso <span class="alerta">restrito</span>. Selecione abaixo a Hipótese Legal que deve ser aplicada aos documentos.</p>
+        <label for="EOUV_ID_HIPOTESE_LEGAL_DOCUMENTO" accesskey="H" class="infraLabelObrigatorio"><span class="infraTeclaAtalho">H</span>ipótese Legal aplicada aos documentos gerados pela integração:</label>
+        <select id="EOUV_ID_HIPOTESE_LEGAL_DOCUMENTO" name="EOUV_ID_HIPOTESE_LEGAL_DOCUMENTO" class="infraSelect"
+            tabindex="<?= PaginaSEI::getInstance()->getProxTabDados() ?>" >
+            <?= $strItensHipotesesLegais ?>
         </select>
     </div>
 

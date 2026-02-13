@@ -39,6 +39,7 @@ try {
       if (isset($_GET['id_md_cgu_eouv_tipo_manifestacao'])) {
         // Busca o tipo de manifestacao
         $objDeParaDTO->setNumIdTipoManifestacaoEouv($_GET['id_md_cgu_eouv_tipo_manifestacao']);
+        $objDeParaDTO->setBolExclusaoLogica(false);
         $objDeParaDTO->retTodos();
         $objDeParaDTO->retStrTipoProcedimento();
         $objMdCguEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
@@ -54,6 +55,7 @@ try {
 
         // Localiza o registro no banco
         $objDeParaDTO->setNumIdTipoManifestacaoEouv($_POST['hdnIdEouv']);
+        $objDeParaDTO->setBolExclusaoLogica(false);
         $objDeParaDTO->retTodos();
         $objMdCguEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
         $objDeParaDTO = $objMdCguEouvDeparaImportacaoRN->consultar($objDeParaDTO);
@@ -61,10 +63,7 @@ try {
           throw new InfraException("Registro não encontrado.");
         }
 
-        $objDeParaDTO->setNumIdTipoProcedimento($_POST['selTipoProc']);
-
-        // Verifica se o nível sugerido para o tipo de processo selecionado é público
-        // e se for lança um erro
+        // Atualiza o tipo de processo
         $objTipoProcedimentoDTO = new TipoProcedimentoDTO();
         $objTipoProcedimentoDTO->setNumIdTipoProcedimento($_POST['selTipoProc']);
         $objTipoProcedimentoDTO->retStrStaNivelAcessoSugestao();
@@ -74,16 +73,14 @@ try {
         if (!$objTipoProcedimentoDTO) {
           PaginaSEI::getInstance()->setStrMensagem('Tipo de Processo não encontrado',
             PaginaSEI::$TIPO_MSG_ERRO);
-        } else if ($objTipoProcedimentoDTO->getStrStaNivelAcessoSugestao() == ProtocoloRN::$NA_PUBLICO) {
-          PaginaSEI::getInstance()->setStrMensagem('O nível de acesso sugerido '.
-            'do tipo de processo não pode ser público. Ajuste os parâmetros '.
-            'do tipo ou então escolha um outro.', PaginaSEI::$TIPO_MSG_ERRO);
-        } else if (is_null($objTipoProcedimentoDTO->getNumIdHipoteseLegalSugestao())) {
-          PaginaSEI::getInstance()->setStrMensagem('O tipo de processo não tem '.
-            'uma Hipótese Legal de restrição de acesso sugerida. Ajuste os '.
-            'parâmetros do tipo ou então escolha um outro.', PaginaSEI::$TIPO_MSG_ERRO);
+        } else if ($objTipoProcedimentoDTO->getStrStaNivelAcessoSugestao() == ProtocoloRN::$NA_RESTRITO && is_null($objTipoProcedimentoDTO->getNumIdHipoteseLegalSugestao())) {
+          PaginaSEI::getInstance()->setStrMensagem('O tipo de processo selecionado '.
+            'possui nível de acesso sugerido restrito, porém não possui sugestão '.
+            'de hipótese legal, dessa forma não pode ser utilizado pela integração. '.
+            'Configure uma hipótese legal sugerida no menu de Administração do SEI '.
+            'ou então escolha um outro tipo de processo.', PaginaSEI::$TIPO_MSG_ERRO);
         } else {
-          // Atualiza o tipo de processo
+          $objDeParaDTO->setNumIdTipoProcedimento($_POST['selTipoProc']);
           $objMdCguEouvDeparaImportacaoRN->alterar($objDeParaDTO);
 
           // Registra mensagem e redireciona

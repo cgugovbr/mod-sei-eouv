@@ -5,7 +5,7 @@ require_once dirname(__FILE__).'/../web/Sip.php';
 class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
 {
   private $nomeModulo = 'Integração com o sistema FalaBR';
-  private $versaoAtual = '4.1.0';
+  private $versaoAtual = '4.2.0';
   private $parametroVersao = 'VERSAO_MODULO_CGU_EOUV';
   private $arrayVersoes = array(
     '2.0.5' => 'instalarv205',
@@ -14,6 +14,7 @@ class MdCguEouvAtualizadorSipRN extends InfraScriptVersao
     '4.0.1' => 'semAlteracoes',
     '4.0.2' => 'semAlteracoes',
     '4.1.0' => 'instalarv410',
+    '4.2.0' => 'semAlteracoes',
   );
   /**
    * 1. Começamos a controlar a partir da versão 2.0.5 que é a última estável para o SEI 3.0
