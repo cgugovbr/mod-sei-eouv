@@ -240,7 +240,7 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
     $objInfraIBanco->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) '.
       "VALUES ('10', 'TOKEN', 'XXX')");
     $objInfraIBanco->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) '.
-      "VALUES ('11', 'IMPORTAR_DADOS_MANIFESTANTE', '1')");
+      "VALUES ('11', 'IMPORTAR_DADOS_MANIFESTANTE', '0')");
 
     $this->logar('Apagando os registros da tabela infra_parametros que foram migrados para tabela específica');
 
