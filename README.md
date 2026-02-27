@@ -90,10 +90,7 @@ nas configurações.
 
 Acessar o menu *Administração -> Integração com FalaBR -> Tipos de Manifestação* e associar cada tipo de manifestação do FalaBR com um tipo de processo existente no SEI. Você poderá criar um novo tipo de processo para cada tipo de manifestação do FalaBR se for o caso.
 
-**Importante:** é preciso configurar o nível de acesso sugerido do tipo de
-processo associado para *Restrito*. Dessa forma, os processos criados pela
-integração ficarão restritos. Configurar também a Hipótese Legal sugerida como
-"Informação Pessoal (Art. 31 da Lei 12.527/2011)".
+**Importante:** os processos criados pela integração usam o nível de acesso sugerido configurado no tipo de processo do SEI.
 
 Abaixo estão os tipos de manifestações do FalaBR que serão importadas para o SEI:
 
@@ -143,6 +140,11 @@ executada, será gerado um documento PDF com os dados da manifestação. Este do
 será anexado ao processo. Este campo indica o Tipo de Documento SEI que será
 utilizado para este PDF. Lembrando que deve ser do Grupo de **Documentos Externos**.
 Para verificar os tipos existentes acesse *Administração > Tipos de Documento > Listar*.
+- **Hipótese Legal aplicada aos documentos gerados pela integração**: Tanto o
+relatório da manifestação quanto os anexos são sempre importados com nível de
+acesso restrito. Este campo indica qual hipótese legal deve ser atribuída a
+esses documentos para justificar a restrição. Recomendamos utilizar a hipótese
+"Informação Pessoal (Art. 31 da Lei 12.527/2011)".
 - **Unidade de Ouvidoria**: Unidade no SEI que deverá receber os processos
 oriundos de manifestações de Ouvidoria importados do FalaBR.
 - **Unidade de Acesso à Informação**: Unidade no SEI que deverá receber os processos

@@ -5,7 +5,7 @@ require_once dirname(__FILE__) . '/../web/SEI.php';
 class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
 {
   private $nomeModulo = 'Integração com o sistema FalaBR';
-  private $versaoAtual = '4.1.0';
+  private $versaoAtual = '4.2.0';
   private $parametroVersao = 'VERSAO_MODULO_CGU_EOUV';
   private $arrayVersoes = array(
     '2.0.5' => 'instalarv205',
@@ -14,6 +14,7 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
     '4.0.1' => 'semAlteracoes',
     '4.0.2' => 'instalarv402',
     '4.1.0' => 'instalarv410',
+    '4.2.0' => 'instalarv420',
   );
   /**
    * 1. Começamos a contralar a partir da versão 2.0.5 que é a última estável para o SEI 3.0
@@ -457,6 +458,15 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
 
     $this->logar('Remove parâmetro ESIC_DATA_INICIAL_IMPORTACAO_MANIFESTACOES');
     $objInfraIBanco->executarSql("DELETE FROM md_eouv_parametros WHERE no_parametro = 'ESIC_DATA_INICIAL_IMPORTACAO_MANIFESTACOES'");
+  }
+
+  protected function instalarv420() {
+    $objInfraIBanco = $this->inicializarObjInfraIBanco();
+
+    // Insere parâmetro de hipótese legal dos documentos gerados
+    // Usa "Informação Pessoal" como padrão
+    $objInfraIBanco->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) '.
+        "VALUES (19, 'EOUV_ID_HIPOTESE_LEGAL_DOCUMENTO', '4')");
   }
 }
 
