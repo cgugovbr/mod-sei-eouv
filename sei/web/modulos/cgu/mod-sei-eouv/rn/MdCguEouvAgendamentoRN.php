@@ -192,7 +192,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $textoMensagemFinal = $textoMensagemFinal . ' Não foram encontradas manifestações para o período.';
             } else {
                 $textoMensagemFinal = $textoMensagemFinal . '<br>Quantidade de Manifestações novas encontradas (FalaBr): ' . $qtdManifestacoesNovas .
-                    '<br>Quantidade de Manifestações encontadas que ocorreram erro em outras importações: ' . $qtdManifestacoesAntigas;
+                    '<br>Quantidade de Manifestações encontradas que ocorreram erro em outras importações: ' . $qtdManifestacoesAntigas;
             }
 
             if ($semRecursosEncontrados) {
