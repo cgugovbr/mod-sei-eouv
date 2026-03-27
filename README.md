@@ -1,3 +1,14 @@
+# ð¨ REPOSITÃRIO MIGRADO ð¨
+
+## â ï¸ ATENÃÃO: Este repositÃ³rio foi movido para o GitHub Enterprise (GHE)!
+
+### ð **Novo endereÃ§o:**
+**https://github.com/cgu-se-dti/mod-sei-eouv**
+
+> Caso nÃ£o tenha acesso fale com a lÃ­der da equipe para inserÃ§Ã£o no grupo do AD para acesso ao novo repositÃ³rio.
+
+---
+
 
 # Módulo de Integração SEI & FalaBR
 
