@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Executar espelhamento do repositório
         env:
-          CGU_SYNC_TOKEN_CGUACTIONS: ${{ secrets.CGU_SYNC_TOKEN_CGUACTIONS }}
+          CGU_SYNC_TOKEN_CGUMODSEIEOUV: ${{ secrets.CGU_SYNC_TOKEN_CGUMODSEIEOUV }}
           CGU_SYNC_TOKEN_CGUGOVBR: ${{ secrets.CGU_SYNC_TOKEN_CGUGOVBR }}
         run: |
           set -e
@@ -24,7 +24,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
           # Clona o repo cgu-se-dti/mod-sei-eouv como mirror
-          git clone --mirror https://x-access-token:${CGU_SYNC_TOKEN_CGUACTIONS}@github.com/cgu-se-dti/mod-sei-eouv.git cgu-se-dti-mirror
+          git clone --mirror https://x-access-token:${CGU_SYNC_TOKEN_CGUMODSEIEOUV}@github.com/cgu-se-dti/mod-sei-eouv.git cgu-se-dti-mirror
           cd cgu-se-dti-mirror
 
           # Faz push para o repo cgugovbr/mod-sei-eouv
