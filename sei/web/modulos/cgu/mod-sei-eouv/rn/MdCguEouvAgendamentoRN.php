@@ -308,13 +308,19 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $objProcedimentoAPI = new ProcedimentoAPI();
             $objProcedimentoAPI->setIdTipoProcedimento($objTipoProcedimentoDTO->getNumIdTipoProcedimento());
 
+            // A especificação é limitada a 100 caracteres pelo SEI
             $varEspecificacaoAssunto = "";
-
             if (is_array($manifestacao['Assunto'])) {
                 $varEspecificacaoAssunto = $manifestacao['Assunto']['DescAssunto'];
+                if (strlen($varEspecificacaoAssunto) > 100) {
+                    $varEspecificacaoAssunto = substr($varEspecificacaoAssunto, 0, 97) . "...";
+                }
             }
             if (is_array($manifestacao['SubAssunto'])) {
-                $varEspecificacaoAssunto = $varEspecificacaoAssunto . " / " . $manifestacao['SubAssunto']['DescSubAssunto'];
+                $varEspecificacaoAssuntoSubAssunto = $varEspecificacaoAssunto . " / " . $manifestacao['SubAssunto']['DescSubAssunto'];
+                if (strlen($varEspecificacaoAssuntoSubAssunto) <= 100) {
+                    $varEspecificacaoAssunto = $varEspecificacaoAssuntoSubAssunto;
+                }
             }
 
             $objProcedimentoAPI->setEspecificacao($varEspecificacaoAssunto);
