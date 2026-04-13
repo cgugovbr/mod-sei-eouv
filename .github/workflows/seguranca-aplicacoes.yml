@@ -1,0 +1,15 @@
+name: Análise de Segurança
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+jobs:
+  security-scan:
+    uses: cgu-se-dti/cgu-actions/.github/workflows/seguranca-aplicacoes.yml@main
+    with:
+      working-directory: "."
