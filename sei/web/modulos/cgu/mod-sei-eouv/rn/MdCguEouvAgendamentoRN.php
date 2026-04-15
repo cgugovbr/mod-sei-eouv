@@ -161,6 +161,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
             if ($this->tipoAcessoAInformacaoAtivo) { // TODO talvez importar sempre, por conta dos pedidos de revisão?
                 $debugLocal && LogSEI::getInstance()->gravar('Consulta novos recursos');
                 $arrRecursos = $this->apiClient->consultaRecursosNoIntervalo($ultimaDataExecucao, $dataAtual);
+                $arrRecursos = $this->filtraRecursosSuportados($arrRecursos);
                 $qtdRecursosNovos = count($arrRecursos);
                 $debugLocal && LogSEI::getInstance()->gravar('Possui recursos qtd: ' . $qtdRecursosNovos);
             } else {
@@ -748,7 +749,18 @@ class MdCguEouvAgendamentoRN extends InfraRN
             // 3 -> Recurso à CGU
             // 6 -> Pedido de Revisão
             // 7 -> Recurso em terceira instância
-            return in_array($recurso['instancia']['IdInstanciaRecurso'], [1, 2, 3, 6, 7]);
+            if (!in_array($recurso['instancia']['IdInstanciaRecurso'], [1, 2, 3, 6, 7])) {
+                return false;
+            };
+
+            // Se for recurso à CGU elimina os casos de recurso de reclamação por
+            // descumprimento de prazo, que não devem ser importados
+            // IdTipoRecurso = 1 significa "Resposta não foi dada no prazo"
+            if ($recurso['instancia']['IdInstanciaRecurso'] === 3 && $recurso['tipoRecurso']['IdTipoRecurso'] === 1) {
+                return false;
+            }
+
+            return true;
         });
     }
 
