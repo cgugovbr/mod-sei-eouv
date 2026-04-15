@@ -19,7 +19,7 @@ try {
 
   switch($_GET['acao']){
       case 'md_cgu_eouv_depara_importacao_listar':
-        $strTitulo = 'Tipos de Manifestação do FalaBR e Tipos de Processo Associados';
+        $strTitulo = 'Configuração de Tratamento dos Tipos de Manifestação e de Recurso do FalaBR';
       break;
 
       case 'md_cgu_eouv_depara_importacao_desativar':
@@ -70,8 +70,7 @@ try {
   $arrComandos = array();
 
   $objDeParaDTO = new MdCguEouvDeparaImportacaoDTO();
-  $objDeParaDTO->retTodos();
-  $objDeParaDTO->retStrTipoProcedimento();
+  $objDeParaDTO->retTodos(true);
   $objDeParaDTO->setBolExclusaoLogica(false);
   PaginaSEI::getInstance()->prepararOrdenacao($objDeParaDTO, 'IdTipoManifestacaoEouv', InfraDTO::$TIPO_ORDENACAO_ASC);
 
@@ -101,8 +100,8 @@ try {
 
       $strResultado = '';
 
-    $strSumarioTabela = 'Tabela de Tipos de Manifestação.';
-    $strCaptionTabela = 'Tipos de Manifestação';
+    $strSumarioTabela = 'Tabela de Tipos de Manifestação e de Recurso.';
+    $strCaptionTabela = 'Tipos de Manifestação e de Recurso';
 
     $strResultado .= '<table width="99%" class="infraTable" summary="'.$strSumarioTabela.'">'."\n";
     $strResultado .= '<caption class="infraCaption">'.PaginaSEI::getInstance()->gerarCaptionTabela($strCaptionTabela,$numRegistros).'</caption>';
@@ -110,9 +109,10 @@ try {
     if ($bolCheck) {
           $strResultado .= '<th class="infraTh" width="1%">'.PaginaSEI::getInstance()->getThCheck().'</th>'."\n";
     }
-    $strResultado .= '<th class="infraTh">'.PaginaSEI::getInstance()->getThOrdenacao($objDeParaDTO,'ID da Manifestação','IdTipoManifestacaoEouv',$arrObjDeParaDTO).'</th>'."\n";
-    $strResultado .= '<th class="infraTh">Tipo de Manifestação</th>'."\n";
+    $strResultado .= '<th class="infraTh">Tipo de Manifestação / Recurso</th>'."\n";
     $strResultado .= '<th class="infraTh">Tipo de Processo Associado</th>'."\n";
+    $strResultado .= '<th class="infraTh">Hipótese Legal de Restrição dos Documentos</th>'."\n";
+    $strResultado .= '<th class="infraTh">Unidade de Destino</th>'."\n";
     $strResultado .= '<th class="infraTh">Ações</th>'."\n";
     $strResultado .= '</tr>'."\n";
     $strCssTr='';
@@ -127,9 +127,10 @@ try {
         if ($bolCheck){
             $strResultado .= '<td valign="top">'.PaginaSEI::getInstance()->getTrCheck($i,$arrObjDeParaDTO[$i]->getNumIdTipoManifestacaoEouv(),$arrObjDeParaDTO[$i]->getStrDeTipoManifestacaoEouv()).'</td>';
         }
-        $strResultado .= '<td width="15%" align="center">'.$arrObjDeParaDTO[$i]->getNumIdTipoManifestacaoEouv().'</td>';
         $strResultado .= '<td width="20%" align="center">'.PaginaSEI::tratarHTML($arrObjDeParaDTO[$i]->getStrDeTipoManifestacaoEouv()).'</td>';
         $strResultado .= '<td align="center">'.PaginaSEI::tratarHTML($arrObjDeParaDTO[$i]->getStrTipoProcedimento()).'</td>';
+        $strResultado .= '<td align="center">'.PaginaSEI::tratarHTML($arrObjDeParaDTO[$i]->getStrHipoteseLegal()).'</td>';
+        $strResultado .= '<td align="center">'.PaginaSEI::tratarHTML($arrObjDeParaDTO[$i]->getStrSiglaUnidadeDestino()).'</td>';
         $strResultado .= '<td width="15%" align="center">';
 
         $strId = $arrObjDeParaDTO[$i]->getNumIdTipoManifestacaoEouv();

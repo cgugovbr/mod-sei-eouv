@@ -13,13 +13,6 @@ require_once __DIR__ . '/../util/MdCguEouvClient.php';
 class MdCguEouvAgendamentoRN extends InfraRN
 {
     protected $idTipoDocumentoAnexoDadosManifestacao;
-    protected $idHipoteseLegalDocumento;
-    protected $idUnidadeOuvidoria;
-    protected $idUnidadeEsicPrincipal;
-    protected $idUnidadeRecursoPrimeiraInstancia;
-    protected $idUnidadeRecursoSegundaInstancia;
-    protected $idUnidadeRecursoTerceiraInstancia;
-    protected $idUnidadeRecursoPedidoRevisao;
     protected $ocorreuErroEmProtocolo;
     protected $importar_dados_manifestante;
     protected $dataInicialImportacaoManifestacoes;
@@ -28,7 +21,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
     private $apiClient;
     private $tiposDeManifestacaoAtivos;
-    private $tipoAcessoAInformacaoAtivo;
     private $protocolosProcessados;
 
     public function __construct()
@@ -76,12 +68,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $objMdCguEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
         $arrObjMdCguEouvDeparaImportacaoDTO = $objMdCguEouvDeparaImportacaoRN->listar($objMdCguEouvDeparaImportacaoDTO);
         $this->tiposDeManifestacaoAtivos = array();
-        $this->tipoAcessoAInformacaoAtivo = false;
         foreach ($arrObjMdCguEouvDeparaImportacaoDTO as $objMdCguEouvDeparaImportacaoDTO) {
             $idTipoManifestacao = $objMdCguEouvDeparaImportacaoDTO->getNumIdTipoManifestacaoEouv();
-            if ($idTipoManifestacao == 8) {
-                $this->tipoAcessoAInformacaoAtivo = true;
-            }
             $this->tiposDeManifestacaoAtivos[] = $idTipoManifestacao;
         }
     }
@@ -96,6 +84,20 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $tiposAtivos = $this->tiposDeManifestacaoAtivos;
         return array_filter($manifestacoes, function($manifestacao) use ($tiposAtivos) {
             return in_array($manifestacao['TipoManifestacao']['IdTipoManifestacao'], $tiposAtivos);
+        });
+    }
+
+    /**
+     * Filtra um array de recursos para deixar passar apenas os tipos que estão
+     * atualmente ativos na configuração do módulo
+     * @param array $recursos Array de estruturas RecursoDTO
+     * (https://falabr.cgu.gov.br/Help/ResourceModel?modelName=RecursoDTO)
+     * @return array Array filtrado
+     */
+    private function filtrarTiposDeRecursosAtivos($recursos) {
+        $tiposAtivos = $this->tiposDeManifestacaoAtivos;
+        return array_filter($recursos, function ($recurso) use ($tiposAtivos) {
+            return in_array($this->obterIdTipoManifestacao($recurso), $tiposAtivos);
         });
     }
 
@@ -157,17 +159,13 @@ class MdCguEouvAgendamentoRN extends InfraRN
             $debugLocal && LogSEI::getInstance()->gravar('Possui manifestações com erros - qtd: ' . $qtdManifestacoesAntigas);
             $arrManifestacoes = array_merge($arrManifestacoes, $arrComErro);
 
-            // Consulta novos recursos, caso a importação de manifestações de acesso à informação esteja ativa
-            if ($this->tipoAcessoAInformacaoAtivo) { // TODO talvez importar sempre, por conta dos pedidos de revisão?
-                $debugLocal && LogSEI::getInstance()->gravar('Consulta novos recursos');
-                $arrRecursos = $this->apiClient->consultaRecursosNoIntervalo($ultimaDataExecucao, $dataAtual);
-                $arrRecursos = $this->filtraRecursosSuportados($arrRecursos);
-                $qtdRecursosNovos = count($arrRecursos);
-                $debugLocal && LogSEI::getInstance()->gravar('Possui recursos qtd: ' . $qtdRecursosNovos);
-            } else {
-                $debugLocal && LogSEI::getInstance()->gravar('Importação de solicitações de acesso à informação desabilitada');
-                $arrRecursos = [];
-            }
+            // Consulta novos recursos
+            $debugLocal && LogSEI::getInstance()->gravar('Consulta novos recursos');
+            $arrRecursos = $this->apiClient->consultaRecursosNoIntervalo($ultimaDataExecucao, $dataAtual);
+            $arrRecursos = $this->filtraRecursosSuportados($arrRecursos);
+            $arrRecursos = $this->filtrarTiposDeRecursosAtivos($arrRecursos);
+            $qtdRecursosNovos = count($arrRecursos);
+            $debugLocal && LogSEI::getInstance()->gravar('Possui recursos qtd: ' . $qtdRecursosNovos);
 
             // Importa manifestações
             if (count($arrManifestacoes) > 0) {
@@ -230,7 +228,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $strParametroNome = $arrObjEouvParametroDTO[$i]->getStrNoParametro();
 
                 switch ($strParametroNome) {
-
                     case "EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES":
                         $this->dataInicialImportacaoManifestacoes = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
                         break;
@@ -239,38 +236,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
                         $this->idTipoDocumentoAnexoDadosManifestacao = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
                         break;
 
-                    case "EOUV_ID_HIPOTESE_LEGAL_DOCUMENTO":
-                        $this->idHipoteseLegalDocumento = intval($arrObjEouvParametroDTO[$i]->getStrDeValorParametro());
-                        break;
-
-                    case "ESIC_ID_UNIDADE_PRINCIPAL":
-                        $this->idUnidadeEsicPrincipal = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
-                        break;
-
-                    case "ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA":
-                        $this->idUnidadeRecursoPrimeiraInstancia = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
-                        break;
-
-                    case "ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA":
-                        $this->idUnidadeRecursoSegundaInstancia = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
-                        break;
-
-                    case "ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA":
-                        $this->idUnidadeRecursoTerceiraInstancia = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
-                        break;
-
-                    case "ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO":
-                        $this->idUnidadeRecursoPedidoRevisao = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
-                        break;
-
                     case "IMPORTAR_DADOS_MANIFESTANTE":
                         $this->importar_dados_manifestante = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
                         break;
-
-                    case "ID_UNIDADE_OUVIDORIA":
-                        $this->idUnidadeOuvidoria = $arrObjEouvParametroDTO[$i]->getStrDeValorParametro();
-                        break;
-
                 }
             }
         }
@@ -348,27 +316,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
             }
 
             throw $e;
-        }
-    }
-
-    public function obterUnidadeDestino(string $tipoImportacao)
-    {
-        switch ($tipoImportacao) {
-            case 'P':
-                return $this->idUnidadeOuvidoria;
-            case 'R':
-                return $this->idUnidadeEsicPrincipal;
-            case 'R1':
-                return $this->idUnidadeRecursoPrimeiraInstancia;
-            case 'R2':
-                return $this->idUnidadeRecursoSegundaInstancia;
-            case 'R3':
-            case 'RC':
-                return $this->idUnidadeRecursoTerceiraInstancia;
-            case 'PR':
-                return $this->idUnidadeRecursoPedidoRevisao;
-            default:
-                throw new InfraException('Tipo de importação desconhecido: ' . $tipoImportacao);
         }
     }
 
@@ -535,47 +482,39 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
     public function executarImportacaoLinha($retornoWsLinha)
     {
-        $debugLocal = false;
-
         $numProtocoloFormatado =  $this->formatarProcesso($retornoWsLinha['NumerosProtocolo'][0]);
 
         if (array_key_exists($numProtocoloFormatado, $this->protocolosProcessados)) {
             return; // Protocolo já processado nessa execução
         }
-        
+
         /**
          * Limpa os registros de detalhe de importação com erro para este NUP.
          * Caso ocorra um novo, será criado novo registro de erro para o NUP no tratamento desta function.
          */
         $this->limparErrosParaNup($numProtocoloFormatado);
 
-        // Verifica se o tipo de manifestação é suportado
-        if (is_array($retornoWsLinha['TipoManifestacao'])) {
-            $numIdTipoManifestacao = $retornoWsLinha['TipoManifestacao']['IdTipoManifestacao'];
-        } else {
-            $numIdTipoManifestacao = null;
-        }
-        if (is_null($numIdTipoManifestacao) || $numIdTipoManifestacao > 8) {
-            // Se não for suportado marca como sucesso para evitar reimportação na próxima execução.
-            $this->gravarLogProtocolo($numProtocoloFormatado,
-                'Tipo de manifestação não suportado (ID = '.$numIdTipoManifestacao.'). Não será importada.',
-                'S', 'P');
-            return;
-        }
-
-        // Verifica Tipo de Manifestação: Ouvidoria ou LAI
-        if ($numIdTipoManifestacao != 8) {
-            $debugLocal && LogSEI::getInstance()->gravar('Importação tipo "P" - tipoManifestação <> "8"');
-            $tipoManifestacao = 'P';
-        } else {
-            $debugLocal && LogSEI::getInstance()->gravar('Importação tipo "R" - tipoManifestação == "8"');
-            $tipoManifestacao = 'R';
-        }
-
         try {
-            // Verifica o tipo de processo SEI correspondente
+            // Consulta detalhes da manifestação
+            $manifestacao = $this->apiClient->consultaDetalhadaManifestacao($retornoWsLinha);
+
+            // Consulta recursos
+            $arrRecursos = $this->apiClient->consultaRecursosDaManifestacao($numProtocoloFormatado);
+            $arrRecursos = $this->filtraRecursosSuportados($arrRecursos);
+            $numRecursos = count($arrRecursos);
+
+            if ($numRecursos > 0) {
+                $ultimoRecurso = end($arrRecursos);
+                $numIdTipoManifestacao = $this->obterIdTipoManifestacao($ultimoRecurso);
+                $tipoImportacaoAtual = $this->obterTipoImportacao($ultimoRecurso);
+            } else {
+                $numIdTipoManifestacao = $manifestacao['TipoManifestacao']['IdTipoManifestacao'];
+                $tipoImportacaoAtual = $numIdTipoManifestacao == 8 ? 'R' : 'P';
+            }
+
+            // Verifica as configurações do tipo de manifestação
             $objEouvDeparaImportacaoDTO = new MdCguEouvDeparaImportacaoDTO();
-            $objEouvDeparaImportacaoDTO->retNumIdTipoProcedimento();
+            $objEouvDeparaImportacaoDTO->retTodos();
             $objEouvDeparaImportacaoDTO->setNumIdTipoManifestacaoEouv($numIdTipoManifestacao);
             
             $objEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
@@ -583,15 +522,14 @@ class MdCguEouvAgendamentoRN extends InfraRN
             
             if ($objEouvDeparaImportacaoDTO == null) {
                 $this->gravarLogProtocolo($numProtocoloFormatado,
-                'Não existe mapeamento desse tipo de manifestação do FalaBR para o tipo de processo do SEI.',
-                'N', $tipoManifestacao);
+                'Não existe mapeamento desse tipo de manifestação ou recurso do FalaBR para o tipo de processo do SEI.',
+                'N', $tipoImportacaoAtual);
                 return;
             } else {
-                $idTipoManifestacaoSei = $objEouvDeparaImportacaoDTO->getNumIdTipoProcedimento();
+                $idTipoProcedimentoSei = $objEouvDeparaImportacaoDTO->getNumIdTipoProcedimento();
+                $idHipoteseLegalSei = $objEouvDeparaImportacaoDTO->getNumIdHipoteseLegal();
+                $idUnidadeDestino = $objEouvDeparaImportacaoDTO->getNumIdUnidadeDestino();
             }
-            
-            // Consulta detalhes da manifestação
-            $manifestacao = $this->apiClient->consultaDetalhadaManifestacao($retornoWsLinha);
 
             // Vefificar se o NUP já existe
             $objProtocoloDTOExistente = $this->verificarProtocoloExistente($numProtocoloFormatado);
@@ -606,19 +544,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 if ($tipoUltimaImportacao == null) {
                     $primeiraImportacaoEmProcessoExistente = true;
                 }
-            }
-
-            // Consulta recursos
-            $arrRecursos = $this->apiClient->consultaRecursosDaManifestacao($numProtocoloFormatado);
-            $arrRecursos = $this->filtraRecursosSuportados($arrRecursos);
-            $numRecursos = count($arrRecursos);
-
-            // Define o tipo de importação
-            if ($numRecursos > 0) {
-                // Verifica o tipo do último recurso
-                $tipoImportacaoAtual = $this->obterTipoImportacao($arrRecursos[$numRecursos-1]);
-            } else {
-                $tipoImportacaoAtual = $tipoManifestacao;
             }
 
             // Verifica se a importação é necessária
@@ -637,8 +562,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
             // Gerar documentos a serem importados
             if ($tipoImportacaoAtual == 'P') {
-                $anexosGerados = $this->gerarAnexosProtocolo($manifestacao['Teor']['Anexos'], $numProtocoloFormatado);
-                $objDocumentoManifestacao = $this->gerarPDFOuvidoria($manifestacao, [], $tipoImportacaoAtual, $anexosGerados['erro']);
+                $anexosGerados = $this->gerarAnexosProtocolo($manifestacao['Teor']['Anexos'], $numProtocoloFormatado, $idHipoteseLegalSei);
+                $objDocumentoManifestacao = $this->gerarPDFManifestacao($manifestacao, [], $tipoImportacaoAtual, $anexosGerados['erro'], $idHipoteseLegalSei);
                 $arrDocumentos = array_merge([$objDocumentoManifestacao], $anexosGerados['documentos']);
             } else {
                 $arrAnexos = [];
@@ -647,7 +572,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 // Caso seja a primeira importação, importa anexos do pedido inicial
                 // exceto se for em um processo já existente ou a manifestação não tem recursos
                 if ($tipoUltimaImportacao == null && (!$primeiraImportacaoEmProcessoExistente || $numRecursos == 0)) {
-                    $anexosGerados = $this->gerarAnexosProtocolo($manifestacao['Teor']['Anexos'], $numProtocoloFormatado);
+                    $anexosGerados = $this->gerarAnexosProtocolo($manifestacao['Teor']['Anexos'], $numProtocoloFormatado, $idHipoteseLegalSei);
                     if ($anexosGerados['erro']) {
                         $ocorreuErroAnexos = true;
                     }
@@ -660,7 +585,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     // apenas os anexos do último recurso
                     if ($primeiraImportacaoEmProcessoExistente) {
                         $recurso = end($arrRecursos);
-                        $anexosGerados = $this->gerarAnexosProtocolo($recurso['anexos'], $numProtocoloFormatado);
+                        $anexosGerados = $this->gerarAnexosProtocolo($recurso['anexos'], $numProtocoloFormatado, $idHipoteseLegalSei);
                         if ($anexosGerados['erro']) {
                             $ocorreuErroAnexos = true;
                         }
@@ -676,7 +601,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                                     $aposUltimaImportacao = true;
                                 }
                             } else {
-                                $anexosGerados = $this->gerarAnexosProtocolo($recurso['anexos'], $numProtocoloFormatado);
+                                $anexosGerados = $this->gerarAnexosProtocolo($recurso['anexos'], $numProtocoloFormatado, $idHipoteseLegalSei);
                                 if ($anexosGerados['erro']) {
                                     $ocorreuErroAnexos = true;
                                 }
@@ -687,28 +612,21 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 }
 
                 // Gera PDF principal
-                if ($tipoManifestacao == 'P') {
-                    $objDocumentoManifestacao = $this->gerarPDFOuvidoria($manifestacao, $arrRecursos, $tipoImportacaoAtual, $ocorreuErroAnexos);
-                } else {
-                    $objDocumentoManifestacao = $this->gerarPDFLai($manifestacao, $arrRecursos, $tipoImportacaoAtual, $ocorreuErroAnexos);
-                }
+                $objDocumentoManifestacao = $this->gerarPDFManifestacao($manifestacao, $arrRecursos, $tipoImportacaoAtual, $ocorreuErroAnexos, $idHipoteseLegalSei);
 
                 // Agrupa documentos
                 $arrDocumentos = array_merge([$objDocumentoManifestacao], $arrAnexos);
             }
 
-            // Verificar a unidade de destino
-            $idUnidadeDestino = $this->obterUnidadeDestino($tipoImportacaoAtual);
-
             // Verifica se cria um processo ou inclui documento
             if (is_null($objProtocoloDTOExistente)) {
                 // Primeira importação, deve-se criar um processo
                 $this->simulaLogin($this->siglaSistema, $this->identificacaoServico, $idUnidadeDestino);
-                $this->criarNovoProcesso($idTipoManifestacaoSei, $manifestacao, $idUnidadeDestino, $numProtocoloFormatado, $arrDocumentos);
+                $this->criarNovoProcesso($idTipoProcedimentoSei, $manifestacao, $idUnidadeDestino, $numProtocoloFormatado, $arrDocumentos);
                 $this->gravarLogProtocolo($numProtocoloFormatado, 'Protocolo importado com sucesso.', 'S', $tipoImportacaoAtual);
             } else {
-                // Simula login na unidade geradora do processo existente
-                $this->simulaLogin($this->siglaSistema, $this->identificacaoServico, $objProtocoloDTOExistente->getNumIdUnidadeGeradora());
+                // Simula login na última unidade em que o processo foi aberto ou concluído
+                $this->simulaLogin($this->siglaSistema, $this->identificacaoServico, $this->consultaUltimaUnidade($objProtocoloDTOExistente->getDblIdProtocolo()));
 
                 // Inclui os documentos no processo
                 $objSeiRN = new SeiRN();
@@ -717,11 +635,40 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     $objSeiRN->incluirDocumento($objDocumentoAPI);
                 }
 
+                // Se o tipo de processo mudou, altera o processo antes de enviá-lo
+                if ($objProtocoloDTOExistente->getNumIdTipoProcedimentoProcedimento() != $idTipoProcedimentoSei) {
+                    // Consulta dados do tipo de processo
+                    $objTipoProcedimentoDTO = new TipoProcedimentoDTO();
+                    $objTipoProcedimentoDTO->retNumIdTipoProcedimento();
+                    $objTipoProcedimentoDTO->retStrStaNivelAcessoSugestao();
+                    $objTipoProcedimentoDTO->retStrStaGrauSigiloSugestao();
+                    $objTipoProcedimentoDTO->retNumIdHipoteseLegalSugestao();
+                    $objTipoProcedimentoDTO->setNumIdTipoProcedimento($idTipoProcedimentoSei);
+                    $objTipoProcedimentoRN = new TipoProcedimentoRN();
+                    $objTipoProcedimentoDTO = $objTipoProcedimentoRN->consultarRN0267($objTipoProcedimentoDTO);
+                    if ($objTipoProcedimentoDTO == null) {
+                        throw new Exception('Tipo de processo não encontrado: ' . $idTipoProcedimentoSei);
+                    }
+
+                    // Atualiza procedimento
+                    $objProcedimentoDTO = new ProcedimentoDTO();
+                    $objProcedimentoDTO->setDblIdProcedimento($objProtocoloDTOExistente->getDblIdProtocolo());
+                    $objProcedimentoDTO->setNumIdTipoProcedimento($idTipoProcedimentoSei);
+                    $objProtocoloDTO = new ProtocoloDTO();
+                    $objProtocoloDTO->setDblIdProtocolo($objProtocoloDTOExistente->getDblIdProtocolo());
+                    $objProtocoloDTO->setStrStaNivelAcessoLocal($objTipoProcedimentoDTO->getStrStaNivelAcessoSugestao());
+                    $objProtocoloDTO->setStrStaGrauSigilo($objTipoProcedimentoDTO->getStrStaGrauSigiloSugestao());
+                    $objProtocoloDTO->setNumIdHipoteseLegal($objTipoProcedimentoDTO->getNumIdHipoteseLegalSugestao());
+                    $objProcedimentoDTO->setObjProtocoloDTO($objProtocoloDTO);
+                    $objProcedimentoRN = new ProcedimentoRN();
+                    $objProcedimentoRN->alterarRN0202($objProcedimentoDTO);
+                }
+
                 // Remete o processo para a unidade correta
                 $objEntradaEnviarProcesso = new EntradaEnviarProcessoAPI();
                 $objEntradaEnviarProcesso->setIdProcedimento($objProtocoloDTOExistente->getDblIdProtocolo());
                 $objEntradaEnviarProcesso->setUnidadesDestino([$idUnidadeDestino]);
-                $objEntradaEnviarProcesso->setSinManterAbertoUnidade('S');
+                $objEntradaEnviarProcesso->setSinManterAbertoUnidade('N');
                 $objEntradaEnviarProcesso->setSinEnviarEmailNotificacao('S');
                 $objEntradaEnviarProcesso->setSinReabrir('S');
 
@@ -777,9 +724,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         // Processar importação da manifestação atualizada
         if ($manifestacao) {
-            if (in_array($manifestacao['TipoManifestacao']['IdTipoManifestacao'], $this->tiposDeManifestacaoAtivos)) {
-                $this->executarImportacaoLinha($manifestacao);
-            }
+            $this->executarImportacaoLinha($manifestacao);
         } else {
             $this->gravarLogProtocolo($numProtocoloFormatado, 'Não foi possível acessar a manifestação',
                 'N', $this->obterTipoImportacao($recurso));
@@ -801,67 +746,24 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
     }
 
-    private function gerarPDFOuvidoria($retornoWsLinha, $recursos, $tipoImportacaoAtual, $ocorreuErroAdicionarAnexo)
+    private function gerarPDFManifestacao($manifestacao, $recursos, $tipoImportacaoAtual, $ocorreuErroAdicionarAnexo, $idHipoteseLegal)
     {
-        $mdCguEouvRelatorioPdf = new MdCguEouvRelatorioPdfManifestacao($retornoWsLinha, $recursos, $this->importar_dados_manifestante, $ocorreuErroAdicionarAnexo);
+        $mdCguEouvRelatorioPdf = new MdCguEouvRelatorioPdfManifestacao($manifestacao, $recursos, $this->importar_dados_manifestante, $ocorreuErroAdicionarAnexo);
 
         $objAnexoRN = new AnexoRN();
-        $strNomeArquivoInicialUpload = $objAnexoRN->gerarNomeArquivoTemporario();
+        $strNomeArquivoInicialUpload = $objAnexoRN->gerarNomeArquivoTemporario() . ".pdf";
 
-        $mdCguEouvRelatorioPdf->Output(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", "F");
-
-        //Renomeia tirando a extensão para o SEI trabalhar o Arquivo
-        rename(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload);
+        $mdCguEouvRelatorioPdf->Output(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload, "F");
 
         $objDocumentoManifestacao = new DocumentoAPI();
         $objDocumentoManifestacao->setTipo('R');
-        if ($tipoImportacaoAtual == 'PR') {
-            $nomeDocumentoArvore = 'Pedido Revisão';
-        } else {
-            $nomeDocumentoArvore = 'Manifestação';
-        }
-        $objDocumentoManifestacao->setNumero($nomeDocumentoArvore);
+        $nomeDocumentoArvore = $this->obterDescricaoImportacao($tipoImportacaoAtual);
+        $objDocumentoManifestacao->setNomeArvore($nomeDocumentoArvore);
         $objDocumentoManifestacao->setIdSerie($this->idTipoDocumentoAnexoDadosManifestacao);
         $objDocumentoManifestacao->setNivelAcesso(1); // restrito
-        $objDocumentoManifestacao->setIdHipoteseLegal($this->idHipoteseLegalDocumento);
-        $objDocumentoManifestacao->setData($retornoWsLinha['DataCadastro']);
+        $objDocumentoManifestacao->setIdHipoteseLegal($idHipoteseLegal);
+        $objDocumentoManifestacao->setData($manifestacao['DataCadastro']);
         $objDocumentoManifestacao->setNomeArquivo('RelatórioDadosManifestação.pdf');
-        $objDocumentoManifestacao->setConteudo(base64_encode(file_get_contents(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload)));
-
-        return $objDocumentoManifestacao;
-    }
-
-    private function gerarPDFLai($retornoWsLinha, $retornoWsRecursos = [], $tipo_recurso = '', $ocorreuErroAdicionarAnexo = false)
-    {
-        $objRelatorioPdf = new MdCguEouvRelatorioPdfManifestacao($retornoWsLinha, $retornoWsRecursos, $this->importar_dados_manifestante, $ocorreuErroAdicionarAnexo);
-        $objAnexoRN = new AnexoRN();
-        $strNomeArquivoInicialUpload = $objAnexoRN->gerarNomeArquivoTemporario();
-
-        $objRelatorioPdf->Output(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", "F");
-
-        //Renomeia tirando a extensão para o SEI trabalhar o Arquivo
-        rename(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload . ".pdf", DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload);
-
-        $objDocumentoManifestacao = new DocumentoAPI();
-        $objDocumentoManifestacao->setTipo('R');
-        if ($tipo_recurso == 'R1') {
-            $nomeDocumentoArvore = 'Primeira Instância';
-        } elseif ($tipo_recurso == 'R2') {
-            $nomeDocumentoArvore = 'Segunda Instância';
-        } elseif ($tipo_recurso == 'R3' || $tipo_recurso == 'RC') {
-            $nomeDocumentoArvore = 'Terceira Instância';
-        } elseif ($tipo_recurso == 'PR') {
-            $nomeDocumentoArvore = 'Pedido Revisão';
-        } else {
-            $nomeDocumentoArvore = 'Pedido Inicial';
-        }
-
-        $objDocumentoManifestacao->setNumero($nomeDocumentoArvore);
-        $objDocumentoManifestacao->setIdSerie($this->idTipoDocumentoAnexoDadosManifestacao);
-        $objDocumentoManifestacao->setNivelAcesso(1); // restrito
-        $objDocumentoManifestacao->setIdHipoteseLegal($this->idHipoteseLegalDocumento);
-        $objDocumentoManifestacao->setData($retornoWsLinha['DataCadastro']);
-        $objDocumentoManifestacao->setNomeArquivo('RelatorioDadosManifestacao.pdf');
         $objDocumentoManifestacao->setConteudo(base64_encode(file_get_contents(DIR_SEI_TEMP . "/" . $strNomeArquivoInicialUpload)));
 
         return $objDocumentoManifestacao;
@@ -875,10 +777,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
      * DadosBasicosAnexoRecursoDTO
      * (https://falabr.cgu.gov.br/Help/ResourceModel?modelName=DadosBasicosAnexoRecursoDTO)
      * @param string $numProtocoloFormatado Número do protocolo da manifestação formatado
+     * @param int $idHipoteseLegal ID de Hipótese Legal do SEI a ser aplicado ao documento restrito
      * @return array Array associativo cuja chave 'documentos' é um array de objetos
      * DocumentoAPI do SEI e achave 'erro' é um bool que indica se algum anexo tem extensão inválida
      */
-    private function gerarAnexosProtocolo($arrAnexosManifestacao, $numProtocoloFormatado)
+    private function gerarAnexosProtocolo($arrAnexosManifestacao, $numProtocoloFormatado, $idHipoteseLegal)
     {
         $arrAnexosAdicionados = array();
         $intTotAnexos = count($arrAnexosManifestacao);
@@ -936,7 +839,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $objAnexoManifestacao->setTipo('R');
                 $objAnexoManifestacao->setIdSerie($this->idTipoDocumentoAnexoDadosManifestacao);
                 $objAnexoManifestacao->setNivelAcesso(1); // restrito
-                $objAnexoManifestacao->setIdHipoteseLegal($this->idHipoteseLegalDocumento);
+                $objAnexoManifestacao->setIdHipoteseLegal($idHipoteseLegal);
                 $objAnexoManifestacao->setData(InfraData::getStrDataHoraAtual());
                 $objAnexoManifestacao->setNomeArquivo($strNomeArquivoOriginal);
                 $objAnexoManifestacao->setNumero($strNomeArquivoOriginal);
@@ -1000,10 +903,48 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $objProtocoloDTOExistente->retDblIdProtocolo();
         $objProtocoloDTOExistente->retNumIdUnidadeGeradora();
         $objProtocoloDTOExistente->retStrProtocoloFormatado();
+        $objProtocoloDTOExistente->retNumIdTipoProcedimentoProcedimento();
         $objProtocoloDTOExistente->setStrProtocoloFormatado($this->formatarProcesso($numProtocoloFormatado));
         $objProtocoloDTOExistente = $objProtocoloRNExistente->consultarRN0186($objProtocoloDTOExistente);
 
         return $objProtocoloDTOExistente;
+    }
+
+    /**
+     * Consulta a última unidade em que o processo foi aberto.
+     * Caso o processo esteja concluído em todas a unidades,
+     * retorna a última unidade em que ele foi concluído
+     * @return int ID da última unidade
+     */
+    public function consultaUltimaUnidade($idProcedimento)
+    {
+        // Consulta unidades abertas
+        $objEntradaProcedimentoAPI = new EntradaConsultarProcedimentoAPI();
+        $objEntradaProcedimentoAPI->setIdProcedimento($idProcedimento);
+        $objEntradaProcedimentoAPI->setSinRetornarUnidadesProcedimentoAberto('S');
+        $objSeiRN = new SeiRN();
+        $objSaidaProcedimentoAPI = $objSeiRN->consultarProcedimento($objEntradaProcedimentoAPI);
+
+        $ultimoIdUnidade = null;
+        foreach ($objSaidaProcedimentoAPI->getUnidadesProcedimentoAberto() as $item) {
+            $unidade = $item->getUnidade();
+            if (!is_null($unidade)) {
+                $ultimoIdUnidade = $unidade->getIdUnidade();
+            }
+        }
+
+        if (is_null($ultimoIdUnidade)) {
+            // Consulta conclusões do processo
+            $objEntradaProcedimentoAPI = new EntradaConsultarProcedimentoAPI();
+            $objEntradaProcedimentoAPI->setIdProcedimento($idProcedimento);
+            $objEntradaProcedimentoAPI->setSinRetornarAndamentoConclusao('S');
+            $objSaidaProcedimentoAPI = $objSeiRN->consultarProcedimento($objEntradaProcedimentoAPI);
+
+            $andamentoConclusao = $objSaidaProcedimentoAPI->getAndamentoConclusao();
+            $ultimoIdUnidade = $andamentoConclusao->getUnidade()->getIdUnidade();
+        }
+
+        return $ultimoIdUnidade;
     }
 
     /**
@@ -1086,6 +1027,56 @@ class MdCguEouvAgendamentoRN extends InfraRN
         }
 
         return 'R';
+    }
+
+    /**
+     * Obter o ID de tipo de recurso usado pelo módulo
+     * @param array $recurso Estrutura RecursoDTO
+     * (https://falabr.cgu.gov.br/Help/ResourceModel?modelName=RecursoDTO)
+     * @return int ID do tipo de manifestação usado internamente no módulo
+     */
+    private function obterIdTipoManifestacao($recurso)
+    {
+        switch ($recurso['instancia']['IdInstanciaRecurso']) {
+            case 1:
+                return MdCguEouvDeparaImportacaoRN::$ID_TIPO_RECURSO_1;
+            case 2:
+                return MdCguEouvDeparaImportacaoRN::$ID_TIPO_RECURSO_2;
+            case 3:
+            case 7:
+                return MdCguEouvDeparaImportacaoRN::$ID_TIPO_RECURSO_3;
+            case 6:
+                return MdCguEouvDeparaImportacaoRN::$ID_TIPO_PEDIDO_DE_REVISAO;
+            default:
+                return -1;
+        }
+    }
+
+    /**
+     * Obter a descrição da manifestação ou recurso de acordo com o código
+     * do tipo de importação
+     * @param string $tipoImportacao
+     * @return string Descrição da manifestação ou recurso importado
+     */
+    private function obterDescricaoImportacao($tipoImportacao)
+    {
+        switch ($tipoImportacao) {
+            case 'P':
+                return 'Manifestação';
+            case 'R':
+                return 'Pedido Inicial';
+            case 'PR':
+                return 'Pedido de Revisão';
+            case 'R1':
+                return 'Primeira Instância';
+            case 'R2':
+                return 'Segunda Instância';
+            case 'R3':
+            case 'RC':
+                return 'Terceira Instância';
+            default:
+                return 'Desconhecido';
+        }
     }
 
     /**

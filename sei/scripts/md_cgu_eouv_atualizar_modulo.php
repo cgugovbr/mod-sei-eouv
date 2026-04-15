@@ -462,11 +462,92 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
 
   protected function instalarv420() {
     $objInfraIBanco = $this->inicializarObjInfraIBanco();
+    $objInfraMetaBD = new InfraMetaBD($objInfraIBanco);
 
-    // Insere parâmetro de hipótese legal dos documentos gerados
-    // Usa "Informação Pessoal" como padrão
-    $objInfraIBanco->executarSql('INSERT INTO md_eouv_parametros (id_parametro, no_parametro, de_valor_parametro) '.
-        "VALUES (19, 'EOUV_ID_HIPOTESE_LEGAL_DOCUMENTO', '4')");
+    // Insere coluna de hipótese legal para ser usada para cada tipo de manifestação / instância recursal
+    // A hipótese legal padrão será "Informação Pessoal" (ID = 4)
+    $objInfraMetaBD->adicionarColuna('md_eouv_depara_importacao', 'id_hipotese_legal', $objInfraMetaBD->tipoNumero(), 'null');
+    $objInfraMetaBD->adicionarChaveEstrangeira('fk2_md_eouv_depara_importacao_hipotese_legal', 'md_eouv_depara_importacao', array('id_hipotese_legal'), 'hipotese_legal', array('id_hipotese_legal'));
+    $objInfraIBanco->executarSql('UPDATE md_eouv_depara_importacao SET id_hipotese_legal = 4');
+
+    // Insere coluna de unidade de destino para ser usada para cada tipo de manifestação / instância recursal
+    $objInfraMetaBD->adicionarColuna('md_eouv_depara_importacao', 'id_unidade_destino', $objInfraMetaBD->tipoNumero(), 'null');
+    $objInfraMetaBD->adicionarChaveEstrangeira('fk3_md_eouv_depara_importacao_unidade_destino', 'md_eouv_depara_importacao', array('id_unidade_destino'), 'unidade', array('id_unidade'));
+
+    // Importa unidades configuradas da tabela de parâmetros
+    $arrParametros = $objInfraIBanco->consultarSql("SELECT de_valor_parametro FROM md_eouv_parametros WHERE no_parametro = 'ID_UNIDADE_OUVIDORIA'");
+    if (count($arrParametros) == 0) {
+      throw new InfraException('Parâmetro ID_UNIDADE_OUVIDORIA não encontrado');
+    }
+    $idUnidadeOuvidoria = intval($arrParametros[0]['de_valor_parametro'] ?? '110000001');
+    $objInfraIBanco->executarSql("UPDATE md_eouv_depara_importacao SET id_unidade_destino = ? WHERE id_tipo_manifestacao_eouv <= 7", [$idUnidadeOuvidoria]);
+
+    $arrParametros = $objInfraIBanco->consultarSql("SELECT de_valor_parametro FROM md_eouv_parametros WHERE no_parametro = 'ESIC_ID_UNIDADE_PRINCIPAL'");
+    if (count($arrParametros) == 0) {
+      throw new InfraException('Parâmetro ESIC_ID_UNIDADE_PRINCIPAL não encontrado');
+    }
+    $idUnidadeEsicPrincipal = intval($arrParametros[0]['de_valor_parametro'] ?? '110000001');
+    $objInfraIBanco->executarSql("UPDATE md_eouv_depara_importacao SET id_unidade_destino = ? WHERE id_tipo_manifestacao_eouv = 8", [$idUnidadeEsicPrincipal]);
+
+    // Consulta unidades das instâncias recursais, para posterior inserção na tabela
+    $arrParametros = $objInfraIBanco->consultarSql("SELECT de_valor_parametro FROM md_eouv_parametros WHERE no_parametro = 'ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO'");
+    if (count($arrParametros) == 0) {
+      throw new InfraException('Parâmetro ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO não encontrado');
+    }
+    $idUnidadeEsicPR = intval($arrParametros[0]['de_valor_parametro'] ?? '110000001');
+
+    $arrParametros = $objInfraIBanco->consultarSql("SELECT de_valor_parametro FROM md_eouv_parametros WHERE no_parametro = 'ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA'");
+    if (count($arrParametros) == 0) {
+      throw new InfraException('Parâmetro ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA não encontrado');
+    }
+    $idUnidadeEsic1a = intval($arrParametros[0]['de_valor_parametro'] ?? '110000001');
+
+    $arrParametros = $objInfraIBanco->consultarSql("SELECT de_valor_parametro FROM md_eouv_parametros WHERE no_parametro = 'ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA'");
+    if (count($arrParametros) == 0) {
+      throw new InfraException('Parâmetro ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA não encontrado');
+    }
+    $idUnidadeEsic2a = intval($arrParametros[0]['de_valor_parametro'] ?? '110000001');
+
+    $arrParametros = $objInfraIBanco->consultarSql("SELECT de_valor_parametro FROM md_eouv_parametros WHERE no_parametro = 'ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA'");
+    if (count($arrParametros) == 0) {
+      throw new InfraException('Parâmetro ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA não encontrado');
+    }
+    $idUnidadeEsic3a = intval($arrParametros[0]['de_valor_parametro'] ?? '110000001');
+
+    // Acessa os dados do tipo Acesso à Informação, para replicar nos tipos recursais
+    $arrResultado = $objInfraIBanco->consultarSql('SELECT id_tipo_procedimento, sin_ativo FROM md_eouv_depara_importacao WHERE id_tipo_manifestacao_eouv = 8');
+    $laiAtivo = $arrResultado[0]['sin_ativo'] ?? 'N';
+    $laiIdTipoProcedimento = $arrResultado[0]['id_tipo_procedimento'];
+
+    // Insere as instâncias recursais da LAI para associação com tipos de processo específicos e hipótese legal
+    // Os IDs usados ficarão na faixa dos 80:
+    // 80 -> Pedido de Revisão
+    // 81 -> Primeira Instância
+    // 82 -> Segunda Instância
+    // 83 -> Terceira Instância
+    $objInfraIBanco->executarSql('INSERT INTO md_eouv_depara_importacao '.
+      '(id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento, id_hipotese_legal, id_unidade_destino, sin_ativo) VALUES '.
+      "(80, 'Pedido de Revisão', ?, ?, ?, ?), ".
+      "(81, 'Recurso em Primeira Instância', ?, ?, ?, ?), ".
+      "(82, 'Recurso em Segunda Instância', ?, ?, ?, ?), ".
+      "(83, 'Recurso em Terceira Instância', ?, ?, ?, ?)",
+      [
+        $laiIdTipoProcedimento, 4, $idUnidadeEsicPR, $laiAtivo,
+        $laiIdTipoProcedimento, 4, $idUnidadeEsic1a, $laiAtivo,
+        $laiIdTipoProcedimento, 4, $idUnidadeEsic2a, $laiAtivo,
+        $laiIdTipoProcedimento, 4, $idUnidadeEsic3a, $laiAtivo,
+      ]
+    );
+
+    // Exclui parâmetros das unidades, que foram migrados para outra tabela
+    $objInfraIBanco->executarSql('DELETE FROM md_eouv_parametros WHERE no_parametro IN ('.
+      "'ID_UNIDADE_OUVIDORIA',".
+      "'ESIC_ID_UNIDADE_PRINCIPAL',".
+      "'ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO',".
+      "'ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA',".
+      "'ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA',".
+      "'ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA')"
+    );
   }
 }
 

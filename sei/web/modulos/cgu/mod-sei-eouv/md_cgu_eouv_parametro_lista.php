@@ -46,10 +46,6 @@ try {
                     $idTipoDocumentoAnexoDadosManifestacao = $arrObjMdCguEouvParametroDTO[$i];
                     break;
 
-                case "EOUV_ID_HIPOTESE_LEGAL_DOCUMENTO":
-                    $idHipoteseLegalDocumento = $arrObjMdCguEouvParametroDTO[$i];
-                    break;
-
                 case "EOUV_USUARIO_ACESSO_WEBSERVICE":
                     $usuarioWebService = $arrObjMdCguEouvParametroDTO[$i];
                     break;
@@ -69,33 +65,9 @@ try {
                 case "EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO":
                     $urlWebServiceEOuv = $arrObjMdCguEouvParametroDTO[$i];
                     break;
-                    
-                case "ESIC_ID_UNIDADE_PRINCIPAL":
-                    $idUnidadeEsicPrincipal = $arrObjMdCguEouvParametroDTO[$i];
-                    break;
-
-                case "ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA":
-                    $idUnidadeRecursoPrimeiraInstancia = $arrObjMdCguEouvParametroDTO[$i];
-                    break;
-
-                case "ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA":
-                    $idUnidadeRecursoSegundaInstancia = $arrObjMdCguEouvParametroDTO[$i];
-                    break;
-
-                case "ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA":
-                    $idUnidadeRecursoTerceiraInstancia = $arrObjMdCguEouvParametroDTO[$i];
-                    break;
-
-                case "ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO":
-                    $idUnidadeRecursoPedidoRevisao = $arrObjMdCguEouvParametroDTO[$i];
-                    break;
 
                 case "IMPORTAR_DADOS_MANIFESTANTE":
                     $importarDadosManifestante = $arrObjMdCguEouvParametroDTO[$i];
-                    break;
-
-                case "ID_UNIDADE_OUVIDORIA":
-                    $idUnidadeOuvidoria = $arrObjMdCguEouvParametroDTO[$i];
                     break;
             }
         }
@@ -115,10 +87,6 @@ try {
         if($_POST['EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO'] != $idTipoDocumentoAnexoDadosManifestacao->getStrDeValorParametro()){
             $idTipoDocumentoAnexoDadosManifestacao->setStrDeValorParametro($_POST['EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO']);
             $objMdCguEouvAlterarParametroRN->alterarParametro($idTipoDocumentoAnexoDadosManifestacao);
-        }
-        if($_POST['EOUV_ID_HIPOTESE_LEGAL_DOCUMENTO'] != $idHipoteseLegalDocumento->getStrDeValorParametro()) {
-            $idHipoteseLegalDocumento->setStrDeValorParametro($_POST['EOUV_ID_HIPOTESE_LEGAL_DOCUMENTO']);
-            $objMdCguEouvAlterarParametroRN->alterarParametro($idHipoteseLegalDocumento);
         }
         if($_POST['EOUV_USUARIO_ACESSO_WEBSERVICE'] != $usuarioWebService->getStrDeValorParametro()){
             $usuarioWebService->setStrDeValorParametro($_POST['EOUV_USUARIO_ACESSO_WEBSERVICE']);
@@ -140,34 +108,10 @@ try {
             $urlWebServiceEOuv->setStrDeValorParametro($_POST['EOUV_URL_WEBSERVICE_IMPORTACAO']);
             $objMdCguEouvAlterarParametroRN->alterarParametro($urlWebServiceEOuv);
         }
-        if($_POST['ID_UNIDADE_OUVIDORIA'] != $idUnidadeOuvidoria->getStrDeValorParametro()){
-            $idUnidadeOuvidoria->setStrDeValorParametro($_POST['ID_UNIDADE_OUVIDORIA']);
-            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeOuvidoria);
-        }
         $ckImportarDadosManifestantes = ($_POST['IMPORTAR_DADOS_MANIFESTANTE'] == 'on'?'1':'0');
         if($ckImportarDadosManifestantes != $importarDadosManifestante->getStrDeValorParametro()){
             $importarDadosManifestante->setStrDeValorParametro($ckImportarDadosManifestantes);
             $objMdCguEouvAlterarParametroRN->alterarParametro($importarDadosManifestante);
-        }
-        if($_POST['ESIC_ID_UNIDADE_PRINCIPAL'] != $idUnidadeEsicPrincipal->getStrDeValorParametro()){
-            $idUnidadeEsicPrincipal->setStrDeValorParametro($_POST['ESIC_ID_UNIDADE_PRINCIPAL']);
-            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeEsicPrincipal);
-        }
-        if($_POST['ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA'] != $idUnidadeRecursoPrimeiraInstancia->getStrDeValorParametro()){
-            $idUnidadeRecursoPrimeiraInstancia->setStrDeValorParametro($_POST['ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA']);
-            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeRecursoPrimeiraInstancia);
-        }
-        if($_POST['ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA'] != $idUnidadeRecursoSegundaInstancia->getStrDeValorParametro()){
-            $idUnidadeRecursoSegundaInstancia->setStrDeValorParametro($_POST['ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA']);
-            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeRecursoSegundaInstancia);
-        }
-        if($_POST['ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA'] != $idUnidadeRecursoTerceiraInstancia->getStrDeValorParametro()){
-            $idUnidadeRecursoTerceiraInstancia->setStrDeValorParametro($_POST['ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA']);
-            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeRecursoTerceiraInstancia);
-        }
-        if($_POST['ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO'] != $idUnidadeRecursoPedidoRevisao->getStrDeValorParametro()){
-            $idUnidadeRecursoPedidoRevisao->setStrDeValorParametro($_POST['ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO']);
-            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeRecursoPedidoRevisao);
         }
 
         PaginaSEI::getInstance()->setStrMensagem('Parâmetros alterados com sucesso.');
@@ -181,13 +125,6 @@ try {
       throw new InfraException("Ação '".$_GET['acao']."' não reconhecida.");
   }
     $strItensSelSerie = SerieINT::montarSelectNomeExternos('null','&nbsp;',$idTipoDocumentoAnexoDadosManifestacao->getStrDeValorParametro());
-    $strItensHipotesesLegais = HipoteseLegalINT::montarSelectNomeBaseLegal('null', '&nbsp', $idHipoteseLegalDocumento->getStrDeValorParametro(), ProtocoloRN::$NA_RESTRITO);
-    $strItensSelUnidadeOuv = UnidadeINT::montarSelectSiglaDescricao('null','&nbsp;',$idUnidadeOuvidoria->getStrDeValorParametro());
-    $strItensSelUnidadeEsic = UnidadeINT::montarSelectSiglaDescricao('null','&nbsp;',$idUnidadeEsicPrincipal->getStrDeValorParametro());
-    $strItensSelUnidadePrimeira = UnidadeINT::montarSelectSiglaDescricao('null','&nbsp;',$idUnidadeRecursoPrimeiraInstancia->getStrDeValorParametro());
-    $strItensSelUnidadeSegunda = UnidadeINT::montarSelectSiglaDescricao('null','&nbsp;',$idUnidadeRecursoSegundaInstancia->getStrDeValorParametro());
-    $strItensSelUnidadeTerceira = UnidadeINT::montarSelectSiglaDescricao('null','&nbsp;',$idUnidadeRecursoTerceiraInstancia->getStrDeValorParametro());
-    $strItensSelUnidadeRevisao = UnidadeINT::montarSelectSiglaDescricao('null','&nbsp;',$idUnidadeRecursoPedidoRevisao->getStrDeValorParametro());
 
 }catch(Exception $e){
   PaginaSEI::getInstance()->processarExcecao($e);
@@ -231,11 +168,6 @@ PaginaSEI::getInstance()->abrirJavaScript();
             document.getElementById('EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO').focus();
             return false;
         }
-        if (infraTrim(document.getElementById('EOUV_ID_HIPOTESE_LEGAL_DOCUMENTO').value) == 'null') {
-            alert('Informe a Hipótese Legal.');
-            document.getElementById('EOUV_ID_HIPOTESE_LEGAL_DOCUMENTO').focus();
-            return false;
-        }
         if (infraTrim(document.getElementById('EOUV_USUARIO_ACESSO_WEBSERVICE').value)=='') {
             alert('Informe o Usuário.');
             document.getElementById('EOUV_USUARIO_ACESSO_WEBSERVICE').focus();
@@ -259,36 +191,6 @@ PaginaSEI::getInstance()->abrirJavaScript();
         if (infraTrim(document.getElementById('EOUV_URL_WEBSERVICE_IMPORTACAO').value)=='') {
             alert('Informe a URL do FalaBR.');
             document.getElementById('EOUV_URL_WEBSERVICE_IMPORTACAO').focus();
-            return false;
-        }
-        if (infraTrim(document.getElementById('ID_UNIDADE_OUVIDORIA').value)=='null') {
-            alert('Informe a Unidade de Ouvidoria');
-            document.getElementById('ID_UNIDADE_OUVIDORIA').focus();
-            return false;
-        }
-        if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_PRINCIPAL').value)=='null') {
-            alert('Informe a Unidade de Acesso a Informação.');
-            document.getElementById('ESIC_ID_UNIDADE_PRINCIPAL').focus();
-            return false;
-        }
-        if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA').value)=='null') {
-            alert('Informe a Unidade de Recurso em 1ª Instância.');
-            document.getElementById('ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA').focus();
-            return false;
-        }
-        if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA').value)=='null') {
-            alert('Informe a Unidade de Recurso em 2ª Instância.');
-            document.getElementById('ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA').focus();
-            return false;
-        }
-        if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA').value)=='null') {
-            alert('Informe a Unidade de Recurso em 3ª Instância.');
-            document.getElementById('ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA').focus();
-            return false;
-        }
-        if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO').value)=='null') {
-            alert('Informe a Unidade de Pedido de Revisão.');
-            document.getElementById('ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO').focus();
             return false;
         }
         return true;
@@ -359,52 +261,6 @@ PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
         <select id="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" name="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" class="infraSelect"
                 tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
             <?=$strItensSelSerie?>
-        </select>
-    </div>
-
-    <div class="infraAreaDados">
-        <p>Os documentos gerados pela integração sempre possuem nível de acesso <span class="alerta">restrito</span>. Selecione abaixo a Hipótese Legal que deve ser aplicada aos documentos.</p>
-        <label for="EOUV_ID_HIPOTESE_LEGAL_DOCUMENTO" accesskey="H" class="infraLabelObrigatorio"><span class="infraTeclaAtalho">H</span>ipótese Legal aplicada aos documentos gerados pela integração:</label>
-        <select id="EOUV_ID_HIPOTESE_LEGAL_DOCUMENTO" name="EOUV_ID_HIPOTESE_LEGAL_DOCUMENTO" class="infraSelect"
-            tabindex="<?= PaginaSEI::getInstance()->getProxTabDados() ?>" >
-            <?= $strItensHipotesesLegais ?>
-        </select>
-    </div>
-
-    <div class="infraAreaDados">
-        <label id="lblID_UNIDADE_OUVIDORIA" for="ID_UNIDADE_OUVIDORIA" accesskey="O" class="infraLabelObrigatorio">Unidade de <span class="infraTeclaAtalho">O</span>uvidoria:</label>
-        <select id="ID_UNIDADE_OUVIDORIA" name="ID_UNIDADE_OUVIDORIA" class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
-            <?=$strItensSelUnidadeOuv?>
-        </select>
-    </div> 
-    <div class="infraAreaDados">
-        <label id="lblESIC_ID_UNIDADE_PRINCIPAL" for="ESIC_ID_UNIDADE_PRINCIPAL" accesskey="A" class="infraLabelObrigatorio">Unidade de <span class="infraTeclaAtalho">A</span>cesso à Informação:</label>
-        <select id="ESIC_ID_UNIDADE_PRINCIPAL" name="ESIC_ID_UNIDADE_PRINCIPAL" class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
-            <?=$strItensSelUnidadeEsic?>
-        </select>
-    </div>
-    <div class="infraAreaDados">
-        <label id="lblESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA" for="ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA" accesskey="1" class="infraLabelObrigatorio">Unidade de Recurso em <span class="infraTeclaAtalho">1</span>ª Instância:</label>
-        <select id="ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA" name="ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA"  class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
-            <?=$strItensSelUnidadePrimeira?>
-        </select>
-    </div>
-    <div class="infraAreaDados">
-        <label id="lblESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA" for="ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA" accesskey="2" class="infraLabelObrigatorio">Unidade de Recurso em <span class="infraTeclaAtalho">2</span>ª Instância:</label>
-        <select id="ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA" name="ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA"  class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
-            <?=$strItensSelUnidadeSegunda?>
-        </select>
-    </div>
-    <div class="infraAreaDados">
-        <label id="lblESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" for="ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" accesskey="3" class="infraLabelObrigatorio">Unidade de Recurso em <span class="infraTeclaAtalho">3</span>ª Instância:</label>
-        <select id="ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" name="ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
-            <?=$strItensSelUnidadeTerceira?>
-        </select>
-    </div>
-    <div class="infraAreaDados">
-        <label id="lblESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO" for="ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO" accesskey="R" class="infraLabelObrigatorio">Unidade de Pedido de <span class="infraTeclaAtalho">R</span>evisão:</label>
-        <select id="ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO" name="ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO" class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
-            <?=$strItensSelUnidadeRevisao?>
         </select>
     </div>
 
