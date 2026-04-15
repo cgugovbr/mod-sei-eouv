@@ -595,6 +595,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
             // Vefificar se o NUP já existe
             $objProtocoloDTOExistente = $this->verificarProtocoloExistente($numProtocoloFormatado);
             $tipoUltimaImportacao = null;
+            $primeiraImportacaoEmProcessoExistente = false;
             
             // Caso já exista um Protocolo no SEI com o mesmo NUP
             if (!is_null($objProtocoloDTOExistente)) {
@@ -602,9 +603,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $tipoUltimaImportacao = MdCguEouvAgendamentoINT::retornarUltimoTipoManifestacao($numProtocoloFormatado);
 
                 if ($tipoUltimaImportacao == null) {
-                    $this->gravarLogProtocolo($numProtocoloFormatado, 'Já existe um processo SEI utilizando o número de protocolo, ' .
-                        'mas aparentemente ele não foi criado pela integração com o FalaBR. Dados não serão importados.', 'N', $tipoManifestacao);
-                    return;
+                    $primeiraImportacaoEmProcessoExistente = true;
                 }
             }
 
@@ -645,7 +644,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $ocorreuErroAnexos = false;
 
                 // Caso seja a primeira importação, importa anexos do pedido inicial
-                if ($tipoUltimaImportacao == null) {
+                // exceto se for em um processo já existente ou a manifestação não tem recursos
+                if ($tipoUltimaImportacao == null && (!$primeiraImportacaoEmProcessoExistente || $numRecursos == 0)) {
                     $anexosGerados = $this->gerarAnexosProtocolo($manifestacao['Teor']['Anexos'], $numProtocoloFormatado);
                     if ($anexosGerados['erro']) {
                         $ocorreuErroAnexos = true;
@@ -655,21 +655,32 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                 // Importa anexos de recursos desde a última importação
                 if ($numRecursos > 0) {
-                    $aposUltimaImportacao = ($tipoUltimaImportacao == null) ||
-                        ($tipoUltimaImportacao == 'R') ||
-                        ($tipoUltimaImportacao == 'P');
+                    // Caso seja primeira importação em um processo existente, importa
+                    // apenas os anexos do último recurso
+                    if ($primeiraImportacaoEmProcessoExistente) {
+                        $recurso = end($arrRecursos);
+                        $anexosGerados = $this->gerarAnexosProtocolo($recurso['anexos'], $numProtocoloFormatado);
+                        if ($anexosGerados['erro']) {
+                            $ocorreuErroAnexos = true;
+                        }
+                        $arrAnexos = array_merge($arrAnexos, $anexosGerados['documentos']);
+                    } else {
+                        $aposUltimaImportacao = ($tipoUltimaImportacao == null) ||
+                            ($tipoUltimaImportacao == 'R') ||
+                            ($tipoUltimaImportacao == 'P');
 
-                    foreach ($arrRecursos as $recurso) {
-                        if (!$aposUltimaImportacao) {
-                            if ($this->obterTipoImportacao($recurso) == $tipoUltimaImportacao) {
-                                $aposUltimaImportacao = true;
+                        foreach ($arrRecursos as $recurso) {
+                            if (!$aposUltimaImportacao) {
+                                if ($this->obterTipoImportacao($recurso) == $tipoUltimaImportacao) {
+                                    $aposUltimaImportacao = true;
+                                }
+                            } else {
+                                $anexosGerados = $this->gerarAnexosProtocolo($recurso['anexos'], $numProtocoloFormatado);
+                                if ($anexosGerados['erro']) {
+                                    $ocorreuErroAnexos = true;
+                                }
+                                $arrAnexos = array_merge($arrAnexos, $anexosGerados['documentos']);
                             }
-                        } else {
-                            $anexosGerados = $this->gerarAnexosProtocolo($recurso['anexos'], $numProtocoloFormatado);
-                            if ($anexosGerados['erro']) {
-                                $ocorreuErroAnexos = true;
-                            }
-                            $arrAnexos = array_merge($arrAnexos, $anexosGerados['documentos']);
                         }
                     }
                 }
