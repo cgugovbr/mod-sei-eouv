@@ -18,7 +18,7 @@ class MdCguEouvRelatorioPdfManifestacao extends MdCguEouvRelatorioPdf
         /**
          * Seção dados básicos
          */
-        $this->secaoDadosBasicos($manifestacao);
+        $this->secaoDadosBasicos($manifestacao, $importarDadosDoManifestante);
 
         /**
          * Seção teor da manifestação
@@ -343,9 +343,10 @@ class MdCguEouvRelatorioPdfManifestacao extends MdCguEouvRelatorioPdf
      * da manifestação
      * @param array $manifestacao Estrutura ManifestacaoDTO
      * (https://falabr.cgu.gov.br/Help/ResourceModel?modelName=ManifestacaoDTO)
+     * @param boolean $importarDadosManifestante Indica se devem ser exibidos dados do manifestante
      * @return void
      */
-    protected function secaoDadosBasicos($manifestacao)
+    protected function secaoDadosBasicos($manifestacao, $importarDadosManifestante)
     {
         $this->secao('Dados Básicos da Manifestação');
         $this->item('Tipo da Manifestação:', $manifestacao['TipoManifestacao']['DescTipoManifestacao'], false, 'R');
@@ -360,7 +361,8 @@ class MdCguEouvRelatorioPdfManifestacao extends MdCguEouvRelatorioPdf
         $this->item('Data limite para resposta:', $manifestacao['PrazoAtendimento'], false, 'R');
         $this->item('Canal de Entrada:', $manifestacao['CanalEntrada']['DescCanalEntrada'] ?? '', false, 'R');
         $this->item('Modo de Resposta:', $manifestacao['ModoResposta']['DescModoResposta'] ?? '', false, 'R');
-        $this->item('Registrado Por:', $manifestacao['RegistradoPor'], false, 'R');
+        $registradoPor = $importarDadosManifestante ? ($manifestacao['RegistradoPor'] ?? '') : 'Cidadão';
+        $this->item('Registrado Por:', $registradoPor, false, 'R');
         $this->item('Tipo de formulário:', $manifestacao['TipoFormulario']['DescTipoFormulario'] ?? '', false, 'R');
         $servico = (isset($manifestacao['Servico']['IdServicoMPOG']) && $manifestacao['Servico']['IdServicoMPOG'] > 0) ?
             $manifestacao['Servico']['Nome'] : '';
