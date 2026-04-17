@@ -479,45 +479,45 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
     if (count($arrParametros) == 0) {
       throw new InfraException('Parâmetro ID_UNIDADE_OUVIDORIA não encontrado');
     }
-    $idUnidadeOuvidoria = intval($arrParametros[0]['de_valor_parametro'] ?? '110000001');
-    $objInfraIBanco->executarSql("UPDATE md_eouv_depara_importacao SET id_unidade_destino = ? WHERE id_tipo_manifestacao_eouv <= 7", [$idUnidadeOuvidoria]);
+    $idUnidadeOuvidoria = $arrParametros[0]['de_valor_parametro'] ?? '110000001';
+    $objInfraIBanco->executarSql("UPDATE md_eouv_depara_importacao SET id_unidade_destino = $idUnidadeOuvidoria WHERE id_tipo_manifestacao_eouv <= 7");
 
     $arrParametros = $objInfraIBanco->consultarSql("SELECT de_valor_parametro FROM md_eouv_parametros WHERE no_parametro = 'ESIC_ID_UNIDADE_PRINCIPAL'");
     if (count($arrParametros) == 0) {
       throw new InfraException('Parâmetro ESIC_ID_UNIDADE_PRINCIPAL não encontrado');
     }
-    $idUnidadeEsicPrincipal = intval($arrParametros[0]['de_valor_parametro'] ?? '110000001');
-    $objInfraIBanco->executarSql("UPDATE md_eouv_depara_importacao SET id_unidade_destino = ? WHERE id_tipo_manifestacao_eouv = 8", [$idUnidadeEsicPrincipal]);
+    $idUnidadeEsicPrincipal = $arrParametros[0]['de_valor_parametro'] ?? '110000001';
+    $objInfraIBanco->executarSql("UPDATE md_eouv_depara_importacao SET id_unidade_destino = $idUnidadeEsicPrincipal WHERE id_tipo_manifestacao_eouv = 8");
 
     // Consulta unidades das instâncias recursais, para posterior inserção na tabela
     $arrParametros = $objInfraIBanco->consultarSql("SELECT de_valor_parametro FROM md_eouv_parametros WHERE no_parametro = 'ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO'");
     if (count($arrParametros) == 0) {
       throw new InfraException('Parâmetro ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO não encontrado');
     }
-    $idUnidadeEsicPR = intval($arrParametros[0]['de_valor_parametro'] ?? '110000001');
+    $idUnidadeEsicPR = $arrParametros[0]['de_valor_parametro'] ?? '110000001';
 
     $arrParametros = $objInfraIBanco->consultarSql("SELECT de_valor_parametro FROM md_eouv_parametros WHERE no_parametro = 'ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA'");
     if (count($arrParametros) == 0) {
       throw new InfraException('Parâmetro ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA não encontrado');
     }
-    $idUnidadeEsic1a = intval($arrParametros[0]['de_valor_parametro'] ?? '110000001');
+    $idUnidadeEsic1a = $arrParametros[0]['de_valor_parametro'] ?? '110000001';
 
     $arrParametros = $objInfraIBanco->consultarSql("SELECT de_valor_parametro FROM md_eouv_parametros WHERE no_parametro = 'ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA'");
     if (count($arrParametros) == 0) {
       throw new InfraException('Parâmetro ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA não encontrado');
     }
-    $idUnidadeEsic2a = intval($arrParametros[0]['de_valor_parametro'] ?? '110000001');
+    $idUnidadeEsic2a = $arrParametros[0]['de_valor_parametro'] ?? '110000001';
 
     $arrParametros = $objInfraIBanco->consultarSql("SELECT de_valor_parametro FROM md_eouv_parametros WHERE no_parametro = 'ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA'");
     if (count($arrParametros) == 0) {
       throw new InfraException('Parâmetro ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA não encontrado');
     }
-    $idUnidadeEsic3a = intval($arrParametros[0]['de_valor_parametro'] ?? '110000001');
+    $idUnidadeEsic3a = $arrParametros[0]['de_valor_parametro'] ?? '110000001';
 
     // Acessa os dados do tipo Acesso à Informação, para replicar nos tipos recursais
     $arrResultado = $objInfraIBanco->consultarSql('SELECT id_tipo_procedimento, sin_ativo FROM md_eouv_depara_importacao WHERE id_tipo_manifestacao_eouv = 8');
     $laiAtivo = $arrResultado[0]['sin_ativo'] ?? 'N';
-    $laiIdTipoProcedimento = $arrResultado[0]['id_tipo_procedimento'];
+    $laiIdTipoProcedimento = $arrResultado[0]['id_tipo_procedimento'] ?? 'NULL';
 
     // Insere as instâncias recursais da LAI para associação com tipos de processo específicos e hipótese legal
     // Os IDs usados ficarão na faixa dos 80:
@@ -527,17 +527,10 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
     // 83 -> Terceira Instância
     $objInfraIBanco->executarSql('INSERT INTO md_eouv_depara_importacao '.
       '(id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento, id_hipotese_legal, id_unidade_destino, sin_ativo) VALUES '.
-      "(80, 'Pedido de Revisão', ?, ?, ?, ?), ".
-      "(81, 'Recurso em Primeira Instância', ?, ?, ?, ?), ".
-      "(82, 'Recurso em Segunda Instância', ?, ?, ?, ?), ".
-      "(83, 'Recurso em Terceira Instância', ?, ?, ?, ?)",
-      [
-        $laiIdTipoProcedimento, 4, $idUnidadeEsicPR, $laiAtivo,
-        $laiIdTipoProcedimento, 4, $idUnidadeEsic1a, $laiAtivo,
-        $laiIdTipoProcedimento, 4, $idUnidadeEsic2a, $laiAtivo,
-        $laiIdTipoProcedimento, 4, $idUnidadeEsic3a, $laiAtivo,
-      ]
-    );
+      "(80, 'Pedido de Revisão', $laiIdTipoProcedimento, 4, $idUnidadeEsicPR, '$laiAtivo'), ".
+      "(81, 'Recurso em Primeira Instância', $laiIdTipoProcedimento, 4, $idUnidadeEsic1a, '$laiAtivo'), ".
+      "(82, 'Recurso em Segunda Instância', $laiIdTipoProcedimento, 4, $idUnidadeEsic2a, '$laiAtivo'), ".
+      "(83, 'Recurso em Terceira Instância', $laiIdTipoProcedimento, 4, $idUnidadeEsic3a, '$laiAtivo')");
 
     // Exclui parâmetros das unidades, que foram migrados para outra tabela
     $objInfraIBanco->executarSql('DELETE FROM md_eouv_parametros WHERE no_parametro IN ('.
@@ -548,6 +541,20 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
       "'ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA',".
       "'ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA')"
     );
+
+    // Insere parâmetro para configurar tipo de documento dos anexos separadamente
+    // Usa o tipo "Anexo" como padrão
+    $arrSeries = $objInfraIBanco->consultarSql("SELECT id_serie ".
+      "FROM serie WHERE nome = 'Anexo'");
+    if (count($arrSeries) == 0) {
+      $idSerieDocExterno = '';
+    } else {
+      $idSerieDocExterno = $arrSeries[0]['id_serie'];
+    }
+
+    $objInfraIBanco->executarSql('INSERT INTO md_eouv_parametros '.
+      '(id_parametro, no_parametro, de_valor_parametro) VALUES '.
+      "(3, 'ID_SERIE_ANEXO', '$idSerieDocExterno')");
   }
 }
 

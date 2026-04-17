@@ -43,7 +43,11 @@ try {
                     break;
 
                 case "EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO":
-                    $idTipoDocumentoAnexoDadosManifestacao = $arrObjMdCguEouvParametroDTO[$i];
+                    $idTipoDocumentoDadosManifestacao = $arrObjMdCguEouvParametroDTO[$i];
+                    break;
+
+                case "ID_SERIE_ANEXO":
+                    $idTipoDocumentoAnexo = $arrObjMdCguEouvParametroDTO[$i];
                     break;
 
                 case "EOUV_USUARIO_ACESSO_WEBSERVICE":
@@ -84,9 +88,13 @@ try {
             $dataInicialImportacaoManifestacoes->setStrDeValorParametro($_POST['EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES']);
             $objMdCguEouvAlterarParametroRN->alterarParametro($dataInicialImportacaoManifestacoes);
         }
-        if($_POST['EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO'] != $idTipoDocumentoAnexoDadosManifestacao->getStrDeValorParametro()){
-            $idTipoDocumentoAnexoDadosManifestacao->setStrDeValorParametro($_POST['EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO']);
-            $objMdCguEouvAlterarParametroRN->alterarParametro($idTipoDocumentoAnexoDadosManifestacao);
+        if($_POST['EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO'] != $idTipoDocumentoDadosManifestacao->getStrDeValorParametro()){
+            $idTipoDocumentoDadosManifestacao->setStrDeValorParametro($_POST['EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO']);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($idTipoDocumentoDadosManifestacao);
+        }
+        if($_POST['ID_SERIE_ANEXO'] != $idTipoDocumentoAnexo->getStrDeValorParametro()){
+            $idTipoDocumentoAnexo->setStrDeValorParametro($_POST['ID_SERIE_ANEXO']);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($idTipoDocumentoAnexo);
         }
         if($_POST['EOUV_USUARIO_ACESSO_WEBSERVICE'] != $usuarioWebService->getStrDeValorParametro()){
             $usuarioWebService->setStrDeValorParametro($_POST['EOUV_USUARIO_ACESSO_WEBSERVICE']);
@@ -124,7 +132,8 @@ try {
     default:
       throw new InfraException("Ação '".$_GET['acao']."' não reconhecida.");
   }
-    $strItensSelSerie = SerieINT::montarSelectNomeExternos('null','&nbsp;',$idTipoDocumentoAnexoDadosManifestacao->getStrDeValorParametro());
+    $strItensSelSerieDados = SerieINT::montarSelectNomeExternos('null','&nbsp;',$idTipoDocumentoDadosManifestacao->getStrDeValorParametro());
+    $strItensSelSerieAnexo = SerieINT::montarSelectNomeExternos('null','&nbsp;',$idTipoDocumentoAnexo->getStrDeValorParametro());
 
 }catch(Exception $e){
   PaginaSEI::getInstance()->processarExcecao($e);
@@ -164,8 +173,13 @@ PaginaSEI::getInstance()->abrirJavaScript();
             return false;
         }
         if (infraTrim(document.getElementById('EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO').value)=='null') {
-            alert('Informe o Tipo de Documento.');
+            alert('Informe o Tipo de Documento para os Dados da Manifestação.');
             document.getElementById('EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('ID_SERIE_ANEXO').value)=='null') {
+            alert('Informe o Tipo de Documento para os Anexos da Manifestação.');
+            document.getElementById('ID_SERIE_ANEXO').focus();
             return false;
         }
         if (infraTrim(document.getElementById('EOUV_USUARIO_ACESSO_WEBSERVICE').value)=='') {
@@ -257,10 +271,19 @@ PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
 
     <!-- EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO -->
     <div class="infraAreaDados">
-        <label id="lblEOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" for="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" accesskey="T" class="infraLabelObrigatorio"><span class="infraTeclaAtalho">T</span>ipo de documento usado na importação:</label>
+        <label id="lblEOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" for="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" accesskey="T" class="infraLabelObrigatorio"><span class="infraTeclaAtalho">T</span>ipo de documento do relatório da manifestação:</label>
         <select id="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" name="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" class="infraSelect"
                 tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
-            <?=$strItensSelSerie?>
+            <?=$strItensSelSerieDados?>
+        </select>
+    </div>
+
+    <!-- ID_SERIE_ANEXO -->
+    <div class="infraAreaDados">
+        <label id="lblID_SERIE_ANEXO" for="ID_SERIE_ANEXO" accesskey="p" class="infraLabelObrigatorio">Ti<span class="infraTeclaAtalho">p</span>o de documento dos anexos da manifestação:</label>
+        <select id="ID_SERIE_ANEXO" name="ID_SERIE_ANEXO" class="infraSelect"
+                tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
+            <?=$strItensSelSerieAnexo?>
         </select>
     </div>
 
