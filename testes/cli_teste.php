@@ -150,6 +150,10 @@ try {
             $agendamento->gravarLogImportacao(null, null, 'T', 'Teste');
             echoln('Fim');
             break;
+        case 'agendamento':
+            $agendamento = new MdCguEouvAgendamentoRN();
+            $agendamento->executarImportacaoManifestacaoFalaBr();
+            break;
         default:
             echoln('Comando não econtrado', true);
             break;

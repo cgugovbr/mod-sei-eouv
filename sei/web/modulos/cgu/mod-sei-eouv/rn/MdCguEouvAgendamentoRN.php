@@ -574,7 +574,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
             // Gerar documentos a serem importados
             if ($tipoImportacaoAtual == 'P') {
-                $anexosGerados = $this->gerarAnexosProtocolo($manifestacao['Teor']['Anexos'], $numProtocoloFormatado, $idHipoteseLegalSei, $i, 'Manifestação');
+                $anexosGerados = $this->gerarAnexosProtocolo($manifestacao, $idHipoteseLegalSei, $i);
                 $i = $anexosGerados['indice'];
                 $objDocumentoManifestacao = $this->gerarPDFManifestacao($manifestacao, [], $tipoImportacaoAtual, $anexosGerados['erro'], $idHipoteseLegalSei);
                 $arrDocumentos = array_merge([$objDocumentoManifestacao], $anexosGerados['documentos']);
@@ -585,7 +585,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 // Caso seja a primeira importação, importa anexos do pedido inicial
                 // exceto se for em um processo já existente ou a manifestação não tem recursos
                 if ($tipoUltimaImportacao == null && (!$primeiraImportacaoEmProcessoExistente || $numRecursos == 0)) {
-                    $anexosGerados = $this->gerarAnexosProtocolo($manifestacao['Teor']['Anexos'], $numProtocoloFormatado, $idHipoteseLegalSei, $i, 'Pedido Inicial');
+                    $anexosGerados = $this->gerarAnexosProtocolo($manifestacao, $idHipoteseLegalSei, $i);
                     $i = $anexosGerados['indice'];
                     if ($anexosGerados['erro']) {
                         $ocorreuErroAnexos = true;
@@ -600,11 +600,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     if ($primeiraImportacaoEmProcessoExistente) {
                         $recurso = end($arrRecursos);
                         $anexosGerados = $this->gerarAnexosProtocolo(
-                            $recurso['anexos'],
-                            $numProtocoloFormatado,
+                            $recurso,
                             $idHipoteseLegalSei,
-                            $i,
-                            $this->obterDescricaoInstanciaRecurso($recurso['instancia']['IdInstanciaRecurso'])
+                            $i
                         );
                         $i = $anexosGerados['indice'];
                         if ($anexosGerados['erro']) {
@@ -623,11 +621,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
                                 }
                             } else {
                                 $anexosGerados = $this->gerarAnexosProtocolo(
-                                    $recurso['anexos'],
-                                    $numProtocoloFormatado,
+                                    $recurso,
                                     $idHipoteseLegalSei,
-                                    $i,
-                                    $this->obterDescricaoInstanciaRecurso($recurso['instancia']['IdInstanciaRecurso'])
+                                    $i
                                 );
                                 $i = $anexosGerados['indice'];
                                 if ($anexosGerados['erro']) {
@@ -800,25 +796,78 @@ class MdCguEouvAgendamentoRN extends InfraRN
     /**
      * Gera objetos DocumentoAPI do SEI para os anexos da manifestação ou recurso, mas não
      * os adiciona ao processo.
-     * @param array $arrAnexosManifestacao Lista de estruturas DadosBasicosAnexoDTO
-     * (https://falabr.cgu.gov.br/Help/ResourceModel?modelName=DadosBasicosAnexoDTO) ou
-     * DadosBasicosAnexoRecursoDTO
-     * (https://falabr.cgu.gov.br/Help/ResourceModel?modelName=DadosBasicosAnexoRecursoDTO)
-     * @param string $numProtocoloFormatado Número do protocolo da manifestação formatado
+     * @param array $fonte Estrutura ManifestacaoDTO
+     * (https://falabr.cgu.gov.br/Help/ResourceModel?modelName=ManifestacaoDTO)
+     * ou estrutura RecursoDTO
+     * (https://falabr.cgu.gov.br/Help/ResourceModel?modelName=RecursoDTO)
      * @param int $idHipoteseLegal ID de Hipótese Legal do SEI a ser aplicado ao documento restrito
      * @param int $indice Número inicial usado para determinar os próximos números dos anexos
-     * @param string $nomeArvore Valor a ser usado no campo nome na árvore para os documentos
      * @return array Array associativo cuja chave 'documentos' é um array de objetos
      * DocumentoAPI do SEI, a chave 'erro' é um bool que indica se algum anexo tem extensão inválida,
      * a chave 'indice' indica o valor do índice numérico atualizado
      */
-    private function gerarAnexosProtocolo($arrAnexosManifestacao, $numProtocoloFormatado, $idHipoteseLegal, $indice, $nomeArvore)
+    private function gerarAnexosProtocolo($fonte, $idHipoteseLegal, $indice)
     {
-        $arrAnexosAdicionados = array();
-        $intTotAnexos = count($arrAnexosManifestacao);
+        $ehManifestacao = false;
+        $ehLai = false;
+        $anexos = [];
+
+        // Verifica se a fonte é manifestação ou recurso
+        if (isset($fonte['TipoManifestacao'])) { // $fonte é ManifestacaoDTO
+            $ehManifestacao = true;
+            // Verifica se LAI ou Ouvidoria
+            $ehLai = $fonte['TipoManifestacao']['IdTipoManifestacao'] == 8;
+
+            // Varre os anexos
+            foreach ($fonte['Teor']['Anexos'] as $anexo) {
+                $idTipo = $anexo['TipoAnexoManifestacao']['IdTipoAnexoManifestacao'];
+                if ($idTipo == 1) { // anexo da manifestação
+                    $anexos[] = [
+                        'nome' => $ehLai ? 'Pedido Inicial' : 'Manifestação',
+                        'dto' => $anexo,
+                    ];
+                } else if ($idTipo == 2) { // anexo da resposta
+                    $anexos[] = [
+                        'nome' => 'Resposta Inicial',
+                        'dto' => $anexo,
+                    ];
+                }
+            }
+        } else if (isset($fonte['tipoRecurso'])) { // $fonte é RecursoDTO
+            $ehManifestacao = false;
+
+            foreach ($fonte['anexos'] as $anexo) {
+                $idInstancia = $anexo['Instancia']['IdInstanciaRecurso'];
+                $descInstancia = $anexo['Instancia']['DescInstanciaRecurso'];
+                if ($idInstancia == 6) {
+                    $nome = $descInstancia;
+                } else if ($idInstancia == 3) { // instância CGU
+                    $nome = 'Recurso à ' . $descInstancia;
+                } else {
+                    $nome = 'Recurso em ' . $descInstancia;
+                }
+                $anexos[] = [
+                    'nome' => $nome,
+                    'dto' => $anexo
+                ];
+            }
+
+            foreach ($fonte['respostasRecurso'] as $resposta) {
+                foreach ($resposta['anexos'] as $anexo) {
+                    $descInstancia = $anexo['Instancia']['DescInstanciaRecurso'];
+                    $anexos[] = [
+                        'nome' => 'Resposta ' . $descInstancia,
+                        'dto' => $anexo,
+                    ];
+                }
+            }
+        } else {
+            throw new Exception("Estrutura inválida passada para gerar anexos do protocolo");
+        }
+
         $arrExtensoesInvalidas = [];
 
-        if($intTotAnexos == 0){
+        if(count($anexos) == 0){
             //Não encontrou anexos..
             return [
                 'documentos' => [],
@@ -840,13 +889,15 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $arrExtensoesPermitidas = array();
 
         foreach($arrObjArquivoExtensaoDTO as $extensao){
-            array_push($arrExtensoesPermitidas, strtoupper ($extensao->getStrExtensao()));
+            array_push($arrExtensoesPermitidas, strtoupper($extensao->getStrExtensao()));
         }
 
-        foreach ($arrAnexosManifestacao as $retornoWsAnexoLinha) {
-            $strNomeArquivoOriginal = $retornoWsAnexoLinha['NomeArquivo']; // Para DadosBasicosAnexoDTO é NomeArquivo
+        $arrAnexosAdicionados = [];
+        foreach ($anexos as $infoAnexo) {
+            $anexoDTO = $infoAnexo['dto'];
+            $strNomeArquivoOriginal = $anexoDTO['NomeArquivo']; // Para DadosBasicosAnexoDTO é NomeArquivo
             if ($strNomeArquivoOriginal == null) {
-                $strNomeArquivoOriginal = $retornoWsAnexoLinha['nomeArquivo']; // Para DadosBasicosAnexoRecursoDTO é nomeArquivo
+                $strNomeArquivoOriginal = $anexoDTO['nomeArquivo']; // Para DadosBasicosAnexoRecursoDTO é nomeArquivo
             }
 
             // Ajustamos aqui o nome do arquivo limitado a 50 caracteres
@@ -861,34 +912,33 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                 // Faz download do anexo
                 $strCaminhoArquivoUpload = DIR_SEI_TEMP . '/' . $strNomeArquivoUpload;
-                $this->apiClient->downloadAnexo($retornoWsAnexoLinha, $strCaminhoArquivoUpload);
+                $this->apiClient->downloadAnexo($anexoDTO, $strCaminhoArquivoUpload);
 
                 // Se o arquivo vier vazio irá gerar erro ao cadastrar no SEI
                 if (filesize($strCaminhoArquivoUpload) == 0) {
                     continue;
                 }
 
+                $i += 1;
                 $objAnexoManifestacao = new DocumentoAPI();
-
                 $objAnexoManifestacao->setTipo('R');
                 $objAnexoManifestacao->setIdSerie($this->idTipoDocumentoAnexo);
                 $objAnexoManifestacao->setNivelAcesso(1); // restrito
                 $objAnexoManifestacao->setIdHipoteseLegal($idHipoteseLegal);
                 $objAnexoManifestacao->setData(InfraData::getStrDataHoraAtual());
                 $objAnexoManifestacao->setNomeArquivo($strNomeArquivoOriginal);
-                $objAnexoManifestacao->setNomeArvore($nomeArvore);
+                $objAnexoManifestacao->setNumero(sprintf("%02d", $i));
+                $objAnexoManifestacao->setNomeArvore($infoAnexo['nome']);
                 $objAnexoManifestacao->setConteudo(base64_encode(file_get_contents($strCaminhoArquivoUpload)));
 
-                if (!$this->hashDuplicado($strCaminhoArquivoUpload, $numProtocoloFormatado)) {
-                    $i += 1;
-                    $objAnexoManifestacao->setNumero(sprintf("%02d", $i));
-                    array_push($arrAnexosAdicionados, $objAnexoManifestacao);
-                }
+                array_push($arrAnexosAdicionados, $objAnexoManifestacao);
             } else {
                 if (!in_array($ext, $arrExtensoesInvalidas)) {
                     $arrExtensoesInvalidas[] = $ext;
                 }
-                LogSEI::getInstance()->gravar('Importação de Manifestação ' . $numProtocoloFormatado . ': Arquivo ' . $strNomeArquivoOriginal . ' possui extensão inválida.', InfraLog::$INFORMACAO);
+                LogSEI::getInstance()->gravar('Importação de Manifestação FalaBR: Arquivo ' .
+                    $strNomeArquivoOriginal . ' possui extensão inativada no SEI e por isso não foi importado.',
+                    InfraLog::$AVISO);
             }
         }
 
@@ -1024,25 +1074,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
     }
 
     /**
-     * Verifica se já existe o hash do arquivo na tabela anexo coluna hash
-     *
-     * @param $strArquivo
-     * @return bool
-     * @throws InfraException
-     */
-    public function hashDuplicado($strArquivo, $numProtocoloFormatado)
-    {
-        // Verifica hash do arquivo
-        $hash = md5_file($strArquivo);
-
-        // Select na tabela Anexe com o hash Criado
-        $consulta = new MdCguEouvConsultarHashBD($this->getObjInfraIBanco());
-        $res = $consulta->consultarHash($hash, $numProtocoloFormatado);
-
-        return count($res) > 0;
-    }
-
-    /**
      * Função para simular login
      *
      * @param $siglaSistema
@@ -1152,30 +1183,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 return 'Terceira Instância';
             default:
                 return 'Desconhecido';
-        }
-    }
-
-
-    /**
-     * Obter a descrição da instância de um recurso
-     * @param string $idInstancia
-     * @return string
-     */
-    private function obterDescricaoInstanciaRecurso($idInstancia)
-    {
-        switch ($idInstancia) {
-            case 1:
-                return 'Recurso em Primeira Instância';
-            case 2:
-                return 'Recurso em Segunda Instância';
-            case 3:
-                return 'Recurso à CGU';
-            case 6:
-                return 'Pedido de Revisão';
-            case 7:
-                return 'Recurso em Terceira Instância';
-            default:
-                return '';
         }
     }
 
