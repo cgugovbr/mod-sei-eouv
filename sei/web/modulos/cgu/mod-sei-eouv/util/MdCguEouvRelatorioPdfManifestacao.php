@@ -11,7 +11,7 @@
 
 class MdCguEouvRelatorioPdfManifestacao extends MdCguEouvRelatorioPdf
 {
-    public function __construct($manifestacao, $recursos, $importarDadosDoManifestante, $ocorreuErroAdicionarAnexo)
+    public function __construct($manifestacao, $recursos, $importarDadosDoManifestante, $errosAnexos)
     {
         parent::__construct();
 
@@ -51,7 +51,11 @@ class MdCguEouvRelatorioPdfManifestacao extends MdCguEouvRelatorioPdf
         if (count($anexosOriginais) > 0) {
             $itens = [];
             foreach ($anexosOriginais as $anexo) {
-                $itens[] = [$anexo['NomeArquivo']];
+                $msgErro = '';
+                if (isset($errosAnexos[$anexo['IdAnexoManifestacao']])) {
+                    $msgErro = ' - '.$this->mensagemDeErroAnexo($errosAnexos[$anexo['IdAnexoManifestacao']]);
+                }
+                $itens[] = [$anexo['NomeArquivo'].$msgErro];
             }
             $this->tabela($itens, ['Anexos Originais']);
         } else {
@@ -62,7 +66,11 @@ class MdCguEouvRelatorioPdfManifestacao extends MdCguEouvRelatorioPdf
         if (count($anexosComplementares) > 0) {
             $itens = [];
             foreach ($anexosComplementares as $anexo) {
-                $itens[] = [$anexo['NomeArquivo']];
+                $msgErro = '';
+                if (isset($errosAnexos[$anexo['IdAnexoManifestacao']])) {
+                    $msgErro = ' - '.$this->mensagemDeErroAnexo($errosAnexos[$anexo['IdAnexoManifestacao']]);
+                }
+                $itens[] = [$anexo['NomeArquivo'].$msgErro];
             }
             $this->tabela($itens, ['Anexos Complementares']);
         } else {
@@ -166,7 +174,11 @@ class MdCguEouvRelatorioPdfManifestacao extends MdCguEouvRelatorioPdf
                     $nomesDosAnexos = [];
                     foreach ($teor['Anexos'] as $anexo) {
                         if ($anexo['IdObjeto'] == $evento['Resposta']['IdRespostaManifestacao']) {
-                            $nomesDosAnexos[] = $anexo['NomeArquivo'];
+                            $msgErro = '';
+                            if (isset($errosAnexos[$anexo['IdAnexoManifestacao']])) {
+                                $msgErro = ' - '.$this->mensagemDeErroAnexo($errosAnexos[$anexo['IdAnexoManifestacao']]);
+                            }
+                            $nomesDosAnexos[] = $anexo['NomeArquivo'].$msgErro;
                         }
                     }
                     $this->item('Anexos', implode("\n", $nomesDosAnexos));
@@ -204,7 +216,11 @@ class MdCguEouvRelatorioPdfManifestacao extends MdCguEouvRelatorioPdf
                     $anexosRecursos = $recurso['anexos'];
                     if (is_array($anexosRecursos)) {
                         foreach ($anexosRecursos as $anexoRecurso) {
-                            $nomesDosAnexos[] = $anexoRecurso['nomeArquivo'];
+                            $msgErro = '';
+                            if (isset($errosAnexos[$anexoRecurso['IdAnexoRecurso']])) {
+                                $msgErro = ' - '.$this->mensagemDeErroAnexo($errosAnexos[$anexoRecurso['IdAnexoRecurso']]);
+                            }
+                            $nomesDosAnexos[] = $anexoRecurso['nomeArquivo'].$msgErro;
                         }
                     }
                     $this->item('Anexos', implode("\n", $nomesDosAnexos));
@@ -226,7 +242,11 @@ class MdCguEouvRelatorioPdfManifestacao extends MdCguEouvRelatorioPdf
                             $nomesDosAnexos = [];
                             if (is_array($resposta['anexos'])) {
                                 foreach ($resposta['anexos'] as $anexoResposta) {
-                                    $nomesDosAnexos[] = $anexoResposta['nomeArquivo'];
+                                    $msgErro = '';
+                                    if (isset($errosAnexos[$anexoResposta['idAnexoRespostaRecurso']])) {
+                                        $msgErro = ' - '.$this->mensagemDeErroAnexo($errosAnexos[$anexoResposta['idAnexoRespostaRecurso']]);
+                                    }
+                                    $nomesDosAnexos[] = $anexoResposta['nomeArquivo'].$msgErro;
                                 }
                             }
                             $this->item('Anexos', implode("\n", $nomesDosAnexos));
@@ -318,11 +338,10 @@ class MdCguEouvRelatorioPdfManifestacao extends MdCguEouvRelatorioPdf
         /**
          * Seção observações
          */
-        if ($ocorreuErroAdicionarAnexo) {
+        if (count($errosAnexos) > 0) {
             $this->secao('Observações');
-            $this->texto('Um ou mais anexos da manifestação não foram '.
-                'importados para o SEI devido a restrições da extensão '.
-                'do arquivo.');
+            $this->texto('Aconteceram erros na importação de um ou mais anexos '.
+                'da manifestação para o SEI.');
         }
     }
 
@@ -449,6 +468,26 @@ class MdCguEouvRelatorioPdfManifestacao extends MdCguEouvRelatorioPdf
                     $this->item('Dados Complementares:', implode("\n", $dadosComplementares), false, 'R');
                 }
             }
+        }
+    }
+
+    /**
+     * Retorna a mensagem de erro de importação de anexo correspondente ao código
+     * @param int $codigo
+     * @return string
+     */
+    private function mensagemDeErroAnexo($codigo)
+    {
+        switch ($codigo) {
+            case MdCguEouvAgendamentoRN::$ANEXO_ERRO_EXTENSAO:
+                return 'Não foi possível importar o anexo, pois a extensão do '.
+                    'arquivo não está habilitada no SEI';
+            case MdCguEouvAgendamentoRN::$ANEXO_ERRO_VAZIO:
+                return 'O anexo não foi importado pois o arquivo veio vazio';
+            case MdCguEouvAgendamentoRN::$ANEXO_ERRO_OUTRO:
+                return 'Aconteceu um erro na importação do anexo';
+            default:
+                return 'Erro não identificado ao importar anexo';
         }
     }
 }

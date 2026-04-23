@@ -12,6 +12,10 @@ require_once __DIR__ . '/../util/MdCguEouvClient.php';
 
 class MdCguEouvAgendamentoRN extends InfraRN
 {
+    public static $ANEXO_ERRO_EXTENSAO = 0;
+    public static $ANEXO_ERRO_VAZIO = 1;
+    public static $ANEXO_ERRO_OUTRO = 99;
+
     protected $idTipoDocumentoDadosManifestacao;
     protected $idTipoDocumentoAnexo;
     protected $ocorreuErroEmProtocolo;
@@ -576,21 +580,19 @@ class MdCguEouvAgendamentoRN extends InfraRN
             if ($tipoImportacaoAtual == 'P') {
                 $anexosGerados = $this->gerarAnexosProtocolo($manifestacao, $idHipoteseLegalSei, $i);
                 $i = $anexosGerados['indice'];
-                $objDocumentoManifestacao = $this->gerarPDFManifestacao($manifestacao, [], $tipoImportacaoAtual, $anexosGerados['erro'], $idHipoteseLegalSei);
+                $objDocumentoManifestacao = $this->gerarPDFManifestacao($manifestacao, [], $tipoImportacaoAtual, $anexosGerados['erros'], $idHipoteseLegalSei);
                 $arrDocumentos = array_merge([$objDocumentoManifestacao], $anexosGerados['documentos']);
             } else {
                 $arrAnexos = [];
-                $ocorreuErroAnexos = false;
+                $arrErrosAnexos = [];
 
                 // Caso seja a primeira importação, importa anexos do pedido inicial
                 // exceto se for em um processo já existente ou a manifestação não tem recursos
                 if ($tipoUltimaImportacao == null && (!$primeiraImportacaoEmProcessoExistente || $numRecursos == 0)) {
                     $anexosGerados = $this->gerarAnexosProtocolo($manifestacao, $idHipoteseLegalSei, $i);
                     $i = $anexosGerados['indice'];
-                    if ($anexosGerados['erro']) {
-                        $ocorreuErroAnexos = true;
-                    }
                     $arrAnexos = array_merge($arrAnexos, $anexosGerados['documentos']);
+                    $arrErrosAnexos += $anexosGerados['erros'];
                 }
 
                 // Importa anexos de recursos desde a última importação
@@ -605,10 +607,8 @@ class MdCguEouvAgendamentoRN extends InfraRN
                             $i
                         );
                         $i = $anexosGerados['indice'];
-                        if ($anexosGerados['erro']) {
-                            $ocorreuErroAnexos = true;
-                        }
                         $arrAnexos = array_merge($arrAnexos, $anexosGerados['documentos']);
+                        $arrErrosAnexos += $anexosGerados['erros'];
                     } else {
                         $aposUltimaImportacao = ($tipoUltimaImportacao == null) ||
                             ($tipoUltimaImportacao == 'R') ||
@@ -626,17 +626,15 @@ class MdCguEouvAgendamentoRN extends InfraRN
                                     $i
                                 );
                                 $i = $anexosGerados['indice'];
-                                if ($anexosGerados['erro']) {
-                                    $ocorreuErroAnexos = true;
-                                }
                                 $arrAnexos = array_merge($arrAnexos, $anexosGerados['documentos']);
+                                $arrErrosAnexos += $anexosGerados['erros'];
                             }
                         }
                     }
                 }
 
                 // Gera PDF principal
-                $objDocumentoManifestacao = $this->gerarPDFManifestacao($manifestacao, $arrRecursos, $tipoImportacaoAtual, $ocorreuErroAnexos, $idHipoteseLegalSei);
+                $objDocumentoManifestacao = $this->gerarPDFManifestacao($manifestacao, $arrRecursos, $tipoImportacaoAtual, $arrErrosAnexos, $idHipoteseLegalSei);
 
                 // Agrupa documentos
                 $arrDocumentos = array_merge([$objDocumentoManifestacao], $arrAnexos);
@@ -770,9 +768,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
     }
 
-    private function gerarPDFManifestacao($manifestacao, $recursos, $tipoImportacaoAtual, $ocorreuErroAdicionarAnexo, $idHipoteseLegal)
+    private function gerarPDFManifestacao($manifestacao, $recursos, $tipoImportacaoAtual, $errosAnexos, $idHipoteseLegal)
     {
-        $mdCguEouvRelatorioPdf = new MdCguEouvRelatorioPdfManifestacao($manifestacao, $recursos, $this->importar_dados_manifestante, $ocorreuErroAdicionarAnexo);
+        $mdCguEouvRelatorioPdf = new MdCguEouvRelatorioPdfManifestacao($manifestacao, $recursos, $this->importar_dados_manifestante, $errosAnexos);
 
         $objAnexoRN = new AnexoRN();
         $strNomeArquivoInicialUpload = $objAnexoRN->gerarNomeArquivoTemporario() . ".pdf";
@@ -803,18 +801,17 @@ class MdCguEouvAgendamentoRN extends InfraRN
      * @param int $idHipoteseLegal ID de Hipótese Legal do SEI a ser aplicado ao documento restrito
      * @param int $indice Número inicial usado para determinar os próximos números dos anexos
      * @return array Array associativo cuja chave 'documentos' é um array de objetos
-     * DocumentoAPI do SEI, a chave 'erro' é um bool que indica se algum anexo tem extensão inválida,
-     * a chave 'indice' indica o valor do índice numérico atualizado
+     * DocumentoAPI do SEI, a chave 'erros' é um array com os Ids dos anexos que
+     * não foram gerados por algum erro e a chave 'indice' indica o valor do índice
+     * numérico atualizado
      */
     private function gerarAnexosProtocolo($fonte, $idHipoteseLegal, $indice)
     {
-        $ehManifestacao = false;
         $ehLai = false;
         $anexos = [];
 
         // Verifica se a fonte é manifestação ou recurso
         if (isset($fonte['TipoManifestacao'])) { // $fonte é ManifestacaoDTO
-            $ehManifestacao = true;
             // Verifica se LAI ou Ouvidoria
             $ehLai = $fonte['TipoManifestacao']['IdTipoManifestacao'] == 8;
 
@@ -834,8 +831,6 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 }
             }
         } else if (isset($fonte['tipoRecurso'])) { // $fonte é RecursoDTO
-            $ehManifestacao = false;
-
             foreach ($fonte['anexos'] as $anexo) {
                 $idInstancia = $anexo['Instancia']['IdInstanciaRecurso'];
                 $descInstancia = $anexo['Instancia']['DescInstanciaRecurso'];
@@ -865,13 +860,11 @@ class MdCguEouvAgendamentoRN extends InfraRN
             throw new Exception("Estrutura inválida passada para gerar anexos do protocolo");
         }
 
-        $arrExtensoesInvalidas = [];
-
         if(count($anexos) == 0){
             //Não encontrou anexos..
             return [
                 'documentos' => [],
-                'erro' => false,
+                'erros' => [],
                 'indice' => $indice,
             ];
         }
@@ -893,11 +886,20 @@ class MdCguEouvAgendamentoRN extends InfraRN
         }
 
         $arrAnexosAdicionados = [];
+        $arrAnexosComErro = [];
         foreach ($anexos as $infoAnexo) {
             $anexoDTO = $infoAnexo['dto'];
             $strNomeArquivoOriginal = $anexoDTO['NomeArquivo']; // Para DadosBasicosAnexoDTO é NomeArquivo
             if ($strNomeArquivoOriginal == null) {
                 $strNomeArquivoOriginal = $anexoDTO['nomeArquivo']; // Para DadosBasicosAnexoRecursoDTO é nomeArquivo
+            }
+
+            $idAnexo = $anexoDTO['IdAnexoManifestacao']; // DadosBasicosAnexoDTO
+            if ($idAnexo == null) {
+                $idAnexo = $anexoDTO['IdAnexoRecurso']; // DadosBasicosAnexoRecursoDTO
+            }
+            if ($idAnexo == null) {
+                $idAnexo = $anexoDTO['idAnexoRespostaRecurso']; // DadosBasicosAnexoRespostaRecursoDTO
             }
 
             // Ajustamos aqui o nome do arquivo limitado a 50 caracteres
@@ -916,6 +918,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                 // Se o arquivo vier vazio irá gerar erro ao cadastrar no SEI
                 if (filesize($strCaminhoArquivoUpload) == 0) {
+                    $arrAnexosComErro[$idAnexo] = self::$ANEXO_ERRO_VAZIO;
                     continue;
                 }
 
@@ -933,9 +936,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
                 array_push($arrAnexosAdicionados, $objAnexoManifestacao);
             } else {
-                if (!in_array($ext, $arrExtensoesInvalidas)) {
-                    $arrExtensoesInvalidas[] = $ext;
-                }
+                $arrAnexosComErro[$idAnexo] = self::$ANEXO_ERRO_EXTENSAO;
                 LogSEI::getInstance()->gravar('Importação de Manifestação FalaBR: Arquivo ' .
                     $strNomeArquivoOriginal . ' possui extensão inativada no SEI e por isso não foi importado.',
                     InfraLog::$AVISO);
@@ -944,7 +945,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
 
         return [
             'documentos' => $arrAnexosAdicionados,
-            'erro' => count($arrExtensoesInvalidas) > 0,
+            'erros' => $arrAnexosComErro,
             'indice' => $i,
         ];
     }
