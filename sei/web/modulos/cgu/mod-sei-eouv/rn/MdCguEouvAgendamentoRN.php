@@ -699,7 +699,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $this->gravarLogProtocolo($numProtocoloFormatado, 'Recurso importado com sucesso.', 'S', $tipoImportacaoAtual);
             }
         } catch (\Exception $e) {
-            $this->gravarLogProtocolo($numProtocoloFormatado, 'Erro na importação: ' . $e, 'N', $tipoImportacaoAtual);
+            $this->gravarLogProtocolo($numProtocoloFormatado, 'Erro na importação: ' . $e, 'N', $tipoImportacaoAtual ?? 'ND');
             throw $e;
         }
     }
