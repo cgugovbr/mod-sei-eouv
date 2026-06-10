@@ -35,7 +35,7 @@ A estrutura de pastas do arquivo zip é a seguinte:
 Copie o arquivo zip para o servidor do SEI e descompacte-o na raiz de instalação do sistema usando o comando abaixo:
   
 ```bash
-$ cd <DIRETORIDIO_RAZ_DE_INSTALAÇÃO_DO_SEI>
+$ cd <DIRETORIO_RAIZ_DE_INSTALAÇÃO_DO_SEI>
 $ unzip integracao-falabr-VERSAO.zip
 ```
 
@@ -88,35 +88,49 @@ nas configurações.
 
 #### Tipos de Manifestação
 
-Acessar o menu *Administração -> Integração com FalaBR -> Tipos de Manifestação* e associar cada tipo de manifestação do FalaBR com um tipo de processo existente no SEI. Você poderá criar um novo tipo de processo para cada tipo de manifestação do FalaBR se for o caso.
+Acessar o menu *Administração -> Integração com FalaBR -> Tipos de Manifestação* e verificar os tipos de manifestação e recursos do FalaBR que deseja importar para o SEI.
 
-**Importante:** os processos criados pela integração usam o nível de acesso sugerido configurado no tipo de processo do SEI.
+Abaixo estão os tipos suportados pelo módulo:
 
-Abaixo estão os tipos de manifestações do FalaBR que serão importadas para o SEI:
-
-| ID FalaBR                | Tipo de Manifestação |
-| :-:                      | :-:                  |
-|1                         |Denúncia              |
-|2                         |Reclamação            |
-|3                         |Elogio                |
-|4                         |Sugestão              |
-|5                         |Solicitação           |
-|6                         |Não Classificada      |
-|7                         |Comunicado            |
-|8                         |Acesso à Informação   |
+| Tipo de Manifestação / Recurso |
+| :-:                            |
+| Denúncia                       |
+| Reclamação                     |
+| Elogio                         |
+| Sugestão                       |
+| Solicitação                    |
+| Não Classificada               |
+| Comunicado                     |
+| Acesso à Informação            |
+| Pedido de Revisão              |
+| Recurso em Primeira Instância  |
+| Recurso em Segunda Instância   |
+| Recurso em Terceira Instância  |
 
 > Obs: manifestações do tipo "Simplifique" não são suportadas.
 
-Caso não deseje importar algum tipo de manifestação, desative o tipo correspondente
+Caso não deseje importar algum tipo de manifestação ou recurso, desative o tipo correspondente
 usando o botão na coluna de *Ações*.
 
 ![Desativar algum tipo de manifestação](imagens/tipos-manifestacao.png)
 
 Os tipos desativados ficam com a linha toda vermelha.
 
+Para cada tipo de manifestação ou recurso a ser importado devem ser configurados três parâmetros:
+
+![Configurar tipo de manifestação](imagens/form-config-manifestacao.png)
+
+* **Tipo de Processo**: Tipo de Processo SEI que será associado ao tipo de manifestação ou recurso. Em caso de recurso, o tipo de processo será alterado caso seja diferente do tipo do pedido inicial. O processo terá o nível de acesso sugerido configurado para o tipo no SEI.
+* **Hipótese Legal aplicada aos documentos importados**: Tanto o
+relatório da manifestação quanto os anexos são sempre importados com nível de
+acesso restrito. Este campo indica qual hipótese legal deve ser atribuída a
+esses documentos para justificar a restrição. Recomendamos utilizar a hipótese
+"Informação Pessoal (Art. 31 da Lei 12.527/2011)".
+* **Unidade de Destino**: indica a unidade na qual o processo deve ser gerado ou para a qual deve ser enviado ao receber uma manifestação ou recurso do tipo em questão.
+
 #### Parâmetros
 
-Acessar o menu *Administração -> Integração com FalaBR -> Parâmetros da Integração* e preencha o formulário:
+Acesse o menu *Administração -> Integração com FalaBR -> Parâmetros da Integração* e preencha o formulário:
 
 ![Formulário de parâmetros](imagens/form-parametros.png)
 
@@ -132,31 +146,16 @@ Caso ainda não possua este usuário, solicitar via formulário para o
 - **Data inicial de Importação**:  Data a partir da qual as manifestações devem
 ser importadas. Sugerimos que seja colocada a **data da instalação** para que apenas as
 novas manifestações sejam importadas para o SEI.
-- **Importar dados do manifestante**: Marque para importar os dados pessoais da
+- **Importar Dados do Manifestante**: Marque para importar os dados pessoais da
 pessoa que enviou a manifestação para o processo SEI, caso eles estejam visíveis
 para o órgão.
-- **Tipo de documento usado na importação**: Quando a rotina de importação for
+- **Tipo de documento do relatório da manifestação**: Quando a rotina de importação for
 executada, será gerado um documento PDF com os dados da manifestação. Este documento
 será anexado ao processo. Este campo indica o Tipo de Documento SEI que será
 utilizado para este PDF. Lembrando que deve ser do Grupo de **Documentos Externos**.
+- **Tipo de documento dos anexos da manifestação**: Tipo de Documento SEI que será utilizado para importar os anexos das manifestações e recursos. Também deve ser do Grupo de **Documentos Externos**.
+
 Para verificar os tipos existentes acesse *Administração > Tipos de Documento > Listar*.
-- **Hipótese Legal aplicada aos documentos gerados pela integração**: Tanto o
-relatório da manifestação quanto os anexos são sempre importados com nível de
-acesso restrito. Este campo indica qual hipótese legal deve ser atribuída a
-esses documentos para justificar a restrição. Recomendamos utilizar a hipótese
-"Informação Pessoal (Art. 31 da Lei 12.527/2011)".
-- **Unidade de Ouvidoria**: Unidade no SEI que deverá receber os processos
-oriundos de manifestações de Ouvidoria importados do FalaBR.
-- **Unidade de Acesso à Informação**: Unidade no SEI que deverá receber os processos
-oriundos de pedidos de Acesso à Informação importados do FalaBR.
-- **Unidade de Recurso em 1ª Instância**: Unidade no SEI que deverá receber os
-processos quando houver recurso de **primeira** instância.
-- **Unidade de Recurso em 2ª Instância**: Unidade no SEI que deverá receber os
-processos quando houver recurso de **segunda** instância.
-- **Unidade de Recurso em 3ª Instância**: Unidade no SEI que deverá receber os
-processos quando houver recurso de **terceira** instância.
-- **Unidade de Pedido de Revisão**: Unidade no SEI que deverá receber os
-processos quando houver pedido de **revisão**.
 
 #### Agendamento
 
@@ -168,4 +167,4 @@ Ajuste a periodicidade de execução do agendamento no menu *Infra > Agendamento
 
 ## Orientações Gerais
 
-Em caso de dúvidas favor enviar um email para [DISOL - disol@cgu.gov.br](mailto:disol@cgu.gov.br?subject=[DUVIDA]%20SEI%20-%20módulo%20FalaBR)
+Em caso de dúvidas ou problemas técnicos favor abrir um *issue* neste repositório do GitHub.
