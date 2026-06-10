@@ -93,11 +93,11 @@ class MdCguEouvRelatorioPdf extends InfraPDF
 
     /**
      * Adiciona uma tabela
-     * @param string $titulo Título da tabela
-     * @param array<string> $cabecalhos Array em que cada elemento representa o
-     * nome de exibição da coluna
      * @param array<array<string>> $dados Matriz em que cada elemento representa
      * o texto de uma célula da tabela
+     * @param array<string> $cabecalhos Array em que cada elemento representa o
+     * nome de exibição da coluna
+     * @param string $titulo Título da tabela
      */
     protected function tabela($dados, $cabecalhos = [], $titulo = '')
     {

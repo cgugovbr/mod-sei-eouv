@@ -109,7 +109,7 @@ class MdCguEouvAgendamentoINT extends InfraINT
             return null;
         } else {
             // Trim aqui foi necessário pois a coluna tip_manifestacao está como char(2),
-            // o que faz com que alguns bancos aidicionem um espaço quando o tipo só tem 1 caractere
+            // o que faz com que alguns bancos adicionem um espaço quando o tipo só tem 1 caractere
             return trim($resultadoObjEouvRelatorioImportacaoDetalheDTO->getStrTipManifestacao());
         }
     }

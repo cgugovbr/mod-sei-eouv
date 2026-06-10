@@ -211,7 +211,7 @@ PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
         documentos importados:
       </label>
       <p>Os documentos importados pela integração sempre possuem nível de acesso
-        <span class="alerta">restrito</span>. Selecione abaixo a Hipótese Legal
+        <strong>restrito</strong>. Selecione abaixo a Hipótese Legal
         que deve ser aplicada a esses documentos.</p>
       <select id="selHipoteseLegal" name="selHipoteseLegal" class="infraSelect"
         tabindex="<?= PaginaSEI::getInstance()->getProxTabDados() ?>" >

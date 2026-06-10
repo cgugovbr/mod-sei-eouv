@@ -134,7 +134,7 @@ try {
             $manifestacao = $client->consultaManifestacao($nup);
             $detalhada = $client->consultaDetalhadaManifestacao($manifestacao);
             $recursos = $client->consultaRecursosDaManifestacao($nup);
-            $relatorio = new MdCguEouvRelatorioPdfManifestacao($detalhada, $recursos, true, false);
+            $relatorio = new MdCguEouvRelatorioPdfManifestacao($detalhada, $recursos, true, []);
             $arquivo = __DIR__ . '/Relatorio_'.$nup.'.pdf';
             echoln("Gerando arquivo PDF $arquivo");
             $relatorio->Output($arquivo, 'F');

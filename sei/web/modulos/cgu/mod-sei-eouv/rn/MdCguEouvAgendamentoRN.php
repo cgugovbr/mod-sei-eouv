@@ -889,10 +889,9 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $arrAnexosComErro = [];
         foreach ($anexos as $infoAnexo) {
             $anexoDTO = $infoAnexo['dto'];
-            $strNomeArquivoOriginal = $anexoDTO['NomeArquivo']; // Para DadosBasicosAnexoDTO é NomeArquivo
-            if ($strNomeArquivoOriginal == null) {
-                $strNomeArquivoOriginal = $anexoDTO['nomeArquivo']; // Para DadosBasicosAnexoRecursoDTO é nomeArquivo
-            }
+            // Para DadosBasicosAnexoDTO é NomeArquivo
+            // Para DadosBasicosAnexoRecursoDTO é nomeArquivo
+            $strNomeArquivoOriginal = $anexoDTO['NomeArquivo'] ?? $anexoDTO['nomeArquivo'];
 
             $idAnexo = $anexoDTO['IdAnexoManifestacao']; // DadosBasicosAnexoDTO
             if ($idAnexo == null) {

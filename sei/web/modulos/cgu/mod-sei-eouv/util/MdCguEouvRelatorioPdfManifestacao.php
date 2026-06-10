@@ -311,7 +311,7 @@ class MdCguEouvRelatorioPdfManifestacao extends MdCguEouvRelatorioPdf
          * Seção prorrogação
          */
         $this->secao('Dados de Prorrogação');
-        $historico = $manifestacao['historico'];
+        $historico = $manifestacao['Historico'];
         $possuiProrrogacao = false;
         if (is_array($historico)) {
             foreach ($historico as $evento) {
