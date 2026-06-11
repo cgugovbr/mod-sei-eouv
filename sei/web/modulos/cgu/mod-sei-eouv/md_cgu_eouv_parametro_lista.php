@@ -43,7 +43,11 @@ try {
                     break;
 
                 case "EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO":
-                    $idTipoDocumentoAnexoDadosManifestacao = $arrObjMdCguEouvParametroDTO[$i];
+                    $idTipoDocumentoDadosManifestacao = $arrObjMdCguEouvParametroDTO[$i];
+                    break;
+
+                case "ID_SERIE_ANEXO":
+                    $idTipoDocumentoAnexo = $arrObjMdCguEouvParametroDTO[$i];
                     break;
 
                 case "EOUV_USUARIO_ACESSO_WEBSERVICE":
@@ -65,33 +69,9 @@ try {
                 case "EOUV_URL_WEBSERVICE_IMPORTACAO_MANIFESTACAO":
                     $urlWebServiceEOuv = $arrObjMdCguEouvParametroDTO[$i];
                     break;
-                    
-                case "ESIC_ID_UNIDADE_PRINCIPAL":
-                    $idUnidadeEsicPrincipal = $arrObjMdCguEouvParametroDTO[$i];
-                    break;
-
-                case "ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA":
-                    $idUnidadeRecursoPrimeiraInstancia = $arrObjMdCguEouvParametroDTO[$i];
-                    break;
-
-                case "ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA":
-                    $idUnidadeRecursoSegundaInstancia = $arrObjMdCguEouvParametroDTO[$i];
-                    break;
-
-                case "ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA":
-                    $idUnidadeRecursoTerceiraInstancia = $arrObjMdCguEouvParametroDTO[$i];
-                    break;
-
-                case "ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO":
-                    $idUnidadeRecursoPedidoRevisao = $arrObjMdCguEouvParametroDTO[$i];
-                    break;
 
                 case "IMPORTAR_DADOS_MANIFESTANTE":
                     $importarDadosManifestante = $arrObjMdCguEouvParametroDTO[$i];
-                    break;
-
-                case "ID_UNIDADE_OUVIDORIA":
-                    $idUnidadeOuvidoria = $arrObjMdCguEouvParametroDTO[$i];
                     break;
             }
         }
@@ -108,9 +88,13 @@ try {
             $dataInicialImportacaoManifestacoes->setStrDeValorParametro($_POST['EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES']);
             $objMdCguEouvAlterarParametroRN->alterarParametro($dataInicialImportacaoManifestacoes);
         }
-        if($_POST['EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO'] != $idTipoDocumentoAnexoDadosManifestacao->getStrDeValorParametro()){
-            $idTipoDocumentoAnexoDadosManifestacao->setStrDeValorParametro($_POST['EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO']);
-            $objMdCguEouvAlterarParametroRN->alterarParametro($idTipoDocumentoAnexoDadosManifestacao);
+        if($_POST['EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO'] != $idTipoDocumentoDadosManifestacao->getStrDeValorParametro()){
+            $idTipoDocumentoDadosManifestacao->setStrDeValorParametro($_POST['EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO']);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($idTipoDocumentoDadosManifestacao);
+        }
+        if($_POST['ID_SERIE_ANEXO'] != $idTipoDocumentoAnexo->getStrDeValorParametro()){
+            $idTipoDocumentoAnexo->setStrDeValorParametro($_POST['ID_SERIE_ANEXO']);
+            $objMdCguEouvAlterarParametroRN->alterarParametro($idTipoDocumentoAnexo);
         }
         if($_POST['EOUV_USUARIO_ACESSO_WEBSERVICE'] != $usuarioWebService->getStrDeValorParametro()){
             $usuarioWebService->setStrDeValorParametro($_POST['EOUV_USUARIO_ACESSO_WEBSERVICE']);
@@ -132,34 +116,10 @@ try {
             $urlWebServiceEOuv->setStrDeValorParametro($_POST['EOUV_URL_WEBSERVICE_IMPORTACAO']);
             $objMdCguEouvAlterarParametroRN->alterarParametro($urlWebServiceEOuv);
         }
-        if($_POST['ID_UNIDADE_OUVIDORIA'] != $idUnidadeOuvidoria->getStrDeValorParametro()){
-            $idUnidadeOuvidoria->setStrDeValorParametro($_POST['ID_UNIDADE_OUVIDORIA']);
-            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeOuvidoria);
-        }
         $ckImportarDadosManifestantes = ($_POST['IMPORTAR_DADOS_MANIFESTANTE'] == 'on'?'1':'0');
         if($ckImportarDadosManifestantes != $importarDadosManifestante->getStrDeValorParametro()){
             $importarDadosManifestante->setStrDeValorParametro($ckImportarDadosManifestantes);
             $objMdCguEouvAlterarParametroRN->alterarParametro($importarDadosManifestante);
-        }
-        if($_POST['ESIC_ID_UNIDADE_PRINCIPAL'] != $idUnidadeEsicPrincipal->getStrDeValorParametro()){
-            $idUnidadeEsicPrincipal->setStrDeValorParametro($_POST['ESIC_ID_UNIDADE_PRINCIPAL']);
-            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeEsicPrincipal);
-        }
-        if($_POST['ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA'] != $idUnidadeRecursoPrimeiraInstancia->getStrDeValorParametro()){
-            $idUnidadeRecursoPrimeiraInstancia->setStrDeValorParametro($_POST['ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA']);
-            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeRecursoPrimeiraInstancia);
-        }
-        if($_POST['ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA'] != $idUnidadeRecursoSegundaInstancia->getStrDeValorParametro()){
-            $idUnidadeRecursoSegundaInstancia->setStrDeValorParametro($_POST['ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA']);
-            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeRecursoSegundaInstancia);
-        }
-        if($_POST['ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA'] != $idUnidadeRecursoTerceiraInstancia->getStrDeValorParametro()){
-            $idUnidadeRecursoTerceiraInstancia->setStrDeValorParametro($_POST['ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA']);
-            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeRecursoTerceiraInstancia);
-        }
-        if($_POST['ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO'] != $idUnidadeRecursoPedidoRevisao->getStrDeValorParametro()){
-            $idUnidadeRecursoPedidoRevisao->setStrDeValorParametro($_POST['ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO']);
-            $objMdCguEouvAlterarParametroRN->alterarParametro($idUnidadeRecursoPedidoRevisao);
         }
 
         PaginaSEI::getInstance()->setStrMensagem('Parâmetros alterados com sucesso.');
@@ -172,13 +132,8 @@ try {
     default:
       throw new InfraException("Ação '".$_GET['acao']."' não reconhecida.");
   }
-    $strItensSelSerie = SerieINT::montarSelectNomeExternos('null','&nbsp;',$idTipoDocumentoAnexoDadosManifestacao->getStrDeValorParametro());
-    $strItensSelUnidadeOuv = UnidadeINT::montarSelectSiglaDescricao('null','&nbsp;',$idUnidadeOuvidoria->getStrDeValorParametro());
-    $strItensSelUnidadeEsic = UnidadeINT::montarSelectSiglaDescricao('null','&nbsp;',$idUnidadeEsicPrincipal->getStrDeValorParametro());
-    $strItensSelUnidadePrimeira = UnidadeINT::montarSelectSiglaDescricao('null','&nbsp;',$idUnidadeRecursoPrimeiraInstancia->getStrDeValorParametro());
-    $strItensSelUnidadeSegunda = UnidadeINT::montarSelectSiglaDescricao('null','&nbsp;',$idUnidadeRecursoSegundaInstancia->getStrDeValorParametro());
-    $strItensSelUnidadeTerceira = UnidadeINT::montarSelectSiglaDescricao('null','&nbsp;',$idUnidadeRecursoTerceiraInstancia->getStrDeValorParametro());
-    $strItensSelUnidadeRevisao = UnidadeINT::montarSelectSiglaDescricao('null','&nbsp;',$idUnidadeRecursoPedidoRevisao->getStrDeValorParametro());
+    $strItensSelSerieDados = SerieINT::montarSelectNomeExternos('null','&nbsp;',$idTipoDocumentoDadosManifestacao->getStrDeValorParametro());
+    $strItensSelSerieAnexo = SerieINT::montarSelectNomeExternos('null','&nbsp;',$idTipoDocumentoAnexo->getStrDeValorParametro());
 
 }catch(Exception $e){
   PaginaSEI::getInstance()->processarExcecao($e);
@@ -194,6 +149,9 @@ PaginaSEI::getInstance()->abrirStyle();
 ?>
 .infraAreaDados {
     margin-bottom: 1em;
+}
+.alerta {
+    color: #ff4545;
 }
 <?
 PaginaSEI::getInstance()->fecharStyle();
@@ -211,12 +169,17 @@ PaginaSEI::getInstance()->abrirJavaScript();
     function ValidarCadastroParametro() {
         if (infraTrim(document.getElementById('EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES').value)=='') {
             alert('Informe a Data Inicial de Importação.');
-            document.getElementById('EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO').focus();
+            document.getElementById('EOUV_DATA_INICIAL_IMPORTACAO_MANIFESTACOES').focus();
             return false;
         }
         if (infraTrim(document.getElementById('EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO').value)=='null') {
-            alert('Informe o Tipo de Documento.');
+            alert('Informe o Tipo de Documento para os Dados da Manifestação.');
             document.getElementById('EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO').focus();
+            return false;
+        }
+        if (infraTrim(document.getElementById('ID_SERIE_ANEXO').value)=='null') {
+            alert('Informe o Tipo de Documento para os Anexos da Manifestação.');
+            document.getElementById('ID_SERIE_ANEXO').focus();
             return false;
         }
         if (infraTrim(document.getElementById('EOUV_USUARIO_ACESSO_WEBSERVICE').value)=='') {
@@ -244,36 +207,6 @@ PaginaSEI::getInstance()->abrirJavaScript();
             document.getElementById('EOUV_URL_WEBSERVICE_IMPORTACAO').focus();
             return false;
         }
-        if (infraTrim(document.getElementById('ID_UNIDADE_OUVIDORIA').value)=='null') {
-            alert('Informe a Unidade de Ouvidoria');
-            document.getElementById('ID_UNIDADE_OUVIDORIA').focus();
-            return false;
-        }
-        if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_PRINCIPAL').value)=='null') {
-            alert('Informe a Unidade de Acesso a Informação.');
-            document.getElementById('ESIC_ID_UNIDADE_PRINCIPAL').focus();
-            return false;
-        }
-        if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA').value)=='null') {
-            alert('Informe a Unidade de Recurso em 1ª Instância.');
-            document.getElementById('ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA').focus();
-            return false;
-        }
-        if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA').value)=='null') {
-            alert('Informe a Unidade de Recurso em 2ª Instância.');
-            document.getElementById('ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA').focus();
-            return false;
-        }
-        if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA').value)=='null') {
-            alert('Informe a Unidade de Recurso em 3ª Instância.');
-            document.getElementById('ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA').focus();
-            return false;
-        }
-        if (infraTrim(document.getElementById('ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO').value)=='null') {
-            alert('Informe a Unidade de Pedido de Revisão.');
-            document.getElementById('ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO').focus();
-            return false;
-        }
         return true;
     }
     //</script>
@@ -287,7 +220,7 @@ PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
     <!-- EOUV_URL_WEBSERVICE_IMPORTACAO -->
     <div class="infraAreaDados">
         <label id="lblEOUV_URL_WEBSERVICE_IMPORTACAO" for="EOUV_URL_WEBSERVICE_IMPORTACAO" accesskey="W" class="infraLabelObrigatorio">
-        UR<span class="infraTeclaAtalho">L</span> do FalaBR</label>
+        UR<span class="infraTeclaAtalho">L</span> do FalaBR:</label>
         <input type="text" id="EOUV_URL_WEBSERVICE_IMPORTACAO" name="EOUV_URL_WEBSERVICE_IMPORTACAO" class="infraText"
                value="<?=PaginaSEI::tratarHTML($urlWebServiceEOuv->getStrDeValorParametro());?>" onkeypress="return infraMascaraTexto(this,event,100);"
                maxlength="100" size="50" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" />
@@ -338,47 +271,19 @@ PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
 
     <!-- EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO -->
     <div class="infraAreaDados">
-        <label id="lblEOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" for="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" accesskey="T" class="infraLabelObrigatorio"><span class="infraTeclaAtalho">T</span>ipo de documento usado na importação:</label>
+        <label id="lblEOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" for="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" accesskey="T" class="infraLabelObrigatorio"><span class="infraTeclaAtalho">T</span>ipo de documento do relatório da manifestação:</label>
         <select id="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" name="EOUV_ID_SERIE_DOCUMENTO_EXTERNO_DADOS_MANIFESTACAO" class="infraSelect"
                 tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
-            <?=$strItensSelSerie?>
+            <?=$strItensSelSerieDados?>
         </select>
     </div>
 
+    <!-- ID_SERIE_ANEXO -->
     <div class="infraAreaDados">
-        <label id="lblID_UNIDADE_OUVIDORIA" for="ID_UNIDADE_OUVIDORIA" accesskey="O" class="infraLabelObrigatorio">Unidade de <span class="infraTeclaAtalho">O</span>uvidoria:</label>
-        <select id="ID_UNIDADE_OUVIDORIA" name="ID_UNIDADE_OUVIDORIA" class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
-            <?=$strItensSelUnidadeOuv?>
-        </select>
-    </div> 
-    <div class="infraAreaDados">
-        <label id="lblESIC_ID_UNIDADE_PRINCIPAL" for="ESIC_ID_UNIDADE_PRINCIPAL" accesskey="A" class="infraLabelObrigatorio">Unidade de <span class="infraTeclaAtalho">A</span>cesso à Informação:</label>
-        <select id="ESIC_ID_UNIDADE_PRINCIPAL" name="ESIC_ID_UNIDADE_PRINCIPAL" class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
-            <?=$strItensSelUnidadeEsic?>
-        </select>
-    </div>
-    <div class="infraAreaDados">
-        <label id="lblESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA" for="ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA" accesskey="1" class="infraLabelObrigatorio">Unidade de Recurso em <span class="infraTeclaAtalho">1</span>ª Instância:</label>
-        <select id="ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA" name="ESIC_ID_UNIDADE_RECURSO_PRIMEIRA_INSTANCIA"  class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
-            <?=$strItensSelUnidadePrimeira?>
-        </select>
-    </div>
-    <div class="infraAreaDados">
-        <label id="lblESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA" for="ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA" accesskey="2" class="infraLabelObrigatorio">Unidade de Recurso em <span class="infraTeclaAtalho">2</span>ª Instância:</label>
-        <select id="ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA" name="ESIC_ID_UNIDADE_RECURSO_SEGUNDA_INSTANCIA"  class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
-            <?=$strItensSelUnidadeSegunda?>
-        </select>
-    </div>
-    <div class="infraAreaDados">
-        <label id="lblESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" for="ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" accesskey="3" class="infraLabelObrigatorio">Unidade de Recurso em <span class="infraTeclaAtalho">3</span>ª Instância:</label>
-        <select id="ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" name="ESIC_ID_UNIDADE_RECURSO_TERCEIRA_INSTANCIA" class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
-            <?=$strItensSelUnidadeTerceira?>
-        </select>
-    </div>
-    <div class="infraAreaDados">
-        <label id="lblESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO" for="ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO" accesskey="R" class="infraLabelObrigatorio">Unidade de Pedido de <span class="infraTeclaAtalho">R</span>evisão:</label>
-        <select id="ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO" name="ESIC_ID_UNIDADE_RECURSO_PEDIDO_REVISAO" class="infraSelect" tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
-            <?=$strItensSelUnidadeRevisao?>
+        <label id="lblID_SERIE_ANEXO" for="ID_SERIE_ANEXO" accesskey="p" class="infraLabelObrigatorio">Ti<span class="infraTeclaAtalho">p</span>o de documento dos anexos da manifestação:</label>
+        <select id="ID_SERIE_ANEXO" name="ID_SERIE_ANEXO" class="infraSelect"
+                tabindex="<?=PaginaSEI::getInstance()->getProxTabDados()?>" >
+            <?=$strItensSelSerieAnexo?>
         </select>
     </div>
 

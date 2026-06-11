@@ -5,6 +5,18 @@
 
 class MdCguEouvDeparaImportacaoRN extends InfraRN
 {
+  public static $ID_TIPO_DENUNCIA = 1;
+  public static $ID_TIPO_RECLAMACAO = 2;
+  public static $ID_TIPO_ELOGIO = 3;
+  public static $ID_TIPO_SUGESTAO = 4;
+  public static $ID_TIPO_SOLICITACAO = 5;
+  public static $ID_TIPO_NAO_CLASSIFICADA = 6;
+  public static $ID_TIPO_COMUNICADO = 7;
+  public static $ID_TIPO_ACESSO_A_INFORMACAO = 8;
+  public static $ID_TIPO_PEDIDO_DE_REVISAO = 80;
+  public static $ID_TIPO_RECURSO_1 = 81;
+  public static $ID_TIPO_RECURSO_2 = 82;
+  public static $ID_TIPO_RECURSO_3 = 83;
 
   public function __construct()
   {
@@ -50,13 +62,10 @@ class MdCguEouvDeparaImportacaoRN extends InfraRN
       //Regras de Negocio
       $objInfraException = new InfraException();
 
-      if ($objEouvDeparaImportacaoDTO->isSetNumIdTipoManifestacaoEouv()){
-        $this->validarNumIdTipoManifestacaoEouv($objEouvDeparaImportacaoDTO, $objInfraException);
-      }
-      
-      if ($objEouvDeparaImportacaoDTO->isSetNumIdTipoProcedimento()){
-        $this->validarNumIdTipoProcedimento($objEouvDeparaImportacaoDTO, $objInfraException);
-      }
+      $this->validarNumIdTipoManifestacaoEouv($objEouvDeparaImportacaoDTO, $objInfraException);
+      $this->validarNumIdTipoProcedimento($objEouvDeparaImportacaoDTO, $objInfraException);
+      $this->validarNumIdHipoteseLegal($objEouvDeparaImportacaoDTO, $objInfraException);
+      $this->validarNumIdUnidadeDestino($objEouvDeparaImportacaoDTO, $objInfraException);
       
       $objInfraException->lancarValidacoes();
 
@@ -140,14 +149,26 @@ class MdCguEouvDeparaImportacaoRN extends InfraRN
     }
 
   private function validarNumIdTipoManifestacaoEouv(MdCguEouvDeparaImportacaoDTO $objEouvDeparaImportacaoDTO, InfraException $objInfraException){
-    if (InfraString::isBolVazia($objEouvDeparaImportacaoDTO->getNumIdTipoManifestacaoEouv())){
+    if (is_null($objEouvDeparaImportacaoDTO->getNumIdTipoManifestacaoEouv())){
       $objInfraException->adicionarValidacao('ID do Tipo da Manifestação não informado.');
     }
   }
   
   private function validarNumIdTipoProcedimento(MdCguEouvDeparaImportacaoDTO $objEouvDeparaImportacaoDTO, InfraException $objInfraException){
-    if (InfraString::isBolVazia($objEouvDeparaImportacaoDTO->getNumIdTipoProcedimento())){
+    if (is_null($objEouvDeparaImportacaoDTO->getNumIdTipoProcedimento())){
       $objInfraException->adicionarValidacao('ID do Tipo de Processo não informado.');
+    }
+  }
+
+  private function validarNumIdHipoteseLegal(MdCguEouvDeparaImportacaoDTO $objEouvDeparaImportacaoDTO, InfraException $objInfraException){
+    if (is_null($objEouvDeparaImportacaoDTO->getNumIdHipoteseLegal())){
+      $objInfraException->adicionarValidacao('ID de Hipótese Legal não informado.');
+    }
+  }
+
+  private function validarNumIdUnidadeDestino(MdCguEouvDeparaImportacaoDTO $objEouvDeparaImportacaoDTO, InfraException $objInfraException){
+    if (is_null($objEouvDeparaImportacaoDTO->getNumIdUnidadeDestino())){
+      $objInfraException->adicionarValidacao('ID da Unidade de Destino não informado.');
     }
   }
   

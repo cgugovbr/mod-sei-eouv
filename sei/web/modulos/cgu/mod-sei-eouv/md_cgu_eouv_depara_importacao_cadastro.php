@@ -23,7 +23,7 @@ try {
 
   switch ($_GET['acao']) {
     case 'md_cgu_eouv_depara_importacao_alterar':
-      $strTitulo = 'Alterar Tipo de Processo Associado ao Tipo de Manifestação';
+      $strTitulo = 'Alterar Configuração do Tipo de Manifestação ou Recurso';
 
       // Lista as opções de tipos de processo disponíveis
       $objSeiRN = new SeiRN();
@@ -39,8 +39,8 @@ try {
       if (isset($_GET['id_md_cgu_eouv_tipo_manifestacao'])) {
         // Busca o tipo de manifestacao
         $objDeParaDTO->setNumIdTipoManifestacaoEouv($_GET['id_md_cgu_eouv_tipo_manifestacao']);
-        $objDeParaDTO->retTodos();
-        $objDeParaDTO->retStrTipoProcedimento();
+        $objDeParaDTO->setBolExclusaoLogica(false);
+        $objDeParaDTO->retTodos(true);
         $objMdCguEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
         $objDeParaDTO = $objMdCguEouvDeparaImportacaoRN->consultar($objDeParaDTO);
         if ($objDeParaDTO == null) {
@@ -48,12 +48,13 @@ try {
         }
       } else if (isset($_POST['sbmAlterarMdCguEouvDeparaImportacao'])) {
         // Verifica parâmetros necessários
-        if (!isset($_POST['hdnIdEouv']) || !isset($_POST['selTipoProc'])) {
+        if (!isset($_POST['hdnIdEouv']) || !isset($_POST['selTipoProc']) || !isset($_POST['selHipoteseLegal']) || !isset($_POST['selUnidadeDestino'])) {
           throw new InfraException('Faltando parâmetros para concluir ação');
         }
 
         // Localiza o registro no banco
         $objDeParaDTO->setNumIdTipoManifestacaoEouv($_POST['hdnIdEouv']);
+        $objDeParaDTO->setBolExclusaoLogica(false);
         $objDeParaDTO->retTodos();
         $objMdCguEouvDeparaImportacaoRN = new MdCguEouvDeparaImportacaoRN();
         $objDeParaDTO = $objMdCguEouvDeparaImportacaoRN->consultar($objDeParaDTO);
@@ -61,10 +62,7 @@ try {
           throw new InfraException("Registro não encontrado.");
         }
 
-        $objDeParaDTO->setNumIdTipoProcedimento($_POST['selTipoProc']);
-
-        // Verifica se o nível sugerido para o tipo de processo selecionado é público
-        // e se for lança um erro
+        // Atualiza o tipo de processo
         $objTipoProcedimentoDTO = new TipoProcedimentoDTO();
         $objTipoProcedimentoDTO->setNumIdTipoProcedimento($_POST['selTipoProc']);
         $objTipoProcedimentoDTO->retStrStaNivelAcessoSugestao();
@@ -74,20 +72,25 @@ try {
         if (!$objTipoProcedimentoDTO) {
           PaginaSEI::getInstance()->setStrMensagem('Tipo de Processo não encontrado',
             PaginaSEI::$TIPO_MSG_ERRO);
-        } else if ($objTipoProcedimentoDTO->getStrStaNivelAcessoSugestao() == ProtocoloRN::$NA_PUBLICO) {
-          PaginaSEI::getInstance()->setStrMensagem('O nível de acesso sugerido '.
-            'do tipo de processo não pode ser público. Ajuste os parâmetros '.
-            'do tipo ou então escolha um outro.', PaginaSEI::$TIPO_MSG_ERRO);
-        } else if (is_null($objTipoProcedimentoDTO->getNumIdHipoteseLegalSugestao())) {
-          PaginaSEI::getInstance()->setStrMensagem('O tipo de processo não tem '.
-            'uma Hipótese Legal de restrição de acesso sugerida. Ajuste os '.
-            'parâmetros do tipo ou então escolha um outro.', PaginaSEI::$TIPO_MSG_ERRO);
+        } else if ($objTipoProcedimentoDTO->getStrStaNivelAcessoSugestao() == ProtocoloRN::$NA_RESTRITO && is_null($objTipoProcedimentoDTO->getNumIdHipoteseLegalSugestao())) {
+          PaginaSEI::getInstance()->setStrMensagem('O tipo de processo selecionado '.
+            'possui nível de acesso sugerido restrito, porém não possui sugestão '.
+            'de hipótese legal, dessa forma não pode ser utilizado pela integração. '.
+            'Configure uma hipótese legal sugerida no menu de Administração do SEI '.
+            'ou então escolha um outro tipo de processo.', PaginaSEI::$TIPO_MSG_ERRO);
         } else {
-          // Atualiza o tipo de processo
+          $objDeParaDTO->setNumIdTipoProcedimento($_POST['selTipoProc']);
+
+          // Atualiza a hipótese legal
+          $objDeParaDTO->setNumIdHipoteseLegal($_POST['selHipoteseLegal']);
+
+          // Atualiza unidade de destino
+          $objDeParaDTO->setNumIdUnidadeDestino($_POST['selUnidadeDestino']);
+
+          // Salvar dados, registra mensagem e redireciona
           $objMdCguEouvDeparaImportacaoRN->alterar($objDeParaDTO);
 
-          // Registra mensagem e redireciona
-          PaginaSEI::getInstance()->setStrMensagem('Associação com Tipo de Manifestação "'.$objDeParaDTO->getStrDeTipoManifestacaoEouv().'" alterada com sucesso.');
+          PaginaSEI::getInstance()->setStrMensagem('Configurações do tipo "'.$objDeParaDTO->getStrDeTipoManifestacaoEouv().'" alteradas com sucesso.');
           $strLinkRedirect = SessaoSEI::getInstance()->assinarLink('controlador.php?'.
             'acao='.PaginaSEI::getInstance()->getAcaoRetorno().'&'.
             'acao_origem='.$_GET['acao'].
@@ -120,12 +123,19 @@ PaginaSEI::getInstance()->abrirStyle();
 
 ?>
 
-#divGeral {height:30em;}
-#lblTipoEouv {position:absolute;left:0%;top:0%;width:70%;}
-#txtTipoEouv {position:absolute;left:0%;top:6%;width:70%;}
+.infraAreaDados input {
+  display: block;
+  width: 50%;
+  margin-bottom: 1rem;
+}
 
-#lblTipoProc {position:absolute;left:0%;top:16%;width:70%;}
-#selTipoProc {position:absolute;left:0%;top:22%;width:70%;}
+.infraAreaDados select {
+  margin-bottom: 1rem;
+}
+
+.infraAreaDados p {
+  margin: 0;
+}
 
 <?
 PaginaSEI::getInstance()->fecharStyle();
@@ -134,29 +144,56 @@ PaginaSEI::getInstance()->abrirJavaScript();
 
 ?>
 
-function inicializar() {
+// <script>
 
+function inicializar() {
 }
+
+function validarFormulario() {
+  if (infraTrim(document.getElementById('selTipoProc').value)=='null') {
+    alert('Informe o Tipo de Processo.');
+    document.getElementById('selTipoProc').focus();
+    return false;
+  }
+
+  if (infraTrim(document.getElementById('selHipoteseLegal').value)=='null') {
+    alert('Informe a Hipótese Legal.');
+    document.getElementById('selHipoteseLegal').focus();
+    return false;
+  }
+
+  if (infraTrim(document.getElementById('selUnidadeDestino').value)=='null') {
+    alert('Informe a Unidade de Destino.');
+    document.getElementById('selUnidadeDestino').focus();
+    return false;
+  }
+
+  return true;
+}
+// </script>
 
 <?
 PaginaSEI::getInstance()->fecharJavaScript();
 PaginaSEI::getInstance()->fecharHead();
 PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
 ?>
-  <form id="frmMdCguEouvDeparaImportacaoCadastro" method="post" action="<?=SessaoSEI::getInstance()->assinarLink('controlador.php?acao='.$_GET['acao'].'&acao_origem='.$_GET['acao'])?>">
+  <form method="post" onsubmit="return validarFormulario();" action="<?=SessaoSEI::getInstance()->assinarLink('controlador.php?acao='.$_GET['acao'].'&acao_origem='.$_GET['acao'])?>">
     <?
     PaginaSEI::getInstance()->montarBarraComandosSuperior($arrComandos);
     ?>
 
-    <div id="divGeral" class="infraAreaDados">
+    <div class="infraAreaDados">
       <input type="hidden" id="hdnIdEouv" name="hdnIdEouv" class="infraText" value="<?=$objDeParaDTO->getNumIdTipoManifestacaoEouv()?>">
 
-      <label id="lblTipoEouv" for="txtTipoEouv" class="infraLabelObrigatorio">Tipo de Manifestação:</label>
-      <input type="text" id="txtTipoEouv" name="txtTipoEouv" class="infraText" disabled="disabled" value="<?=$objDeParaDTO->getStrDeTipoManifestacaoEouv()?>">
+      <label id="lblTipoEouv" for="txtTipoEouv" class="infraLabelObrigatorio">Tipo de Manifestação / Recurso:</label>
+      <input type="text" id="txtTipoEouv" name="txtTipoEouv" maxlength="50" class="infraText" disabled="disabled" value="<?=$objDeParaDTO->getStrDeTipoManifestacaoEouv()?>">
 
       <label id="lblTipoProc" for="selTipoProc" accesskey="T" class="infraLabelObrigatorio"><span class="infraTeclaAtalho">T</span>ipo de Processo:</label>
+      <p>Os processos criados pela integração para este tipo de manifestação ou
+        recurso serão do tipo selecionado abaixo. Esses processos seguirão o
+        nível de acesso e hipótese legal sugeridos para o tipo.</p>
       <select id="selTipoProc" name="selTipoProc" class="infraSelect">
-        <option value=""></option>
+        <option value="null"></option>
         <?
         // Gera as opções
         $numIdTipoProcAtual = $objDeParaDTO->getNumIdTipoProcedimento();
@@ -168,10 +205,34 @@ PaginaSEI::getInstance()->abrirBody($strTitulo,'onload="inicializar();"');
         }
         ?>
       </select>
+
+      <label for="selHipoteseLegal" accesskey="H" class="infraLabelObrigatorio">
+        <span class="infraTeclaAtalho">H</span>ipótese Legal aplicada aos
+        documentos importados:
+      </label>
+      <p>Os documentos importados pela integração sempre possuem nível de acesso
+        <strong>restrito</strong>. Selecione abaixo a Hipótese Legal
+        que deve ser aplicada a esses documentos.</p>
+      <select id="selHipoteseLegal" name="selHipoteseLegal" class="infraSelect"
+        tabindex="<?= PaginaSEI::getInstance()->getProxTabDados() ?>" >
+        <?= HipoteseLegalINT::montarSelectNomeBaseLegal('null', '&nbsp',
+          $objDeParaDTO->getNumIdHipoteseLegal(), ProtocoloRN::$NA_RESTRITO); ?>
+      </select>
+
+      <label for="selUnidadeDestino" accesskey="U" class="infraLabelObrigatorio">
+        <span class="infraTeclaAtalho">U</span>nidade de Destino:
+      </label>
+      <p>Os processos desse tipo de manifestação ou recurso serão enviados para
+        a unidade selecionada abaixo.</p>
+      <select id="selUnidadeDestino" name="selUnidadeDestino" class="infraSelect"
+        tabindex="<?= PaginaSEI::getInstance()->getProxTabDados() ?>" >
+        <?= UnidadeINT::montarSelectSiglaDescricao('null', '&nbsp;',
+          $objDeParaDTO->getNumIdUnidadeDestino()); ?>
+      </select>
     </div>
 
     <?
-    //PaginaSEI::getInstance()->montarAreaDebug();
+      PaginaSEI::getInstance()->montarBarraComandosInferior($arrComandos);
     ?>
   </form>
 <?

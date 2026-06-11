@@ -67,6 +67,16 @@
     }
   }
 
+  function getTipoLabel($tipo) {
+    if (in_array($tipo, ['R', 'R1', 'R2', 'R3', 'RE', 'RC', 'PR'])) {
+      return 'e-Sic';
+    } else if ($tipo == 'P') {
+      return 'e-Ouv';
+    } else {
+      return 'N/D';
+    }
+  }
+
   $objEouvRelatorioImportacaoDetalheDTO = new MdCguEouvRelatorioImportacaoDetalheDTO();
   $objEouvRelatorioImportacaoDetalheDTO->retNumIdRelatorioImportacao();
   $objEouvRelatorioImportacaoDetalheDTO->retStrProtocoloFormatado();
@@ -139,7 +149,7 @@
       }
 
       $strResultado .= '<td align="center">'.trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrProtocoloFormatado()).'</td>';
-      $strResultado .= '<td align="center">'.(in_array(trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrTipManifestacao()), ['R', 'R1', 'R2', 'R3', 'RE', 'RC', 'PR']) ? 'e-Sic' : 'e-Ouv').'</td>';
+      $strResultado .= '<td align="center">'.getTipoLabel(trim($arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrTipManifestacao())).'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrSinSucesso().'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getDthDthImportacao().'</td>';
       $strResultado .= '<td align="center">'.$arrObjEouvRelatorioImportacaoDetalheDTO[$i]->getStrDescricaoLog().'</td>';
