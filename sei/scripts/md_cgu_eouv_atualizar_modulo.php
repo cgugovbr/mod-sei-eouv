@@ -465,10 +465,8 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
     $objInfraMetaBD = new InfraMetaBD($objInfraIBanco);
 
     // Insere coluna de hipótese legal para ser usada para cada tipo de manifestação / instância recursal
-    // A hipótese legal padrão será "Informação Pessoal" (ID = 4)
     $objInfraMetaBD->adicionarColuna('md_eouv_depara_importacao', 'id_hipotese_legal', $objInfraMetaBD->tipoNumero(), 'null');
     $objInfraMetaBD->adicionarChaveEstrangeira('fk2_md_eouv_depara_importacao_hipotese_legal', 'md_eouv_depara_importacao', array('id_hipotese_legal'), 'hipotese_legal', array('id_hipotese_legal'));
-    $objInfraIBanco->executarSql('UPDATE md_eouv_depara_importacao SET id_hipotese_legal = 4');
 
     // Insere coluna de unidade de destino para ser usada para cada tipo de manifestação / instância recursal
     $objInfraMetaBD->adicionarColuna('md_eouv_depara_importacao', 'id_unidade_destino', $objInfraMetaBD->tipoNumero(), 'null');
@@ -527,10 +525,10 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
     // 83 -> Terceira Instância
     $objInfraIBanco->executarSql('INSERT INTO md_eouv_depara_importacao '.
       '(id_tipo_manifestacao_eouv, de_tipo_manifestacao_eouv, id_tipo_procedimento, id_hipotese_legal, id_unidade_destino, sin_ativo) VALUES '.
-      "(80, 'Pedido de Revisão', $laiIdTipoProcedimento, 4, $idUnidadeEsicPR, '$laiAtivo'), ".
-      "(81, 'Recurso em Primeira Instância', $laiIdTipoProcedimento, 4, $idUnidadeEsic1a, '$laiAtivo'), ".
-      "(82, 'Recurso em Segunda Instância', $laiIdTipoProcedimento, 4, $idUnidadeEsic2a, '$laiAtivo'), ".
-      "(83, 'Recurso em Terceira Instância', $laiIdTipoProcedimento, 4, $idUnidadeEsic3a, '$laiAtivo')");
+      "(80, 'Pedido de Revisão', $laiIdTipoProcedimento, NULL, $idUnidadeEsicPR, '$laiAtivo'), ".
+      "(81, 'Recurso em Primeira Instância', $laiIdTipoProcedimento, NULL, $idUnidadeEsic1a, '$laiAtivo'), ".
+      "(82, 'Recurso em Segunda Instância', $laiIdTipoProcedimento, NULL, $idUnidadeEsic2a, '$laiAtivo'), ".
+      "(83, 'Recurso em Terceira Instância', $laiIdTipoProcedimento, NULL, $idUnidadeEsic3a, '$laiAtivo')");
 
     // Exclui parâmetros das unidades, que foram migrados para outra tabela
     $objInfraIBanco->executarSql('DELETE FROM md_eouv_parametros WHERE no_parametro IN ('.
