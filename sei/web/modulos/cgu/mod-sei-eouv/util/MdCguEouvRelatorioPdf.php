@@ -7,12 +7,14 @@
  * importadas do FalaBR
  */
 
-class MdCguEouvRelatorioPdf extends InfraPDF
+require_once __DIR__ . '/MdCguEouvInfraPdf.php';
+
+class MdCguEouvRelatorioPdf extends MdCguEouvInfraPdf
 {
     private $numSecao;
 
     public function __construct() {
-        parent::__construct('P', 'pt', 'A4');
+        parent::__construct();
         $this->AddPage();
         $this->numSecao = 1;
     }
