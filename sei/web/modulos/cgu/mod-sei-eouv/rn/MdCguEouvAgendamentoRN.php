@@ -690,7 +690,7 @@ class MdCguEouvAgendamentoRN extends InfraRN
                 $objEntradaEnviarProcesso = new EntradaEnviarProcessoAPI();
                 $objEntradaEnviarProcesso->setIdProcedimento($objProtocoloDTOExistente->getDblIdProtocolo());
                 $objEntradaEnviarProcesso->setUnidadesDestino([$idUnidadeDestino]);
-                $objEntradaEnviarProcesso->setSinManterAbertoUnidade('N');
+                $objEntradaEnviarProcesso->setSinManterAbertoUnidade('S');
                 $objEntradaEnviarProcesso->setSinEnviarEmailNotificacao('S');
                 $objEntradaEnviarProcesso->setSinReabrir('S');
 
@@ -1052,22 +1052,28 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $objRelProtocoloProtocoloRN = new RelProtocoloProtocoloRN();
         $arrIdDocumentos = InfraArray::converterArrInfraDTO($objRelProtocoloProtocoloRN->listarRN0187($objRelProtocoloProtocoloDTO), 'IdProtocolo2');
 
+        if (count($arrIdDocumentos) == 0) {
+            return 0;
+        }
+
+        $objDocumentoDTO = new DocumentoDTO();
+        $objDocumentoDTO->retStrNumero();
+        $objDocumentoDTO->setDblIdDocumento($arrIdDocumentos, InfraDTO::$OPER_IN);
+        $objDocumentoDTO->setNumIdSerie($idTipoDocumento);
+
+        $objDocumentoRN = new DocumentoRN();
+        $arrObjDocumentoDTO = $objDocumentoRN->listarRN0008($objDocumentoDTO);
+
         // Percorre os documentos identificando o seu número
         $maiorNumero = 0;
-        $objSeiRN = new SeiRN();
-        foreach ($arrIdDocumentos as $idDocumento) {
-            $objConsultarDocumento = new EntradaConsultarDocumentoAPI();
-            $objConsultarDocumento->setIdDocumento($idDocumento);
-            $objSaidaDocumento = $objSeiRN->consultarDocumento($objConsultarDocumento);
-            if ($objSaidaDocumento->getSerie()->getIdSerie() == $idTipoDocumento) {
-                $numero = intval($objSaidaDocumento->getNumero());
-                // Ignora números muito grandes, pois podem ser documentos da forma antiga,
-                // cujo padrão era iniciar com o número do processo
-                if ($numero >= 10000) {
-                    $numero = 0;
-                }
-                $maiorNumero = max($maiorNumero, $numero);
+        foreach ($arrObjDocumentoDTO as $objDocumentoDTO) {
+            $numero = intval($objDocumentoDTO->getStrNumero());
+            // Ignora números muito grandes, pois podem ser documentos da forma antiga,
+            // cujo padrão era iniciar com o número do processo
+            if ($numero >= 10000) {
+                $numero = 0;
             }
+            $maiorNumero = max($maiorNumero, $numero);
         }
 
         return $maiorNumero;
