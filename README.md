@@ -2,7 +2,7 @@
 
 ## Requisitos
 
-- SEI versão 4.0.3 ou superior (verificar versão no arquivo /sei/web/SEI.php).
+- SEI versão 4.0.3 ou superior (verificar versão no arquivo /sei/web/SEI.php). Para o SEI 5, utilize a versão 4.2.1 ou superior do módulo.
 
 - Utilizar o Sistema FalaBR do Governo Federal. Caso ainda não tenha aderido ao FalaBR e queira saber mais informações acesse https://falabr.cgu.gov.br/.
 
