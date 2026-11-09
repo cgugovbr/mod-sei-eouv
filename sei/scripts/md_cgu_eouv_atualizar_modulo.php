@@ -5,7 +5,7 @@ require_once dirname(__FILE__) . '/../web/SEI.php';
 class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
 {
   private $nomeModulo = 'Integração com o sistema FalaBR';
-  private $versaoAtual = '4.2.0';
+  private $versaoAtual = '4.2.1';
   private $parametroVersao = 'VERSAO_MODULO_CGU_EOUV';
   private $arrayVersoes = array(
     '2.0.5' => 'instalarv205',
@@ -15,6 +15,7 @@ class MdCguEouvAtualizadorSeiRN extends InfraScriptVersao
     '4.0.2' => 'instalarv402',
     '4.1.0' => 'instalarv410',
     '4.2.0' => 'instalarv420',
+    '4.2.1' => 'semAlteracoes',
   );
   /**
    * 1. Começamos a contralar a partir da versão 2.0.5 que é a última estável para o SEI 3.0

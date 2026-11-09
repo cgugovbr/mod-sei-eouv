@@ -686,11 +686,15 @@ class MdCguEouvAgendamentoRN extends InfraRN
                     $objProcedimentoRN->alterarRN0202($objProcedimentoDTO);
                 }
 
+                // Mantém o processo aberto na unidade atual só quando o SEI não
+                // permitiria concluí-lo nela; nos demais casos, conclui
+                $sinManterAberto = $this->possuiPendenciaParaConcluirNaUnidade($objProtocoloDTOExistente, $idUnidadeDestino) ? 'S' : 'N';
+
                 // Remete o processo para a unidade correta
                 $objEntradaEnviarProcesso = new EntradaEnviarProcessoAPI();
                 $objEntradaEnviarProcesso->setIdProcedimento($objProtocoloDTOExistente->getDblIdProtocolo());
                 $objEntradaEnviarProcesso->setUnidadesDestino([$idUnidadeDestino]);
-                $objEntradaEnviarProcesso->setSinManterAbertoUnidade('N');
+                $objEntradaEnviarProcesso->setSinManterAbertoUnidade($sinManterAberto);
                 $objEntradaEnviarProcesso->setSinEnviarEmailNotificacao('S');
                 $objEntradaEnviarProcesso->setSinReabrir('S');
 
@@ -1035,6 +1039,36 @@ class MdCguEouvAgendamentoRN extends InfraRN
     }
 
     /**
+     * Verifica se o processo tem pendência que impede concluí-lo na unidade
+     * atual ao enviá-lo para outra unidade. Aplica as mesmas validações que o
+     * SEI faz em AtividadeRN::enviarRN0023 quando o processo não é mantido
+     * aberto: retorno programado pendente (exceto o requisitado pela unidade de
+     * destino) e liberação de acesso externo com inclusão de documentos válida.
+     * Deve ser chamada com a sessão simulada na unidade atual do processo.
+     * @param ProtocoloDTO $objProtocoloDTO Processo (IdProtocolo e ProtocoloFormatado)
+     * @param int $idUnidadeDestino ID da unidade para onde o processo será enviado
+     * @return bool true se o processo deve ser mantido aberto na unidade atual
+     */
+    private function possuiPendenciaParaConcluirNaUnidade(ProtocoloDTO $objProtocoloDTO, $idUnidadeDestino): bool
+    {
+        $objInfraException = new InfraException();
+
+        $objRetornoProgramadoDTO = new RetornoProgramadoDTO();
+        $objRetornoProgramadoDTO->setDblIdProtocolo($objProtocoloDTO->getDblIdProtocolo());
+        $objRetornoProgramadoDTO->setNumIdUnidadeEnvio([$idUnidadeDestino]);
+        $objRetornoProgramadoRN = new RetornoProgramadoRN();
+        $objRetornoProgramadoRN->validarExistencia($objRetornoProgramadoDTO, $objInfraException);
+
+        $objProcedimentoDTO = new ProcedimentoDTO();
+        $objProcedimentoDTO->setDblIdProcedimento($objProtocoloDTO->getDblIdProtocolo());
+        $objProcedimentoDTO->setStrProtocoloProcedimentoFormatado($objProtocoloDTO->getStrProtocoloFormatado());
+        $objAcessoExternoRN = new AcessoExternoRN();
+        $objAcessoExternoRN->validarExistenciaLiberacaoInclusao($objProcedimentoDTO, $objInfraException);
+
+        return $objInfraException->contemValidacoes();
+    }
+
+    /**
      * Consulta o maior número do documento de determinado tipo em um processo.
      * A função é útil para determinar o número do próximo documento gerado
      * @param double $idProcesso ID do processo em questão
@@ -1052,22 +1086,28 @@ class MdCguEouvAgendamentoRN extends InfraRN
         $objRelProtocoloProtocoloRN = new RelProtocoloProtocoloRN();
         $arrIdDocumentos = InfraArray::converterArrInfraDTO($objRelProtocoloProtocoloRN->listarRN0187($objRelProtocoloProtocoloDTO), 'IdProtocolo2');
 
+        if (count($arrIdDocumentos) == 0) {
+            return 0;
+        }
+
+        $objDocumentoDTO = new DocumentoDTO();
+        $objDocumentoDTO->retStrNumero();
+        $objDocumentoDTO->setDblIdDocumento($arrIdDocumentos, InfraDTO::$OPER_IN);
+        $objDocumentoDTO->setNumIdSerie($idTipoDocumento);
+
+        $objDocumentoRN = new DocumentoRN();
+        $arrObjDocumentoDTO = $objDocumentoRN->listarRN0008($objDocumentoDTO);
+
         // Percorre os documentos identificando o seu número
         $maiorNumero = 0;
-        $objSeiRN = new SeiRN();
-        foreach ($arrIdDocumentos as $idDocumento) {
-            $objConsultarDocumento = new EntradaConsultarDocumentoAPI();
-            $objConsultarDocumento->setIdDocumento($idDocumento);
-            $objSaidaDocumento = $objSeiRN->consultarDocumento($objConsultarDocumento);
-            if ($objSaidaDocumento->getSerie()->getIdSerie() == $idTipoDocumento) {
-                $numero = intval($objSaidaDocumento->getNumero());
-                // Ignora números muito grandes, pois podem ser documentos da forma antiga,
-                // cujo padrão era iniciar com o número do processo
-                if ($numero >= 10000) {
-                    $numero = 0;
-                }
-                $maiorNumero = max($maiorNumero, $numero);
+        foreach ($arrObjDocumentoDTO as $objDocumentoDTO) {
+            $numero = intval($objDocumentoDTO->getStrNumero());
+            // Ignora números muito grandes, pois podem ser documentos da forma antiga,
+            // cujo padrão era iniciar com o número do processo
+            if ($numero >= 10000) {
+                $numero = 0;
             }
+            $maiorNumero = max($maiorNumero, $numero);
         }
 
         return $maiorNumero;
